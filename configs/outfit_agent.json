@@ -1,0 +1,58 @@
+{
+  "agent_id": "outfit_agent_v1",
+  "agent_name": "Personalized Outfit Agent",
+  "intent": "outfit_recommendation",
+  "default_query": "서울 내일 날씨에 맞춰 내 스타일로 옷 추천해줘",
+  "default_user_id": "user_a",
+  "default_city": {
+    "display": "서울",
+    "query": "Seoul"
+  },
+  "intent_keywords": ["옷", "옷차림", "코디", "추천", "wear", "outfit"],
+  "tools": {
+    "weather": {
+      "enabled": true
+    },
+    "shopping_history": {
+      "enabled": true,
+      "file": "shopping_history.json"
+    }
+  },
+  "temperature_rules": [
+    {
+      "name": "cold_outfit",
+      "max_avg_temp": 8,
+      "recommendation": "보온성을 우선한 {styles_text} 스타일이 적합합니다.",
+      "owned_item_categories": ["outer", "top", "bottom", "shoes"],
+      "items": ["두꺼운 아우터", "{favorite_items_text}", "{colors_text} 계열 이너"]
+    },
+    {
+      "name": "mild_outfit",
+      "min_avg_temp": 8,
+      "max_avg_temp": 22,
+      "recommendation": "일교차를 고려한 가벼운 레이어드가 적합합니다.",
+      "owned_item_categories": ["outer", "top", "bottom", "shoes"],
+      "items": ["가벼운 자켓", "{favorite_items_text}", "{colors_text} 계열 하의"]
+    },
+    {
+      "name": "warm_outfit",
+      "min_avg_temp": 22,
+      "recommendation": "통풍이 좋은 편한 옷차림이 적합합니다.",
+      "owned_item_categories": ["top", "bottom", "shoes"],
+      "items": ["반팔 상의", "얇은 셔츠", "{colors_text} 계열 포인트 아이템"]
+    }
+  ],
+  "conditional_extras": [
+    {
+      "precipitation_min": 50,
+      "item": "우산",
+      "text": "강수확률이 높아 우산을 준비하세요"
+    },
+    {
+      "temp_gap_min": 10,
+      "item": "얇은 겉옷",
+      "text": "일교차가 커서 겉옷을 추가하세요"
+    }
+  ],
+  "output_template": "[{agent_name}]\n{city_display}의 {date_label}({weather_date}) 날씨는 {weather_condition}, 평균 {avg_temp}°C입니다.\n쇼핑 기록 분석: 총 {shopping_item_count}개 구매 기록에서 선호 스타일은 {styles_text}, 선호 색상은 {colors_text}로 분석되었습니다.\n추천 방향: {recommendation}\n보유 단품 기반 추천: {owned_recommended_items_text}\n추가 추천: {additional_items_text}\n추가 조건: {extras_text}"
+}

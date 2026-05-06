@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Builder MVP</title>
+  <style>
+    body { margin: 0; font-family: Arial, "Malgun Gothic", sans-serif; color: #16202a; background: #f5f7fb; }
+    .topbar { padding: 22px 32px 14px; background: #fff; border-bottom: 1px solid #dce3ea; }
+    .eyebrow { margin: 0 0 6px; color: #397367; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+    h1 { margin: 0; font-size: 28px; line-height: 1.25; }
+    .subtitle { max-width: 900px; margin: 10px 0 0; color: #52606d; line-height: 1.55; }
+    .shell { display: grid; grid-template-columns: minmax(320px, 440px) minmax(0, 1fr); gap: 18px; padding: 22px 32px 36px; }
+    .panel { background: #fff; border: 1px solid #dce3ea; border-radius: 8px; box-shadow: 0 8px 22px rgba(24, 38, 53, .06); }
+    .control, .result { padding: 18px; }
+    .field { margin-bottom: 14px; }
+    label { display: block; margin-bottom: 8px; font-weight: 700; }
+    select, textarea { width: 100%; box-sizing: border-box; border: 1px solid #b8c4cf; border-radius: 6px; padding: 11px 12px; color: #16202a; background: #fff; font: inherit; line-height: 1.5; }
+    textarea { min-height: 116px; resize: vertical; }
+    button { width: 100%; border: 0; border-radius: 6px; padding: 12px 14px; background: #1f6f8b; color: #fff; font-weight: 700; cursor: pointer; }
+    button:disabled { background: #8aa8b4; cursor: wait; }
+    .metric-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+    .metric { border: 1px solid #dce3ea; border-radius: 6px; padding: 10px; background: #fbfcfe; }
+    .metric strong { display: block; margin-bottom: 3px; font-size: 13px; }
+    .metric span { color: #52606d; font-size: 13px; }
+    .answer { white-space: pre-wrap; line-height: 1.65; padding: 14px; background: #eef7f6; border: 1px solid #c7e4df; border-radius: 8px; }
+    .trace { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+    .step { border: 1px solid #dce3ea; border-radius: 8px; padding: 12px; min-height: 116px; }
+    .step h3, .config-box h3 { margin: 0 0 8px; font-size: 15px; }
+    .step p { margin: 0; color: #52606d; line-height: 1.5; }
+    .config { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-top: 16px; }
+    .config-box { border: 1px solid #dce3ea; border-radius: 8px; padding: 12px; background: #fbfcfe; }
+    code { display: block; color: #52606d; white-space: pre-wrap; word-break: break-word; }
+    .raw { overflow: auto; margin-top: 12px; padding: 12px; border-radius: 6px; background: #16202a; color: #edf2f7; font-size: 12px; }
+    .error { padding: 14px; background: #fff2f0; border: 1px solid #ffccc7; border-radius: 8px; color: #8a1f11; line-height: 1.55; }
+    @media (max-width: 980px) { .shell, .trace, .config { grid-template-columns: 1fr; } .topbar, .shell { padding-left: 18px; padding-right: 18px; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <p class="eyebrow">Portable Configuration-driven Agent Builder MVP</p>
+    <h1>설정 파일 교체로 다른 Agent를 실행하는 Builder Demo</h1>
+    <p class="subtitle">Python 없이 브라우저에서 실행되는 공유용 화면입니다. Agent Config와 User Profile을 바꿔 같은 흐름이 다른 결과를 만드는 점을 확인할 수 있습니다.</p>
+  </header>
+  <main class="shell">
+    <section class="panel control">
+      <div class="field">
+        <label for="agent">Agent Config</label>
+        <select id="agent">
+          <option value="outfit">Personalized Outfit Agent</option>
+          <option value="travel">Travel Packing Agent</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="user">User Profile</label>
+        <select id="user">
+          <option value="user_a">User A - 캐주얼 / 블랙 / 후드티</option>
+          <option value="user_b">User B - 미니멀 / 화이트 / 셔츠</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="query">User Input</label>
+        <textarea id="query"></textarea>
+      </div>
+      <button id="runButton" type="button">Run Selected Agent</button>
+      <div class="metric-grid">
+        <div class="metric"><strong>Engine</strong><span>same flow</span></div>
+        <div class="metric"><strong>Config</strong><span>embedded JSON</span></div>
+        <div class="metric"><strong>Flow</strong><span>Plan -> Act -> Decide -> Compose</span></div>
+      </div>
+    </section>
+    <section class="panel result" id="result"></section>
+  </main>
+  <script>
+    const cityAliases = {
+      "서울": ["서울", "Seoul"], "seoul": ["서울", "Seoul"],
+      "부산": ["부산", "Busan"], "busan": ["부산", "Busan"],
+      "제주": ["제주", "Jeju City"], "jeju": ["제주", "Jeju City"],
+      "도쿄": ["도쿄", "Tokyo"], "tokyo": ["도쿄", "Tokyo"],
+      "오사카": ["오사카", "Osaka"], "osaka": ["오사카", "Osaka"]
+    };
+    const weatherText = {
+      0: "맑음", 1: "대체로 맑음", 2: "부분적으로 흐림", 3: "흐림",
+      45: "안개", 48: "서리 안개", 51: "약한 이슬비", 53: "이슬비",
+      55: "강한 이슬비", 61: "약한 비", 63: "비", 65: "강한 비",
+      71: "약한 눈", 73: "눈", 75: "강한 눈", 80: "약한 소나기",
+      81: "소나기", 82: "강한 소나기", 95: "뇌우"
+    };
+    const users = {
+      user_a: { name: "User A", styles: ["캐주얼", "스트릿"], colors: ["블랙", "네이비"], favorite_items: ["후드티", "조거 팬츠"] },
+      user_b: { name: "User B", styles: ["미니멀", "포멀"], colors: ["화이트", "베이지"], favorite_items: ["셔츠", "슬랙스"] }
+    };
+    const configs = {
+      outfit: {
+        configName: "configs/outfit_agent.json",
+        agentName: "Personalized Outfit Agent",
+        intent: "outfit_recommendation",
+        defaultQuery: "서울 내일 날씨에 맞춰 내 스타일로 옷 추천해줘",
+        keywords: ["옷", "옷차림", "코디", "추천", "wear", "outfit"],
+        rules: [
+          { name: "cold_outfit", max: 8, recommendation: "보온성을 우선한 {styles_text} 스타일이 적합합니다.", items: ["두꺼운 아우터", "{favorite_items_text}", "{colors_text} 계열 이너"] },
+          { name: "mild_outfit", min: 8, max: 22, recommendation: "일교차를 고려한 가벼운 레이어드가 적합합니다.", items: ["가벼운 자켓", "{favorite_items_text}", "{colors_text} 계열 하의"] },
+          { name: "warm_outfit", min: 22, recommendation: "통풍이 좋은 편한 옷차림이 적합합니다.", items: ["반팔 상의", "얇은 셔츠", "{colors_text} 계열 포인트 아이템"] }
+        ],
+        extras: [
+          { precipitationMin: 50, item: "우산", text: "강수확률이 높아 우산을 준비하세요" },
+          { tempGapMin: 10, item: "얇은 겉옷", text: "일교차가 커서 겉옷을 추가하세요" }
+        ],
+        output: "[{agent_name}]\n{city_display}의 {date_label}({weather_date}) 날씨는 {weather_condition}, 평균 {avg_temp}°C입니다.\n{user_name}님의 선호 스타일은 {styles_text}, 선호 색상은 {colors_text}입니다.\n추천: {recommendation}\n추천 단품: {recommended_items_text}\n추가 조건: {extras_text}"
+      },
+      travel: {
+        configName: "configs/travel_pack_agent.json",
+        agentName: "Travel Packing Agent",
+        intent: "travel_packing",
+        defaultQuery: "서울 내일 여행 갈 때 챙길 물건 추천해줘",
+        keywords: ["여행", "짐", "준비물", "챙길", "packing", "travel"],
+        rules: [
+          { name: "cold_pack", max: 8, recommendation: "추운 날씨에 대비한 보온 중심의 여행 준비가 필요합니다.", items: ["보온 이너", "두꺼운 외투", "핫팩"] },
+          { name: "mild_pack", min: 8, max: 22, recommendation: "가벼운 이동과 온도 변화에 대비한 준비가 적합합니다.", items: ["가벼운 겉옷", "편한 신발", "보조 배터리"] },
+          { name: "warm_pack", min: 22, recommendation: "더운 날씨에 대비해 가볍고 통풍이 좋은 준비가 필요합니다.", items: ["얇은 여벌 옷", "선크림", "물병"] }
+        ],
+        extras: [
+          { precipitationMin: 40, item: "접이식 우산", text: "비 가능성이 있어 접이식 우산을 챙기세요" },
+          { tempGapMin: 10, item: "긴팔 겉옷", text: "아침저녁 온도 차이에 대비하세요" }
+        ],
+        output: "[{agent_name}]\n{city_display}의 {date_label}({weather_date}) 날씨는 {weather_condition}, 평균 {avg_temp}°C입니다.\n여행 준비 방향: {recommendation}\n챙길 물건: {recommended_items_text}\n개인 참고: {user_name}님은 {styles_text} 스타일과 {colors_text} 색상을 선호합니다.\n추가 조건: {extras_text}"
+      }
+    };
+    function esc(v) {
+      return String(v).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+    }
+    function fill(template, context) {
+      return template.replace(/\{([a-zA-Z0-9_]+)\}/g, (_, key) => Object.prototype.hasOwnProperty.call(context, key) ? context[key] : `{${key}}`);
+    }
+    function plan(query, config) {
+      const lower = query.trim().toLowerCase();
+      const alias = Object.keys(cityAliases).sort((a, b) => b.length - a.length).find((key) => lower.includes(key));
+      let dayOffset = 0, dateLabel = "오늘";
+      if (lower.includes("모레") || lower.includes("day after tomorrow")) { dayOffset = 2; dateLabel = "모레"; }
+      else if (lower.includes("내일") || lower.includes("tomorrow")) { dayOffset = 1; dateLabel = "내일"; }
+      const [cityDisplay, cityQuery] = alias ? cityAliases[alias] : ["서울", "Seoul"];
+      return { cityDisplay, cityQuery, dayOffset, dateLabel, matchedKeywords: config.keywords.filter((k) => lower.includes(k.toLowerCase())) };
+    }
+    async function getWeather(cityQuery, dayOffset) {
+      const geoParams = new URLSearchParams({ name: cityQuery, count: "1", language: "ko", format: "json" });
+      const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?${geoParams}`);
+      if (!geoRes.ok) throw new Error("Geocoding API 호출에 실패했습니다.");
+      const location = ((await geoRes.json()).results || [])[0];
+      if (!location) throw new Error(`도시 좌표를 찾을 수 없습니다: ${cityQuery}`);
+      const dailyParams = new URLSearchParams({
+        latitude: location.latitude,
+        longitude: location.longitude,
+        daily: "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+        timezone: "Asia/Seoul",
+        forecast_days: String(Math.max(dayOffset + 1, 3))
+      });
+      const forecastRes = await fetch(`https://api.open-meteo.com/v1/forecast?${dailyParams}`);
+      if (!forecastRes.ok) throw new Error("Weather API 호출에 실패했습니다.");
+      const daily = (await forecastRes.json()).daily;
+      const i = dayOffset;
+      const code = Number(daily.weather_code[i]);
+      return {
+        date: daily.time[i],
+        condition: weatherText[code] || `알 수 없음(${code})`,
+        weatherCode: code,
+        tempMin: Number(daily.temperature_2m_min[i]),
+        tempMax: Number(daily.temperature_2m_max[i]),
+        precipitation: Number(daily.precipitation_probability_max[i] || 0)
+      };
+    }
+    function matchRule(rules, avgTemp) {
+      return rules.find((rule) => {
+        if (rule.min !== undefined && avgTemp < rule.min) return false;
+        if (rule.max !== undefined && avgTemp > rule.max) return false;
+        return true;
+      }) || { name: "fallback", recommendation: "기본 추천을 사용합니다.", items: [] };
+    }
+    function matchExtras(config, weather, context) {
+      return config.extras.filter((extra) => {
+        if (extra.precipitationMin !== undefined && weather.precipitation < extra.precipitationMin) return false;
+        if (extra.tempGapMin !== undefined && weather.tempMax - weather.tempMin < extra.tempGapMin) return false;
+        return true;
+      }).map((extra) => ({ item: fill(extra.item, context), text: fill(extra.text, context) }));
+    }
+    async function runAgent() {
+      const button = document.getElementById("runButton");
+      button.disabled = true;
+      button.textContent = "Running...";
+      try {
+        const config = configs[document.getElementById("agent").value];
+        const userId = document.getElementById("user").value;
+        const profile = users[userId];
+        const query = document.getElementById("query").value.trim() || config.defaultQuery;
+        const intent = plan(query, config);
+        const trace = [{
+          name: "Plan",
+          detail: `agent=${config.agentName}, city=${intent.cityDisplay}, date=${intent.dateLabel}, user=${userId}`,
+          data: { config: config.configName, intent: config.intent, matched_keywords: intent.matchedKeywords }
+        }];
+        const weather = await getWeather(intent.cityQuery, intent.dayOffset);
+        trace.push({
+          name: "Act",
+          detail: "configured tools executed: weather, user_profile",
+          data: { weather: weather, profile: profile }
+        });
+        const context = {
+          agent_name: config.agentName,
+          city_display: intent.cityDisplay,
+          date_label: intent.dateLabel,
+          weather_date: weather.date,
+          weather_condition: weather.condition,
+          avg_temp: Number(((weather.tempMin + weather.tempMax) / 2).toFixed(1)),
+          user_name: profile.name,
+          styles_text: profile.styles.join(", "),
+          colors_text: profile.colors.join(", "),
+          favorite_items_text: profile.favorite_items.join(", ")
+        };
+        const rule = matchRule(config.rules, context.avg_temp);
+        context.recommendation = fill(rule.recommendation, context);
+        const extras = matchExtras(config, weather, context);
+        const items = rule.items.map((item) => fill(item, context)).concat(extras.map((extra) => extra.item));
+        context.recommended_items_text = items.join(", ");
+        context.extras_text = extras.map((extra) => extra.text).join(", ");
+        trace.push({
+          name: "Decide",
+          detail: `rule=${rule.name}, extras=${context.extras_text || "none"}`,
+          data: { avg_temp: context.avg_temp, recommended_items: items, extras: extras }
+        });
+        const answer = fill(config.output, context);
+        trace.push({ name: "Compose", detail: "output_template rendered from config", data: { template_id: config.configName } });
+        render(config, profile, trace, answer);
+      } catch (error) {
+        document.getElementById("result").innerHTML = `<div class="error">${esc(error.message)}<br>인터넷 연결이 필요하며, 브라우저에서 외부 API 요청이 허용되어야 합니다.</div>`;
+      } finally {
+        button.disabled = false;
+        button.textContent = "Run Selected Agent";
+      }
+    }
+    function render(config, profile, trace, answer) {
+      const traceHtml = trace.map((step) => `<section class="step"><h3>${esc(step.name)}</h3><p>${esc(step.detail)}</p></section>`).join("");
+      const configSummary = { config: config.configName, agent_name: config.agentName, intent: config.intent, tools: ["weather", "user_profile"], rules: config.rules.map((rule) => rule.name) };
+      document.getElementById("result").innerHTML = `
+        <div class="answer">${esc(answer)}</div>
+        <div class="trace">${traceHtml}</div>
+        <div class="config">
+          <section class="config-box"><h3>Loaded Config</h3><code>${esc(JSON.stringify(configSummary, null, 2))}</code></section>
+          <section class="config-box"><h3>User Profile</h3><code>${esc(JSON.stringify(profile, null, 2))}</code></section>
+        </div>
+        <pre class="raw">${esc(JSON.stringify(trace, null, 2))}</pre>
+      `;
+    }
+    function syncQuery() {
+      document.getElementById("query").value = configs[document.getElementById("agent").value].defaultQuery;
+    }
+    document.getElementById("agent").addEventListener("change", syncQuery);
+    document.getElementById("runButton").addEventListener("click", runAgent);
+    syncQuery();
+    runAgent();
+  </script>
+</body>
+</html>

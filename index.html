@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Template Weather Agent Demo</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, "Malgun Gothic", sans-serif;
+      color: #16202a;
+      background: #f5f7fb;
+    }
+    .topbar {
+      padding: 24px 32px 14px;
+      background: #ffffff;
+      border-bottom: 1px solid #dce3ea;
+    }
+    .eyebrow {
+      margin: 0 0 6px;
+      color: #397367;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.25;
+    }
+    .subtitle {
+      max-width: 860px;
+      margin: 10px 0 0;
+      color: #52606d;
+      line-height: 1.55;
+    }
+    .shell {
+      display: grid;
+      grid-template-columns: minmax(300px, 420px) minmax(0, 1fr);
+      gap: 18px;
+      padding: 22px 32px 36px;
+    }
+    .panel {
+      background: #ffffff;
+      border: 1px solid #dce3ea;
+      border-radius: 8px;
+      box-shadow: 0 8px 22px rgba(24, 38, 53, 0.06);
+    }
+    .control,
+    .result {
+      padding: 18px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    textarea {
+      width: 100%;
+      min-height: 116px;
+      box-sizing: border-box;
+      resize: vertical;
+      border: 1px solid #b8c4cf;
+      border-radius: 6px;
+      padding: 12px;
+      color: #16202a;
+      font: inherit;
+      line-height: 1.5;
+    }
+    button {
+      width: 100%;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 6px;
+      padding: 12px 14px;
+      background: #1f6f8b;
+      color: #ffffff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #195d75;
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .metric {
+      border: 1px solid #dce3ea;
+      border-radius: 6px;
+      padding: 10px;
+      background: #fbfcfe;
+    }
+    .metric strong {
+      display: block;
+      margin-bottom: 3px;
+      font-size: 13px;
+    }
+    .metric span {
+      color: #52606d;
+      font-size: 13px;
+    }
+    .answer {
+      white-space: pre-wrap;
+      line-height: 1.65;
+      padding: 14px;
+      background: #eef7f6;
+      border: 1px solid #c7e4df;
+      border-radius: 8px;
+    }
+    .trace {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .step {
+      border: 1px solid #dce3ea;
+      border-radius: 8px;
+      padding: 12px;
+      min-height: 116px;
+    }
+    .step h3 {
+      margin: 0 0 8px;
+      font-size: 16px;
+    }
+    .step p {
+      margin: 0 0 8px;
+      color: #52606d;
+      line-height: 1.5;
+    }
+    .raw {
+      overflow: auto;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 6px;
+      background: #16202a;
+      color: #edf2f7;
+      font-size: 12px;
+    }
+    .error {
+      padding: 14px;
+      background: #fff2f0;
+      border: 1px solid #ffccc7;
+      border-radius: 8px;
+      color: #8a1f11;
+      line-height: 1.55;
+    }
+    @media (max-width: 860px) {
+      .shell,
+      .trace {
+        grid-template-columns: 1fr;
+      }
+      .topbar,
+      .shell {
+        padding-left: 18px;
+        padding-right: 18px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <p class="eyebrow">Portable Template-based AI Agent MVP</p>
+    <h1>고정 실행 흐름과 도구 호출을 보장하는 날씨 Agent</h1>
+    <p class="subtitle">
+      이 파일은 Python 없이 브라우저에서 바로 실행되는 공유용 Demo입니다.
+      자연어 입력을 Plan, Act, Compose 단계로 처리하고 외부 Weather API 결과를 합성합니다.
+    </p>
+  </header>
+  <main class="shell">
+    <section class="panel control">
+      <label for="query">User Input</label>
+      <textarea id="query">서울 내일 날씨 알려주고 옷 추천해줘</textarea>
+      <button id="runButton" type="button">Run Template Agent</button>
+      <div class="metric-grid">
+        <div class="metric"><strong>Flow</strong><span>Plan -> Act -> Compose</span></div>
+        <div class="metric"><strong>Tool</strong><span>Open-Meteo API</span></div>
+        <div class="metric"><strong>Install</strong><span>None</span></div>
+      </div>
+    </section>
+    <section class="panel result" id="result"></section>
+  </main>
+
+  <script>
+    const cityAliases = {
+      "서울": ["서울", "Seoul"],
+      "seoul": ["서울", "Seoul"],
+      "부산": ["부산", "Busan"],
+      "busan": ["부산", "Busan"],
+      "인천": ["인천", "Incheon"],
+      "incheon": ["인천", "Incheon"],
+      "대구": ["대구", "Daegu"],
+      "daegu": ["대구", "Daegu"],
+      "대전": ["대전", "Daejeon"],
+      "daejeon": ["대전", "Daejeon"],
+      "광주": ["광주", "Gwangju"],
+      "gwangju": ["광주", "Gwangju"],
+      "제주": ["제주", "Jeju City"],
+      "jeju": ["제주", "Jeju City"],
+      "도쿄": ["도쿄", "Tokyo"],
+      "tokyo": ["도쿄", "Tokyo"],
+      "오사카": ["오사카", "Osaka"],
+      "osaka": ["오사카", "Osaka"],
+      "뉴욕": ["뉴욕", "New York"],
+      "new york": ["뉴욕", "New York"]
+    };
+
+    const weatherText = {
+      0: "맑음",
+      1: "대체로 맑음",
+      2: "부분적으로 흐림",
+      3: "흐림",
+      45: "안개",
+      48: "서리 안개",
+      51: "약한 이슬비",
+      53: "이슬비",
+      55: "강한 이슬비",
+      61: "약한 비",
+      63: "비",
+      65: "강한 비",
+      71: "약한 눈",
+      73: "눈",
+      75: "강한 눈",
+      80: "약한 소나기",
+      81: "소나기",
+      82: "강한 소나기",
+      95: "뇌우",
+      96: "우박을 동반한 뇌우",
+      99: "강한 우박을 동반한 뇌우"
+    };
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function plan(text) {
+      const lower = text.trim().toLowerCase();
+      const aliases = Object.keys(cityAliases).sort((a, b) => b.length - a.length);
+      const alias = aliases.find((item) => lower.includes(item));
+      if (!alias) {
+        throw new Error("도시를 찾을 수 없습니다. 예: 서울 내일 날씨 알려주고 옷 추천해줘");
+      }
+
+      let dayOffset = 0;
+      let dateLabel = "오늘";
+      if (lower.includes("모레") || lower.includes("day after tomorrow")) {
+        dayOffset = 2;
+        dateLabel = "모레";
+      } else if (lower.includes("내일") || lower.includes("tomorrow")) {
+        dayOffset = 1;
+        dateLabel = "내일";
+      }
+
+      const wantsClothing = ["옷", "옷차림", "코디", "입어", "추천", "clothes", "wear"]
+        .some((token) => lower.includes(token));
+      const wantsWeather = lower.includes("날씨") || lower.includes("weather") || !wantsClothing;
+      const [cityDisplay, cityQuery] = cityAliases[alias];
+
+      return {
+        rawText: text,
+        cityDisplay,
+        cityQuery,
+        dayOffset,
+        dateLabel,
+        wantsWeather,
+        wantsClothing
+      };
+    }
+
+    async function act(intent) {
+      const geoParams = new URLSearchParams({
+        name: intent.cityQuery,
+        count: "1",
+        language: "ko",
+        format: "json"
+      });
+      const geoResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/search?${geoParams}`);
+      if (!geoResponse.ok) {
+        throw new Error("Geocoding API 호출에 실패했습니다.");
+      }
+      const geoData = await geoResponse.json();
+      const location = (geoData.results || [])[0];
+      if (!location) {
+        throw new Error(`도시 좌표를 찾을 수 없습니다: ${intent.cityQuery}`);
+      }
+
+      const forecastDays = Math.max(intent.dayOffset + 1, 3);
+      const forecastParams = new URLSearchParams({
+        latitude: location.latitude,
+        longitude: location.longitude,
+        daily: "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max",
+        timezone: "Asia/Seoul",
+        forecast_days: String(forecastDays)
+      });
+      const forecastResponse = await fetch(`https://api.open-meteo.com/v1/forecast?${forecastParams}`);
+      if (!forecastResponse.ok) {
+        throw new Error("Weather API 호출에 실패했습니다.");
+      }
+      const forecastData = await forecastResponse.json();
+      const daily = forecastData.daily;
+      const i = intent.dayOffset;
+      const code = Number(daily.weather_code[i]);
+      const precipitation = Number(daily.precipitation_probability_max[i] || 0);
+
+      return {
+        cityName: location.name,
+        country: location.country || "",
+        date: daily.time[i],
+        condition: weatherText[code] || `알 수 없음(${code})`,
+        weatherCode: code,
+        tempMin: Number(daily.temperature_2m_min[i]),
+        tempMax: Number(daily.temperature_2m_max[i]),
+        precipitationProbability: precipitation,
+        latitude: Number(location.latitude),
+        longitude: Number(location.longitude)
+      };
+    }
+
+    function recommendClothing(avgTemp, weather) {
+      let base;
+      if (avgTemp <= 0) {
+        base = "두꺼운 패딩, 목도리, 장갑처럼 보온성이 높은 옷차림";
+      } else if (avgTemp <= 5) {
+        base = "두꺼운 코트나 패딩, 니트, 보온 이너";
+      } else if (avgTemp <= 11) {
+        base = "코트나 점퍼, 니트, 긴 바지";
+      } else if (avgTemp <= 16) {
+        base = "자켓이나 가디건, 긴팔 상의";
+      } else if (avgTemp <= 22) {
+        base = "얇은 긴팔이나 셔츠, 가벼운 겉옷";
+      } else if (avgTemp <= 27) {
+        base = "반팔에 얇은 겉옷을 함께 준비하는 옷차림";
+      } else {
+        base = "반팔, 얇은 셔츠, 통풍이 잘 되는 옷차림";
+      }
+
+      const extras = [];
+      const rainyCodes = new Set([51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99]);
+      const snowyCodes = new Set([71, 73, 75, 77, 85, 86]);
+      if (weather.precipitationProbability >= 50 || rainyCodes.has(weather.weatherCode)) {
+        extras.push("우산");
+      }
+      if (snowyCodes.has(weather.weatherCode)) {
+        extras.push("미끄럽지 않은 신발");
+      }
+      if (weather.tempMax - weather.tempMin >= 10) {
+        extras.push("일교차 대비용 겉옷");
+      }
+      return extras.length
+        ? `${base}을 추천합니다. 추가로 ${extras.join(", ")}을 준비하세요.`
+        : `${base}을 추천합니다.`;
+    }
+
+    function compose(intent, weather) {
+      const avgTemp = (weather.tempMin + weather.tempMax) / 2;
+      const lines = [
+        "[weather_clothing_template_v1] Plan -> Act -> Compose 실행 완료",
+        `${intent.cityDisplay}의 ${intent.dateLabel}(${weather.date}) 날씨는 ${weather.condition}입니다. 최저 ${weather.tempMin.toFixed(1)}°C, 최고 ${weather.tempMax.toFixed(1)}°C, 강수확률은 ${weather.precipitationProbability}%입니다.`
+      ];
+      if (intent.wantsClothing) {
+        lines.push(`옷 추천: ${recommendClothing(avgTemp, weather)}`);
+      }
+      lines.push("근거: 템플릿이 도시/날짜를 먼저 고정하고, Weather API 호출 후 규칙 기반 Compose 단계에서 응답을 생성했습니다.");
+      return lines.join("\n");
+    }
+
+    function render(trace, answer) {
+      const stepHtml = trace.map((step) => `
+        <section class="step">
+          <h3>${escapeHtml(step.name)}</h3>
+          <p>${escapeHtml(step.description)}</p>
+          <p><strong>${escapeHtml(step.detail)}</strong></p>
+        </section>
+      `).join("");
+      document.getElementById("result").innerHTML = `
+        <div class="answer">${escapeHtml(answer)}</div>
+        <div class="trace">${stepHtml}</div>
+        <pre class="raw">${escapeHtml(JSON.stringify(trace, null, 2))}</pre>
+      `;
+    }
+
+    function renderError(error) {
+      document.getElementById("result").innerHTML = `
+        <div class="error">
+          ${escapeHtml(error.message)}
+          <br>인터넷 연결이 필요하며, 브라우저에서 외부 API 요청이 허용되어야 합니다.
+        </div>
+      `;
+    }
+
+    async function runAgent() {
+      const button = document.getElementById("runButton");
+      const text = document.getElementById("query").value;
+      button.disabled = true;
+      button.textContent = "Running...";
+      try {
+        const intent = plan(text);
+        const trace = [{
+          name: "Plan",
+          description: "사용자 입력에서 도시, 날짜, 작업 유형을 추출",
+          detail: `city=${intent.cityDisplay}, date=${intent.dateLabel}, weather=${intent.wantsWeather}, clothing=${intent.wantsClothing}`,
+          data: {
+            cityQuery: intent.cityQuery,
+            dayOffset: intent.dayOffset,
+            template: "weather_clothing_template_v1"
+          }
+        }];
+
+        const weather = await act(intent);
+        trace.push({
+          name: "Act",
+          description: "템플릿에 바인딩된 날씨 도구를 호출",
+          detail: `${weather.cityName}(${weather.latitude.toFixed(3)}, ${weather.longitude.toFixed(3)}) forecast API 호출 완료`,
+          data: {
+            tool: "Open-Meteo Geocoding API + Forecast API",
+            ...weather
+          }
+        });
+
+        const answer = compose(intent, weather);
+        trace.push({
+          name: "Compose",
+          description: "고정 규칙으로 날씨 요약과 추천 문장을 생성",
+          detail: "날씨 조건, 평균기온, 강수확률을 기반으로 최종 응답 생성",
+          data: {
+            averageTemp: Number(((weather.tempMin + weather.tempMax) / 2).toFixed(1)),
+            precipitationProbability: weather.precipitationProbability
+          }
+        });
+        render(trace, answer);
+      } catch (error) {
+        renderError(error);
+      } finally {
+        button.disabled = false;
+        button.textContent = "Run Template Agent";
+      }
+    }
+
+    document.getElementById("runButton").addEventListener("click", runAgent);
+    runAgent();
+  </script>
+</body>
+</html>

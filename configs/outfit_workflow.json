@@ -1,0 +1,45 @@
+{
+  "workflow_id": "outfit_multi_agent_workflow_v1",
+  "workflow_name": "Outfit Multi-Agent Workflow",
+  "description": "A minimal workflow MVP that connects several small Agents to answer one outfit recommendation request.",
+  "base_agent_config": "outfit_agent.json",
+  "default_query": "서울 내일 날씨에 맞춰 내 스타일로 옷 추천해줘",
+  "default_user_id": "user_a",
+  "agents": [
+    {
+      "id": "request_parser",
+      "name": "Request Parser Agent",
+      "role": "Extract city, date, user and intent from the user request."
+    },
+    {
+      "id": "weather",
+      "name": "Weather Agent",
+      "role": "Call the weather tool and normalize weather data."
+    },
+    {
+      "id": "shopping_analysis",
+      "name": "Shopping Analysis Agent",
+      "role": "Load purchase history and analyze user style preferences."
+    },
+    {
+      "id": "recommendation",
+      "name": "Recommendation Agent",
+      "role": "Match weather and shopping analysis with recommendation rules."
+    },
+    {
+      "id": "compose",
+      "name": "Compose Agent",
+      "role": "Render the final answer with the configured output template."
+    }
+  ],
+  "execution": {
+    "type": "sequential",
+    "order": [
+      "request_parser",
+      "weather",
+      "shopping_analysis",
+      "recommendation",
+      "compose"
+    ]
+  }
+}

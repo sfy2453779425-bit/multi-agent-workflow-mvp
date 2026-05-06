@@ -1,0 +1,58 @@
+{
+  "agent_id": "travel_pack_agent_v1",
+  "agent_name": "Travel Packing Agent",
+  "intent": "travel_packing",
+  "default_query": "서울 내일 여행 갈 때 챙길 물건 추천해줘",
+  "default_user_id": "user_a",
+  "default_city": {
+    "display": "서울",
+    "query": "Seoul"
+  },
+  "intent_keywords": ["여행", "짐", "준비물", "챙길", "packing", "travel"],
+  "tools": {
+    "weather": {
+      "enabled": true
+    },
+    "shopping_history": {
+      "enabled": true,
+      "file": "shopping_history.json"
+    }
+  },
+  "temperature_rules": [
+    {
+      "name": "cold_pack",
+      "max_avg_temp": 8,
+      "recommendation": "추운 날씨에 대비한 보온 중심의 여행 준비가 필요합니다.",
+      "owned_item_categories": ["outer", "top", "bottom", "shoes"],
+      "items": ["보온 이너", "두꺼운 외투", "핫팩"]
+    },
+    {
+      "name": "mild_pack",
+      "min_avg_temp": 8,
+      "max_avg_temp": 22,
+      "recommendation": "가벼운 이동과 온도 변화에 대비한 준비가 적합합니다.",
+      "owned_item_categories": ["outer", "top", "bottom", "shoes"],
+      "items": ["가벼운 겉옷", "편한 신발", "보조 배터리"]
+    },
+    {
+      "name": "warm_pack",
+      "min_avg_temp": 22,
+      "recommendation": "더운 날씨에 대비해 가볍고 통풍이 좋은 준비가 필요합니다.",
+      "owned_item_categories": ["top", "bottom", "shoes"],
+      "items": ["얇은 여벌 옷", "선크림", "물병"]
+    }
+  ],
+  "conditional_extras": [
+    {
+      "precipitation_min": 40,
+      "item": "접이식 우산",
+      "text": "비 가능성이 있어 접이식 우산을 챙기세요"
+    },
+    {
+      "temp_gap_min": 10,
+      "item": "긴팔 겉옷",
+      "text": "아침저녁 온도 차이에 대비하세요"
+    }
+  ],
+  "output_template": "[{agent_name}]\n{city_display}의 {date_label}({weather_date}) 날씨는 {weather_condition}, 평균 {avg_temp}°C입니다.\n쇼핑 기록 분석: 총 {shopping_item_count}개 구매 기록에서 {styles_text} 스타일과 {colors_text} 색상 선호가 확인되었습니다.\n여행 준비 방향: {recommendation}\n보유 단품 중 챙길 물건: {owned_recommended_items_text}\n추가 준비물: {additional_items_text}\n추가 조건: {extras_text}"
+}

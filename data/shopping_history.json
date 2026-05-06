@@ -1,0 +1,126 @@
+{
+  "user_a": [
+    {
+      "id": "A001",
+      "item": "블랙 후드티",
+      "category": "top",
+      "color": "블랙",
+      "style": "캐주얼",
+      "warmth": "medium",
+      "rain_ok": true,
+      "purchased_at": "2026-02-12"
+    },
+    {
+      "id": "A002",
+      "item": "네이비 조거 팬츠",
+      "category": "bottom",
+      "color": "네이비",
+      "style": "스트릿",
+      "warmth": "medium",
+      "rain_ok": true,
+      "purchased_at": "2026-02-20"
+    },
+    {
+      "id": "A003",
+      "item": "라이트 그레이 바람막이",
+      "category": "outer",
+      "color": "그레이",
+      "style": "스포티",
+      "warmth": "light",
+      "rain_ok": true,
+      "purchased_at": "2026-03-05"
+    },
+    {
+      "id": "A004",
+      "item": "블랙 패딩",
+      "category": "outer",
+      "color": "블랙",
+      "style": "캐주얼",
+      "warmth": "heavy",
+      "rain_ok": false,
+      "purchased_at": "2025-12-02"
+    },
+    {
+      "id": "A005",
+      "item": "화이트 반팔 티셔츠",
+      "category": "top",
+      "color": "화이트",
+      "style": "캐주얼",
+      "warmth": "light",
+      "rain_ok": true,
+      "purchased_at": "2026-04-02"
+    },
+    {
+      "id": "A006",
+      "item": "블랙 캔버스 스니커즈",
+      "category": "shoes",
+      "color": "블랙",
+      "style": "스트릿",
+      "warmth": "all",
+      "rain_ok": false,
+      "purchased_at": "2026-01-18"
+    }
+  ],
+  "user_b": [
+    {
+      "id": "B001",
+      "item": "화이트 옥스포드 셔츠",
+      "category": "top",
+      "color": "화이트",
+      "style": "미니멀",
+      "warmth": "medium",
+      "rain_ok": true,
+      "purchased_at": "2026-01-09"
+    },
+    {
+      "id": "B002",
+      "item": "베이지 슬랙스",
+      "category": "bottom",
+      "color": "베이지",
+      "style": "포멀",
+      "warmth": "medium",
+      "rain_ok": true,
+      "purchased_at": "2026-01-22"
+    },
+    {
+      "id": "B003",
+      "item": "네이비 트렌치코트",
+      "category": "outer",
+      "color": "네이비",
+      "style": "포멀",
+      "warmth": "light",
+      "rain_ok": true,
+      "purchased_at": "2026-03-13"
+    },
+    {
+      "id": "B004",
+      "item": "아이보리 니트",
+      "category": "top",
+      "color": "아이보리",
+      "style": "미니멀",
+      "warmth": "heavy",
+      "rain_ok": false,
+      "purchased_at": "2025-12-18"
+    },
+    {
+      "id": "B005",
+      "item": "브라운 로퍼",
+      "category": "shoes",
+      "color": "브라운",
+      "style": "포멀",
+      "warmth": "all",
+      "rain_ok": false,
+      "purchased_at": "2026-02-01"
+    },
+    {
+      "id": "B006",
+      "item": "라이트 블루 린넨 셔츠",
+      "category": "top",
+      "color": "블루",
+      "style": "미니멀",
+      "warmth": "light",
+      "rain_ok": true,
+      "purchased_at": "2026-04-11"
+    }
+  ]
+}

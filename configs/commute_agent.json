@@ -1,0 +1,58 @@
+{
+  "agent_id": "commute_agent_v1",
+  "agent_name": "Commute Preparation Agent",
+  "intent": "commute_preparation",
+  "default_query": "서울 내일 학교 갈 때 뭐 챙겨야 해?",
+  "default_user_id": "user_a",
+  "default_city": {
+    "display": "서울",
+    "query": "Seoul"
+  },
+  "intent_keywords": ["학교", "출근", "통학", "통근", "챙겨", "commute", "school", "work"],
+  "tools": {
+    "weather": {
+      "enabled": true
+    },
+    "shopping_history": {
+      "enabled": true,
+      "file": "shopping_history.json"
+    }
+  },
+  "temperature_rules": [
+    {
+      "name": "cold_commute",
+      "max_avg_temp": 8,
+      "recommendation": "장시간 이동 중 체온 유지를 우선해야 합니다.",
+      "owned_item_categories": ["outer", "top", "bottom", "shoes"],
+      "items": ["따뜻한 외투", "보온 이너", "따뜻한 음료"]
+    },
+    {
+      "name": "mild_commute",
+      "min_avg_temp": 8,
+      "max_avg_temp": 22,
+      "recommendation": "이동 중 일교차와 실내외 온도 차이에 대비하는 구성이 적합합니다.",
+      "owned_item_categories": ["outer", "top", "bottom", "shoes"],
+      "items": ["가벼운 겉옷", "편한 신발", "교통카드"]
+    },
+    {
+      "name": "warm_commute",
+      "min_avg_temp": 22,
+      "recommendation": "가볍고 통풍이 좋은 복장과 수분 보충을 우선하세요.",
+      "owned_item_categories": ["top", "bottom", "shoes"],
+      "items": ["얇은 상의", "물병", "휴대용 선풍기"]
+    }
+  ],
+  "conditional_extras": [
+    {
+      "precipitation_min": 40,
+      "item": "접이식 우산",
+      "text": "비 가능성이 있어 접이식 우산을 챙기세요"
+    },
+    {
+      "temp_gap_min": 10,
+      "item": "얇은 겉옷",
+      "text": "아침저녁 일교차에 대비하세요"
+    }
+  ],
+  "output_template": "[{agent_name}]\n{city_display}의 {date_label}({weather_date}) 날씨는 {weather_condition}, 평균 {avg_temp}°C입니다.\n쇼핑 기록 분석: 총 {shopping_item_count}개 구매 기록에서 {styles_text} 스타일과 {colors_text} 색상 선호가 확인되었습니다.\n통학/출근 준비 방향: {recommendation}\n보유 단품 기반 추천: {owned_recommended_items_text}\n추가 준비물: {additional_items_text}\n추가 조건: {extras_text}"
+}

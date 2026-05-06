@@ -1,0 +1,14 @@
+{
+  "user_a": {
+    "name": "User A",
+    "styles": ["캐주얼", "스트릿"],
+    "colors": ["블랙", "네이비"],
+    "favorite_items": ["후드티", "조거 팬츠"]
+  },
+  "user_b": {
+    "name": "User B",
+    "styles": ["미니멀", "포멀"],
+    "colors": ["화이트", "베이지"],
+    "favorite_items": ["셔츠", "슬랙스"]
+  }
+}
