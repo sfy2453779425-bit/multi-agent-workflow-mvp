@@ -13,4 +13,11 @@ env/
 Thumbs.db
 .DS_Store
 *.lnk
+*.pptx
+docs/
 docs/ppt_previews/
+scripts/generate_ppt.js
+scripts/render_ppt_previews.mjs
+base code for NE/
+builder_static.html
+index.html
