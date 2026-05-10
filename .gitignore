@@ -19,6 +19,7 @@ docs/ppt_previews/
 scripts/generate_ppt.js
 scripts/render_ppt_previews.mjs
 scripts/generate_final_workflow_ppt.js
+scripts/generate_final_workflow_ppt_zh.js
 base code for NE/
 builder_static.html
 index.html
