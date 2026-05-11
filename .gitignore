@@ -20,6 +20,7 @@ scripts/generate_ppt.js
 scripts/render_ppt_previews.mjs
 scripts/generate_final_workflow_ppt.js
 scripts/generate_final_workflow_ppt_zh.js
+scripts/beautify_translated_ppt.js
 base code for NE/
 builder_static.html
 index.html
