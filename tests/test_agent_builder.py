@@ -85,25 +85,67 @@ class AgentBuilderEngineTest(unittest.TestCase):
             weather_tool=FakeWeatherTool(),
         )
 
-        result = engine.run("서울 내일 옷 추천해줘", user_id="user_a")
+        result = engine.run("서울 내일 출근할 때 옷 추천해줘", user_id="user_a")
 
-        self.assertEqual("Outfit Multi-Agent Workflow", result.workflow_name)
+        self.assertEqual("Outfit Recommendation Workflow", result.workflow_name)
         self.assertEqual(
             [
-                "Request Parser Agent",
-                "Weather Agent",
-                "Shopping Analysis Agent",
-                "Recommendation Agent",
-                "Compose Agent",
+                "Request Parser Node",
+                "Question Node",
+                "Weather Tool Node",
+                "Shopping History Analysis Node",
+                "Recommendation Node",
+                "Compose Node",
             ],
             [s.name for s in result.trace],
         )
         self.assertIn("보유 단품 기반 추천", result.answer)
         self.assertIn("블랙 후드티", result.answer)
         self.assertEqual(
-            ["request_parser", "weather", "shopping_analysis", "recommendation", "compose"],
+            [
+                "request_parser",
+                "question",
+                "weather",
+                "shopping_analysis",
+                "recommendation",
+                "compose",
+            ],
             result.context["executed_agents"],
         )
+        self.assertFalse(result.context["needs_clarification"])
+        self.assertIn("출근", result.context["detected_purpose"])
+
+    def test_question_agent_short_circuits_when_information_missing(self):
+        engine = MultiAgentWorkflowEngine(
+            ROOT / "configs" / "outfit_workflow.json",
+            weather_tool=FakeWeatherTool(),
+        )
+
+        result = engine.run("옷 추천해줘", user_id="user_a")
+
+        self.assertEqual(
+            ["Request Parser Node", "Question Node"],
+            [s.name for s in result.trace],
+        )
+        self.assertEqual(
+            ["request_parser", "question"],
+            result.context["executed_agents"],
+        )
+        self.assertTrue(result.context["needs_clarification"])
+        self.assertIn("정보가 부족합니다", result.answer)
+        self.assertNotIn("weather", result.context.get("executed_tools", []))
+
+    def test_question_agent_passes_when_style_keyword_present(self):
+        engine = MultiAgentWorkflowEngine(
+            ROOT / "configs" / "outfit_workflow.json",
+            weather_tool=FakeWeatherTool(),
+        )
+
+        result = engine.run("서울 내일 캐주얼하게 옷 추천해줘", user_id="user_a")
+
+        self.assertFalse(result.context["needs_clarification"])
+        self.assertIn("캐주얼", result.context["detected_style"])
+        self.assertEqual(6, len(result.trace))
 
 
 if __name__ == "__main__":

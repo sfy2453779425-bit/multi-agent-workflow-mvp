@@ -5,6 +5,7 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.claude/
 .venv/
 venv/
 env/
@@ -16,6 +17,8 @@ Thumbs.db
 *.pptx
 docs/
 docs/ppt_previews/
+experiments/
+scripts/
 scripts/generate_ppt.js
 scripts/render_ppt_previews.mjs
 scripts/generate_final_workflow_ppt.js

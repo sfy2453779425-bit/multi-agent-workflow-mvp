@@ -1,34 +1,39 @@
 {
   "workflow_id": "outfit_multi_agent_workflow_v1",
-  "workflow_name": "Outfit Multi-Agent Workflow",
-  "description": "A minimal workflow MVP that connects several small Agents to answer one outfit recommendation request.",
+  "workflow_name": "Outfit Recommendation Workflow",
+  "description": "A minimal workflow MVP that connects several small Workflow Nodes to answer one outfit recommendation request.",
   "base_agent_config": "outfit_agent.json",
-  "default_query": "서울 내일 날씨에 맞춰 내 스타일로 옷 추천해줘",
+  "default_query": "다음 주에 칭다오 여행 가는데 옷 추천해줘",
   "default_user_id": "user_a",
   "agents": [
     {
       "id": "request_parser",
-      "name": "Request Parser Agent",
+      "name": "Request Parser Node",
       "role": "Extract city, date, user and intent from the user request."
     },
     {
+      "id": "question",
+      "name": "Question Node",
+      "role": "Detect missing context (purpose or style) and decide whether clarification is needed."
+    },
+    {
       "id": "weather",
-      "name": "Weather Agent",
+      "name": "Weather Tool Node",
       "role": "Call the weather tool and normalize weather data."
     },
     {
       "id": "shopping_analysis",
-      "name": "Shopping Analysis Agent",
+      "name": "Shopping History Analysis Node",
       "role": "Load purchase history and analyze user style preferences."
     },
     {
       "id": "recommendation",
-      "name": "Recommendation Agent",
+      "name": "Recommendation Node",
       "role": "Match weather and shopping analysis with recommendation rules."
     },
     {
       "id": "compose",
-      "name": "Compose Agent",
+      "name": "Compose Node",
       "role": "Render the final answer with the configured output template."
     }
   ],
@@ -36,10 +41,16 @@
     "type": "sequential",
     "order": [
       "request_parser",
+      "question",
       "weather",
       "shopping_analysis",
       "recommendation",
       "compose"
     ]
+  },
+  "question_agent": {
+    "purpose_keywords": ["여행", "출장", "통학", "출근", "학교", "데이트", "행사", "휴가", "비즈니스", "쇼핑", "출퇴근"],
+    "style_keywords": ["캐주얼", "포멀", "스트릿", "미니멀", "스포티", "정장", "비즈니스"],
+    "clarification_message": "정보가 부족합니다. 여행 목적과 선호 스타일을 알려주세요. (예: 출장 / 캐주얼 등)"
   }
 }

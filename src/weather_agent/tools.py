@@ -30,6 +30,12 @@ CITY_ALIASES = {
     "osaka": ("오사카", "Osaka"),
     "뉴욕": ("뉴욕", "New York"),
     "new york": ("뉴욕", "New York"),
+    "칭다오": ("칭다오", "Qingdao"),
+    "qingdao": ("칭다오", "Qingdao"),
+    "베이징": ("베이징", "Beijing"),
+    "beijing": ("베이징", "Beijing"),
+    "상하이": ("상하이", "Shanghai"),
+    "shanghai": ("상하이", "Shanghai"),
 }
 
 

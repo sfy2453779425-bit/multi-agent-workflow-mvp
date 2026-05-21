@@ -16,17 +16,17 @@ AGENT_CONFIGS = {
     "workflow_outfit": {
         "type": "workflow",
         "labels": {
-            "ko": "의류 추천 Multi-Agent Workflow",
-            "zh": "穿搭推荐 Multi-Agent Workflow",
+            "ko": "의류 추천 Workflow (6 Node)",
+            "zh": "穿搭推荐 Workflow (6 Node)",
         },
         "path": ROOT / "configs" / "outfit_workflow.json",
-        "default_query": "서울 내일 날씨에 맞춰 내 스타일로 옷 추천해줘",
+        "default_query": "다음 주에 칭다오 여행 가는데 옷 추천해줘",
     },
     "outfit": {
         "type": "agent",
         "labels": {
-            "ko": "개인화 의류 추천 Agent",
-            "zh": "个性化穿搭推荐 Agent",
+            "ko": "개인화 의류 추천 (단일 Config)",
+            "zh": "个性化穿搭推荐 (单 Config)",
         },
         "path": ROOT / "configs" / "outfit_agent.json",
         "default_query": "서울 내일 날씨에 맞춰 내 스타일로 옷 추천해줘",
@@ -34,8 +34,8 @@ AGENT_CONFIGS = {
     "travel": {
         "type": "agent",
         "labels": {
-            "ko": "여행 준비물 추천 Agent",
-            "zh": "旅行准备物推荐 Agent",
+            "ko": "여행 준비물 추천 (단일 Config)",
+            "zh": "旅行准备物推荐 (单 Config)",
         },
         "path": ROOT / "configs" / "travel_pack_agent.json",
         "default_query": "서울 내일 여행 갈 때 챙길 물건 추천해줘",
@@ -43,8 +43,8 @@ AGENT_CONFIGS = {
     "commute": {
         "type": "agent",
         "labels": {
-            "ko": "통학/출근 준비 Agent",
-            "zh": "通勤/上学准备 Agent",
+            "ko": "통학/출근 준비 (단일 Config)",
+            "zh": "通勤/上学准备 (单 Config)",
         },
         "path": ROOT / "configs" / "commute_agent.json",
         "default_query": "서울 내일 학교 갈 때 뭐 챙겨야 해?",
@@ -74,46 +74,46 @@ LANGUAGES = {
 UI_TEXT = {
     "ko": {
         "html_lang": "ko",
-        "eyebrow": "Configuration-driven AI Agent Builder MVP",
-        "title": "설정 파일로 Agent와 Workflow를 실행하는 Builder Demo",
-        "subtitle": "하나의 실행 엔진이 JSON 설정을 읽고, 여러 Agent를 순차 Workflow로 연결해 쇼핑 기록과 실시간 날씨 기반 추천을 생성합니다.",
+        "eyebrow": "Personalized Outfit Recommendation Workflow MVP",
+        "title": "JSON Workflow로 6개 Node를 조립한 개인화 의류 추천 Demo",
+        "subtitle": "하나의 실행 엔진이 JSON 설정을 읽고, 6개 Workflow Node를 순차로 연결해 쇼핑 기록과 실시간 날씨 기반의 개인화 의류 추천을 생성합니다.",
         "language": "UI Language",
         "agent_config": "Demo Config",
         "shopping_user": "Shopping History User",
         "user_input": "User Input",
-        "run": "Run Selected Agent",
+        "run": "Run Selected Workflow",
         "metric_data": "Data",
         "metric_data_value": "weather + shopping",
         "metric_config": "Config",
         "metric_config_value": "JSON template",
         "metric_flow": "Flow",
-        "metric_flow_value": "Parser -> Weather -> Shopping -> Recommend -> Compose",
-        "agent_output": "Agent Output",
+        "metric_flow_value": "Parser -> Question -> Weather -> Shopping -> Recommend -> Compose",
+        "agent_output": "Workflow Output",
         "execution_trace": "Workflow Trace",
-        "steps_badge": "5 agents",
+        "steps_badge": "6 Nodes",
         "loaded_config": "Loaded Config",
         "shopping_analysis": "Shopping History Analysis",
         "raw_trace": "Raw Trace",
     },
     "zh": {
         "html_lang": "zh-CN",
-        "eyebrow": "配置驱动 AI Agent Builder MVP",
-        "title": "通过配置文件运行 Agent 与 Workflow 的 Builder Demo",
-        "subtitle": "同一套执行引擎读取 JSON 配置，把多个 Agent 按顺序连接成 Workflow，结合购物记录和实时天气生成推荐。",
+        "eyebrow": "Personalized Outfit Recommendation Workflow MVP",
+        "title": "通过 JSON Workflow 组装 6 个 Node 的个性化穿搭推荐 Demo",
+        "subtitle": "同一套执行引擎读取 JSON 配置，把 6 个 Workflow Node 顺序连接，结合购物记录和实时天气生成个性化穿搭推荐。",
         "language": "界面语言",
         "agent_config": "Demo 配置",
         "shopping_user": "购物记录用户",
         "user_input": "用户输入",
-        "run": "运行所选 Agent",
+        "run": "运行所选 Workflow",
         "metric_data": "数据",
         "metric_data_value": "天气 + 购物记录",
         "metric_config": "配置",
         "metric_config_value": "JSON 模板",
         "metric_flow": "流程",
-        "metric_flow_value": "解析 -> 天气 -> 购物分析 -> 推荐 -> 输出",
-        "agent_output": "Agent 输出",
+        "metric_flow_value": "解析 -> 追问 -> 天气 -> 购物分析 -> 推荐 -> 输出",
+        "agent_output": "Workflow 输出",
         "execution_trace": "Workflow 执行流程",
-        "steps_badge": "5 个 Agent",
+        "steps_badge": "6 个 Node",
         "loaded_config": "已加载配置",
         "shopping_analysis": "购物记录分析",
         "raw_trace": "原始执行记录",
@@ -123,18 +123,17 @@ UI_TEXT = {
 
 STYLE = """
 :root {
-  --bg: #f4f6f8;
+  --bg: #fafafa;
   --panel: #ffffff;
-  --text: #17202a;
-  --muted: #65717d;
-  --line: #d9e1e8;
-  --soft: #f8fafc;
-  --accent: #1f6f8b;
-  --accent-dark: #18596f;
-  --green: #2f7d68;
-  --green-soft: #e8f5f1;
-  --amber-soft: #fff7df;
-  --shadow: 0 12px 30px rgba(24, 38, 53, 0.08);
+  --text: #1a1a1a;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --soft: #f9fafb;
+  --accent: #ED6F1B;
+  --accent-dark: #C25710;
+  --accent-soft: #FFF1E6;
+  --accent-border: #F8C8A2;
+  --output-bg: #FFF9F3;
 }
 
 * {
@@ -143,262 +142,358 @@ STYLE = """
 
 body {
   margin: 0;
-  font-family: Arial, "Malgun Gothic", sans-serif;
+  font-family: "Pretendard", "Noto Sans KR", "Malgun Gothic", -apple-system, BlinkMacSystemFont, Arial, sans-serif;
   color: var(--text);
   background: var(--bg);
+  -webkit-font-smoothing: antialiased;
 }
 
-.topbar {
-  padding: 24px 32px 18px;
+.container {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+}
+
+.header {
+  padding: 28px 0 22px;
   background: var(--panel);
-  border-bottom: 1px solid var(--line);
+  border-bottom: 3px solid var(--accent);
 }
 
 .eyebrow {
-  margin: 0 0 6px;
-  color: var(--green);
-  font-size: 13px;
+  margin: 0;
+  color: var(--accent);
+  font-size: 11px;
   font-weight: 700;
+  letter-spacing: 1px;
   text-transform: uppercase;
 }
 
 h1 {
-  margin: 0;
-  font-size: 29px;
-  line-height: 1.25;
+  margin: 6px 0 0;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.3px;
 }
 
 .subtitle {
-  max-width: 900px;
-  margin: 10px 0 0;
+  max-width: 760px;
+  margin: 8px 0 0;
   color: var(--muted);
   line-height: 1.55;
+  font-size: 13.5px;
 }
 
-.shell {
-  display: grid;
-  grid-template-columns: minmax(330px, 430px) minmax(0, 1fr);
-  gap: 20px;
-  padding: 22px 32px 36px;
-  align-items: start;
+.lang-toggle {
+  position: absolute;
+  top: 0;
+  right: 24px;
+  font-size: 12px;
 }
 
-.panel {
+.lang-toggle a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.lang-toggle a:hover {
+  color: var(--text);
+}
+
+main {
+  padding: 28px 0 48px;
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.input-card {
+  padding: 18px;
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 8px;
-  box-shadow: var(--shadow);
+  border-radius: 10px;
 }
 
-.control,
-.result {
-  padding: 20px;
-}
-
-.control {
-  position: sticky;
-  top: 16px;
-}
-
-.field {
-  margin-bottom: 15px;
-}
-
-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 700;
-  font-size: 14px;
-}
-
-select,
 textarea {
   width: 100%;
-  border: 1px solid #b7c2cc;
-  border-radius: 6px;
-  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 13px;
   color: var(--text);
   background: var(--panel);
   font: inherit;
-  line-height: 1.5;
-}
-
-select:focus,
-textarea:focus {
-  outline: 3px solid rgba(31, 111, 139, 0.16);
-  border-color: var(--accent);
-}
-
-textarea {
-  min-height: 116px;
+  font-size: 15px;
+  line-height: 1.55;
+  min-height: 72px;
   resize: vertical;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(237, 111, 27, 0.15);
+}
+
+.input-bottom {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+select {
+  flex: 0 0 200px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  background: var(--panel);
+  font: inherit;
+  font-size: 13px;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(237, 111, 27, 0.15);
 }
 
 button {
-  width: 100%;
+  flex: 1;
   border: 0;
-  border-radius: 6px;
-  padding: 12px 14px;
+  border-radius: 8px;
+  padding: 12px 18px;
   background: var(--accent);
   color: #fff;
   font-weight: 700;
+  font-size: 14px;
   cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 
 button:hover {
   background: var(--accent-dark);
 }
 
-.metric-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 16px;
+.output-card {
+  margin-top: 22px;
+  padding: 22px;
+  background: var(--output-bg);
+  border: 1px solid var(--accent-border);
+  border-left: 5px solid var(--accent);
+  border-radius: 10px;
 }
 
-.metric {
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 10px;
-  background: var(--soft);
+.output-card .output-label {
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
 }
 
-.metric strong {
-  display: block;
-  margin-bottom: 3px;
-  font-size: 13px;
+.output-card .answer-text {
+  white-space: pre-wrap;
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--text);
 }
 
-.metric span {
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.section-title {
+.section-heading {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 0 0 10px;
+  gap: 10px;
+  margin: 26px 0 12px;
 }
 
-.section-title h2 {
+.section-heading h2 {
   margin: 0;
-  font-size: 17px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
 }
 
-.badge {
-  display: inline-flex;
-  align-items: center;
+.section-heading .pill {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  padding: 3px 10px;
   border-radius: 999px;
-  padding: 5px 9px;
-  background: var(--green-soft);
-  color: var(--green);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 
-.answer {
-  white-space: pre-wrap;
-  line-height: 1.65;
-  padding: 16px;
-  background: var(--green-soft);
-  border: 1px solid #bfe1d8;
-  border-radius: 8px;
-}
-
-.trace {
+.pipeline {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 18px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 8px;
 }
 
-.step {
+.node {
+  background: var(--panel);
   border: 1px solid var(--line);
+  border-top: 3px solid var(--accent);
   border-radius: 8px;
-  padding: 12px;
-  min-height: 126px;
-  background: var(--soft);
+  padding: 12px 11px 13px;
+  min-height: 108px;
+  display: flex;
+  flex-direction: column;
 }
 
-.step h3 {
-  margin: 0 0 8px;
-  font-size: 15px;
+.node .num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.5px;
 }
 
-.step p {
-  margin: 0;
+.node .title {
+  font-size: 12.5px;
+  font-weight: 700;
+  margin: 2px 0 6px;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.node .detail {
+  font-size: 11.5px;
   color: var(--muted);
   line-height: 1.5;
-  font-size: 13px;
+  word-break: break-word;
+  flex: 1;
 }
 
-.config {
+.advanced {
+  margin-top: 28px;
+  border-top: 1px dashed var(--line);
+  padding-top: 18px;
+}
+
+.advanced summary {
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.4px;
+  padding: 6px 0;
+  user-select: none;
+  list-style: none;
+}
+
+.advanced summary::-webkit-details-marker { display: none; }
+
+.advanced summary::before {
+  content: "▸ ";
+  color: var(--accent);
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.advanced[open] summary::before { content: "▾ "; }
+
+.advanced summary:hover { color: var(--text); }
+
+.advanced-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 12px;
-  margin-top: 18px;
+  margin-top: 14px;
 }
 
-.config-box {
+.adv-box {
   border: 1px solid var(--line);
   border-radius: 8px;
-  padding: 12px;
+  padding: 14px;
   background: var(--soft);
 }
 
-.config-box h3 {
+.adv-box h3 {
   margin: 0 0 8px;
-  font-size: 15px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
 }
 
-.config-box code {
+.adv-box code {
   display: block;
-  color: var(--muted);
+  color: var(--text);
   white-space: pre-wrap;
   word-break: break-word;
-  font-size: 12px;
+  font-size: 11.5px;
+  font-family: "SF Mono", "Consolas", "Monaco", monospace;
+  line-height: 1.55;
 }
 
-.raw {
-  overflow: auto;
+.raw-block {
   margin-top: 12px;
-  padding: 12px;
-  border-radius: 6px;
-  background: #17202a;
-  color: #edf2f7;
-  font-size: 12px;
-  max-height: 260px;
-}
-
-.result-grid {
-  display: grid;
-  gap: 18px;
+  overflow: auto;
+  padding: 14px;
+  border-radius: 8px;
+  background: #1a1a1a;
+  color: #f5f5f5;
+  font-size: 11.5px;
+  font-family: "SF Mono", "Consolas", "Monaco", monospace;
+  max-height: 280px;
+  border: 1px solid #2a2a2a;
 }
 
 .error {
-  padding: 14px;
+  margin-top: 22px;
+  padding: 14px 16px;
   background: #fff2f0;
   border: 1px solid #ffccc7;
+  border-left: 4px solid #c0392b;
   border-radius: 8px;
   color: #8a1f11;
+  font-size: 14px;
 }
-@media (max-width: 980px) {
-  .shell,
-  .trace,
-  .config {
-    grid-template-columns: 1fr;
-  }
-  .topbar,
-  .shell {
-    padding-left: 18px;
-    padding-right: 18px;
-  }
 
-  .control {
-    position: static;
-  }
+@media (max-width: 860px) {
+  .pipeline { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .advanced-grid { grid-template-columns: 1fr; }
+  .input-bottom { flex-direction: column; align-items: stretch; }
+  select { flex: 1 1 auto; }
+  button { width: 100%; }
+  h1 { font-size: 22px; }
+}
+
+@media (max-width: 520px) {
+  .pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .container { padding: 0 16px; }
 }
 """
 
@@ -447,14 +542,15 @@ def run_builder_agent(agent_key: str, user_id: str, query: str, lang: str) -> st
             "rules": [rule.get("name") for rule in engine.config.get("temperature_rules", [])],
         }
 
-    trace_html = []
-    for step in result.trace:
-        trace_html.append(
+    nodes_html = []
+    for i, step in enumerate(result.trace, start=1):
+        nodes_html.append(
             f"""
-            <section class="step">
-              <h3>{html.escape(step.name)}</h3>
-              <p>{html.escape(step.detail)}</p>
-            </section>
+            <div class="node">
+              <div class="num">NODE {i:02d}</div>
+              <div class="title">{html.escape(step.name)}</div>
+              <div class="detail">{html.escape(step.detail)}</div>
+            </div>
             """
         )
 
@@ -463,40 +559,34 @@ def run_builder_agent(agent_key: str, user_id: str, query: str, lang: str) -> st
         {"name": step.name, "detail": step.detail, "data": step.data}
         for step in result.trace
     ]
+    step_count_label = f"{len(result.trace)} Nodes" if get_lang(lang) == "ko" else f"{len(result.trace)} 个 Node"
 
     return f"""
-      <div class="result-grid">
-        <section>
-          <div class="section-title">
-            <h2>{html.escape(text["agent_output"])}</h2>
-            <span class="badge">{html.escape(display_name)}</span>
-          </div>
-          <div class="answer">{html.escape(result.answer)}</div>
-        </section>
-        <section>
-          <div class="section-title">
-            <h2>{html.escape(text["execution_trace"])}</h2>
-            <span class="badge">{html.escape(text["steps_badge"])}</span>
-          </div>
-          <div class="trace">{''.join(trace_html)}</div>
-        </section>
-        <section class="config">
-          <div class="config-box">
+      <section class="output-card">
+        <div class="output-label">{html.escape(text["agent_output"])} · {html.escape(display_name)}</div>
+        <div class="answer-text">{html.escape(result.answer)}</div>
+      </section>
+
+      <div class="section-heading">
+        <h2>{html.escape(text["execution_trace"])}</h2>
+        <span class="pill">{html.escape(step_count_label)}</span>
+      </div>
+      <div class="pipeline">{''.join(nodes_html)}</div>
+
+      <details class="advanced">
+        <summary>기술 상세 / Technical Details</summary>
+        <div class="advanced-grid">
+          <div class="adv-box">
             <h3>{html.escape(text["loaded_config"])}</h3>
             <code>{escape_json(config_summary)}</code>
           </div>
-          <div class="config-box">
+          <div class="adv-box">
             <h3>{html.escape(text["shopping_analysis"])}</h3>
             <code>{escape_json(shopping_summary)}</code>
           </div>
-        </section>
-        <section>
-          <div class="section-title">
-            <h2>{html.escape(text["raw_trace"])}</h2>
-          </div>
-          <pre class="raw">{escape_json(raw)}</pre>
-        </section>
-      </div>
+        </div>
+        <pre class="raw-block">{escape_json(raw)}</pre>
+      </details>
     """
 
 
@@ -522,21 +612,21 @@ def render_page(
         except Exception as exc:
             result_html = f'<div class="error">{html.escape(str(exc))}</div>'
 
-    language_options = "\n".join(
-        f'<option value="{html.escape(key)}"{selected(key, lang)}>{html.escape(label)}</option>'
-        for key, label in LANGUAGES.items()
-    )
-    agent_options = "\n".join(
-        (
-            f'<option value="{html.escape(key)}"{selected(key, agent_key)}>'
-            f'{html.escape(str(value["labels"][lang]))}</option>'
-        )
-        for key, value in AGENT_CONFIGS.items()
-    )
     user_options = "\n".join(
         f'<option value="{html.escape(key)}"{selected(key, user_id)}>{html.escape(labels[lang])}</option>'
         for key, labels in USERS.items()
     )
+    tabs_html = "\n".join(
+        (
+            f'<a class="tab{" active" if key == agent_key else ""}" '
+            f'href="?agent={html.escape(key)}&lang={lang}">'
+            f'{html.escape(str(value["labels"][lang]))}</a>'
+        )
+        for key, value in AGENT_CONFIGS.items()
+    )
+    other_lang = "zh" if lang == "ko" else "ko"
+    other_label = "中文" if lang == "ko" else "한국어"
+    placeholder = "다음 주에 칭다오 여행 가는데 옷 추천해줘" if lang == "ko" else "下周去青岛旅行，帮我推荐穿搭"
 
     page = f"""
 <!doctype html>
@@ -544,45 +634,32 @@ def render_page(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Agent Builder MVP</title>
+  <title>Personalized Outfit Recommendation Workflow MVP</title>
   <style>{STYLE}</style>
 </head>
 <body>
-  <header class="topbar">
-    <p class="eyebrow">{html.escape(text["eyebrow"])}</p>
-    <h1>{html.escape(text["title"])}</h1>
-    <p class="subtitle">{html.escape(text["subtitle"])}</p>
-  </header>
-  <main class="shell">
-    <section class="panel control">
-      <form method="post">
-        <div class="field">
-          <label for="lang">{html.escape(text["language"])}</label>
-          <select id="lang" name="lang">{language_options}</select>
-        </div>
-        <div class="field">
-          <label for="agent">{html.escape(text["agent_config"])}</label>
-          <select id="agent" name="agent">{agent_options}</select>
-        </div>
-        <div class="field">
-          <label for="user">{html.escape(text["shopping_user"])}</label>
-          <select id="user" name="user">{user_options}</select>
-        </div>
-        <div class="field">
-          <label for="query">{html.escape(text["user_input"])}</label>
-          <textarea id="query" name="query">{html.escape(query)}</textarea>
-        </div>
-        <button type="submit">{html.escape(text["run"])}</button>
-      </form>
-      <div class="metric-grid">
-        <div class="metric"><strong>{html.escape(text["metric_data"])}</strong><span>{html.escape(text["metric_data_value"])}</span></div>
-        <div class="metric"><strong>{html.escape(text["metric_config"])}</strong><span>{html.escape(text["metric_config_value"])}</span></div>
-        <div class="metric"><strong>{html.escape(text["metric_flow"])}</strong><span>{html.escape(text["metric_flow_value"])}</span></div>
+  <header class="header">
+    <div class="container">
+      <div class="lang-toggle">
+        <a href="?agent={html.escape(agent_key)}&lang={other_lang}">{other_label}</a>
       </div>
-    </section>
-    <section class="panel result">
-      {result_html}
-    </section>
+      <p class="eyebrow">{html.escape(text["eyebrow"])}</p>
+      <h1>{html.escape(text["title"])}</h1>
+      <p class="subtitle">{html.escape(text["subtitle"])}</p>
+    </div>
+  </header>
+  <main class="container">
+    <nav class="tabs">{tabs_html}</nav>
+    <form method="post" class="input-card">
+      <input type="hidden" name="lang" value="{lang}">
+      <input type="hidden" name="agent" value="{html.escape(agent_key)}">
+      <textarea name="query" placeholder="{html.escape(placeholder)}">{html.escape(query)}</textarea>
+      <div class="input-bottom">
+        <select name="user">{user_options}</select>
+        <button type="submit">▶ {html.escape(text["run"])}</button>
+      </div>
+    </form>
+    {result_html}
   </main>
 </body>
 </html>
@@ -649,7 +726,7 @@ def main() -> None:
     requested = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
     port = find_port(requested)
     server = HTTPServer(("127.0.0.1", port), DemoHandler)
-    print(f"Agent Builder MVP demo running at http://127.0.0.1:{port}", flush=True)
+    print(f"Personalized Outfit Recommendation Workflow MVP demo running at http://127.0.0.1:{port}", flush=True)
     server.serve_forever()
 
 

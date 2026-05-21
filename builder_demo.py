@@ -44,7 +44,7 @@ def run_workflow(config_path: Path, query: str | None, user_id: str) -> None:
     print(f"Workflow Config: {config_path.name}")
     print(f"Workflow: {result.workflow_name}")
     print()
-    print("Multi-Agent Trace")
+    print("Workflow Trace (6 Nodes)")
     for index, step in enumerate(result.trace, start=1):
         print(f"{index}. {step.name}: {step.detail}")
     print()

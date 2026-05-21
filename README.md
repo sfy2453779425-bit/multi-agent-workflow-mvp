@@ -1,13 +1,22 @@
-# Multi-Agent Workflow Builder MVP
+# Personalized Outfit Recommendation Workflow MVP
 
-This repository contains a clean technical MVP for a template-based
-Multi-Agent Workflow Builder.
+This repository contains a clean technical MVP for a **personalized outfit
+recommendation system** that integrates weather, user preferences, and
+shopping history.
 
-The project is not a finished Agent Builder platform. It is a minimal demo
-that proves one idea:
+- **Product goal**: personalized outfit recommendation for travel and daily
+  scenarios.
+- **Implementation strategy**: JSON-based Workflow composed of 6 reusable
+  Workflow Nodes (Request Parser → Question → Weather Tool → Shopping History
+  Analysis → Recommendation → Compose).
+- **Future extension**: visual Builder UI, real shopping platform API, larger
+  recommendation rule sets.
 
-> A JSON workflow config can define multiple small Agents and run them in a
-> fixed order to handle one user request.
+This MVP proves one idea:
+
+> A user request like "다음 주에 칭다오 여행 가는데 옷 추천해줘" can be handled
+> by composing 6 small Workflow Nodes defined in JSON, so adding new
+> scenarios only requires filling a config template — not rewriting code.
 
 ## Do Not Open Python Files To Run The Frontend
 
@@ -43,29 +52,30 @@ The web page shows:
 - user input
 - user selection
 - workflow output
-- multi-Agent execution trace
+- 6-Node Workflow execution trace
 - shopping history analysis
 - loaded config summary
 
-Default workflow:
+Default workflow (6 Nodes):
 
 ```text
-Request Parser Agent
--> Weather Agent
--> Shopping Analysis Agent
--> Recommendation Agent
--> Compose Agent
+Request Parser Node
+-> Question Node                       (clarifies missing purpose / style)
+-> Weather Tool Node
+-> Shopping History Analysis Node
+-> Recommendation Node
+-> Compose Node
 ```
 
 ## Command Line Demo
 
-Run the multi-Agent workflow:
+Run the 6-Node Workflow:
 
 ```powershell
 python builder_demo.py --workflow
 ```
 
-Run all single-Agent config demos:
+Run all single-Config demos:
 
 ```bat
 run_builder_demo.cmd
@@ -82,7 +92,7 @@ run_tests.cmd
 Expected result:
 
 ```text
-7 tests OK
+9 tests OK
 ```
 
 ## Project Structure
@@ -113,20 +123,21 @@ Expected result:
 
 ## Current Features
 
-- Sequential multi-Agent workflow execution
-- Config-driven Agent behavior
-- Open-Meteo weather API integration
+- Sequential 6-Node Workflow execution
+- Config-driven Node behavior (JSON Workflow definition)
+- Open-Meteo weather API integration (supports Seoul, Tokyo, Qingdao, Beijing, etc.)
+- Question Node that detects missing context (purpose / style) and asks the user
 - Local simulated shopping history analysis
 - Personalized recommendation based on weather and purchase history
-- Web UI for demo and trace inspection
-- Unit tests for single-Agent and workflow behavior
+- Web UI for demo and Workflow Trace inspection
+- Unit tests for single-Config and Workflow behavior (including clarification short-circuit)
 
 ## Current MVP Scope
 
 In scope:
 
 - JSON workflow definition
-- sequential Agent execution
+- sequential 6-Node Workflow execution
 - weather tool call
 - shopping history analysis
 - recommendation rule matching

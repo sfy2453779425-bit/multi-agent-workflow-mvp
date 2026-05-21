@@ -8,6 +8,17 @@ from agent_builder.shopping import analyze_shopping_history
 from weather_agent.tools import WeatherTool
 
 
+DEFAULT_PURPOSE_KEYWORDS = (
+    "여행", "출장", "통학", "출근", "학교", "데이트", "행사", "휴가", "비즈니스", "쇼핑", "출퇴근",
+)
+DEFAULT_STYLE_KEYWORDS = (
+    "캐주얼", "포멀", "스트릿", "미니멀", "스포티", "정장", "비즈니스",
+)
+DEFAULT_CLARIFICATION_MESSAGE = (
+    "정보가 부족합니다. 여행 목적과 선호 스타일을 알려주세요. (예: 출장 / 캐주얼 등)"
+)
+
+
 @dataclass(frozen=True)
 class WorkflowResult:
     workflow_name: str
@@ -45,6 +56,16 @@ class MultiAgentWorkflowEngine:
         context = self._run_request_parser(query, selected_user)
         trace.append(self._trace_request_parser(context))
 
+        self._run_question_agent(context)
+        trace.append(self._trace_question(context))
+
+        if context.get("needs_clarification"):
+            return self._finalize(
+                trace,
+                context,
+                answer=context["clarification_message"],
+            )
+
         self._run_weather_agent(context)
         trace.append(self._trace_weather(context))
 
@@ -59,10 +80,17 @@ class MultiAgentWorkflowEngine:
         context["executed_agents"].append("compose")
         trace.append(self._trace_compose(context))
 
+        return self._finalize(trace, context, answer=answer)
+
+    def _finalize(
+        self,
+        trace: list[TraceStep],
+        context: dict[str, Any],
+        answer: str,
+    ) -> WorkflowResult:
         context["workflow_name"] = self.workflow_config["workflow_name"]
         context["workflow_agents"] = self.workflow_config.get("agents", [])
         context["workflow_execution"] = self.workflow_config.get("execution", {})
-
         return WorkflowResult(
             workflow_name=self.workflow_config["workflow_name"],
             answer=answer,
@@ -75,6 +103,25 @@ class MultiAgentWorkflowEngine:
         context["executed_agents"] = ["request_parser"]
         context["executed_tools"] = []
         return context
+
+    def _run_question_agent(self, context: dict[str, Any]) -> None:
+        question_config = self.workflow_config.get("question_agent", {})
+        purpose_keywords = question_config.get("purpose_keywords", list(DEFAULT_PURPOSE_KEYWORDS))
+        style_keywords = question_config.get("style_keywords", list(DEFAULT_STYLE_KEYWORDS))
+        clarification_message = question_config.get(
+            "clarification_message", DEFAULT_CLARIFICATION_MESSAGE
+        )
+
+        lower = context["query"].lower()
+        detected_purpose = [kw for kw in purpose_keywords if kw.lower() in lower]
+        detected_style = [kw for kw in style_keywords if kw.lower() in lower]
+        needs_clarification = not detected_purpose and not detected_style
+
+        context["detected_purpose"] = detected_purpose
+        context["detected_style"] = detected_style
+        context["needs_clarification"] = needs_clarification
+        context["clarification_message"] = clarification_message if needs_clarification else ""
+        context["executed_agents"].append("question")
 
     def _run_weather_agent(self, context: dict[str, Any]) -> None:
         weather = self.base_engine.weather_tool.get_daily_weather(
@@ -126,7 +173,7 @@ class MultiAgentWorkflowEngine:
 
     def _trace_request_parser(self, context: dict[str, Any]) -> TraceStep:
         return TraceStep(
-            name="Request Parser Agent",
+            name="Request Parser Node",
             detail=(
                 f"city={context['city_display']}, date={context['date_label']}, "
                 f"user={context['user_id']}"
@@ -139,9 +186,27 @@ class MultiAgentWorkflowEngine:
             },
         )
 
+    def _trace_question(self, context: dict[str, Any]) -> TraceStep:
+        if context.get("needs_clarification"):
+            detail = "정보 부족 → 사용자에게 추가 질문"
+        else:
+            purpose = ", ".join(context.get("detected_purpose", [])) or "(없음)"
+            style = ", ".join(context.get("detected_style", [])) or "(없음)"
+            detail = f"purpose={purpose}, style={style} → 정보 충분"
+        return TraceStep(
+            name="Question Node",
+            detail=detail,
+            data={
+                "detected_purpose": context.get("detected_purpose", []),
+                "detected_style": context.get("detected_style", []),
+                "needs_clarification": context.get("needs_clarification", False),
+                "clarification_message": context.get("clarification_message", ""),
+            },
+        )
+
     def _trace_weather(self, context: dict[str, Any]) -> TraceStep:
         return TraceStep(
-            name="Weather Agent",
+            name="Weather Tool Node",
             detail=(
                 f"{context['city_display']} {context['date_label']} weather loaded: "
                 f"{context['weather_summary']['condition']}"
@@ -151,7 +216,7 @@ class MultiAgentWorkflowEngine:
 
     def _trace_shopping(self, context: dict[str, Any]) -> TraceStep:
         return TraceStep(
-            name="Shopping Analysis Agent",
+            name="Shopping History Analysis Node",
             detail=(
                 f"styles={context['styles_text']}, colors={context['colors_text']}, "
                 f"records={context['shopping_item_count']}"
@@ -161,7 +226,7 @@ class MultiAgentWorkflowEngine:
 
     def _trace_recommendation(self, context: dict[str, Any]) -> TraceStep:
         return TraceStep(
-            name="Recommendation Agent",
+            name="Recommendation Node",
             detail=f"rule={context['matched_rule_name']}, items={len(context['recommended_items'])}",
             data={
                 "avg_temp": context["avg_temp"],
@@ -172,7 +237,7 @@ class MultiAgentWorkflowEngine:
 
     def _trace_compose(self, context: dict[str, Any]) -> TraceStep:
         return TraceStep(
-            name="Compose Agent",
+            name="Compose Node",
             detail="final response rendered from output_template",
             data={
                 "template_id": self.base_engine.config.get("agent_id"),

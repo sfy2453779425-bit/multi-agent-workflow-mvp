@@ -267,6 +267,8 @@ class AgentBuilderEngine:
         return default_city["display"], default_city["query"]
 
     def _extract_date(self, lower_text: str) -> tuple[int, str]:
+        if "다음 주" in lower_text or "다음주" in lower_text or "next week" in lower_text:
+            return 7, "다음 주"
         if "모레" in lower_text or "day after tomorrow" in lower_text:
             return 2, "모레"
         if "내일" in lower_text or "tomorrow" in lower_text:
