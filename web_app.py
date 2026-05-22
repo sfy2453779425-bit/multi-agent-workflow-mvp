@@ -2,7 +2,7 @@ import html
 import json
 import socket
 import sys
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
@@ -30,24 +30,6 @@ AGENT_CONFIGS = {
         },
         "path": ROOT / "configs" / "outfit_agent.json",
         "default_query": "서울 내일 날씨에 맞춰 내 스타일로 옷 추천해줘",
-    },
-    "travel": {
-        "type": "agent",
-        "labels": {
-            "ko": "여행 준비물 추천 (단일 Config)",
-            "zh": "旅行准备物推荐 (单 Config)",
-        },
-        "path": ROOT / "configs" / "travel_pack_agent.json",
-        "default_query": "서울 내일 여행 갈 때 챙길 물건 추천해줘",
-    },
-    "commute": {
-        "type": "agent",
-        "labels": {
-            "ko": "통학/출근 준비 (단일 Config)",
-            "zh": "通勤/上学准备 (单 Config)",
-        },
-        "path": ROOT / "configs" / "commute_agent.json",
-        "default_query": "서울 내일 학교 갈 때 뭐 챙겨야 해?",
     },
 }
 
@@ -94,6 +76,7 @@ UI_TEXT = {
         "loaded_config": "Loaded Config",
         "shopping_analysis": "Shopping History Analysis",
         "raw_trace": "Raw Trace",
+        "followup_placeholder": "추가 답변을 입력하세요. 예: 칭다오 / 다음 주 / 여행",
     },
     "zh": {
         "html_lang": "zh-CN",
@@ -117,6 +100,7 @@ UI_TEXT = {
         "loaded_config": "已加载配置",
         "shopping_analysis": "购物记录分析",
         "raw_trace": "原始执行记录",
+        "followup_placeholder": "请输入补充回答，例如：青岛 / 下周 / 旅行",
     },
 }
 
@@ -514,7 +498,7 @@ def get_agent_meta(agent_key: str) -> dict[str, object]:
     return AGENT_CONFIGS.get(agent_key, AGENT_CONFIGS[DEFAULT_AGENT])
 
 
-def run_builder_agent(agent_key: str, user_id: str, query: str, lang: str) -> str:
+def run_builder_agent(agent_key: str, user_id: str, query: str, lang: str) -> tuple[str, bool]:
     text = UI_TEXT[get_lang(lang)]
     meta = get_agent_meta(agent_key)
     if meta.get("type") == "workflow":
@@ -555,6 +539,7 @@ def run_builder_agent(agent_key: str, user_id: str, query: str, lang: str) -> st
         )
 
     shopping_summary = result.context.get("shopping_analysis_summary", {})
+    needs_clarification = bool(result.context.get("needs_clarification", False))
     raw = [
         {"name": step.name, "detail": step.detail, "data": step.data}
         for step in result.trace
@@ -587,7 +572,15 @@ def run_builder_agent(agent_key: str, user_id: str, query: str, lang: str) -> st
         </div>
         <pre class="raw-block">{escape_json(raw)}</pre>
       </details>
-    """
+    """, needs_clarification
+
+
+def merge_followup_query(previous_query: str, new_query: str) -> str:
+    previous_query = previous_query.strip()
+    new_query = new_query.strip()
+    if previous_query and new_query:
+        return f"{previous_query} {new_query}"
+    return new_query or previous_query
 
 
 def render_page(
@@ -595,6 +588,7 @@ def render_page(
     user_id: str = DEFAULT_USER,
     lang: str = DEFAULT_LANG,
     query: str | None = None,
+    conversation_context: str = "",
     result_html: str = "",
     error: str = "",
 ) -> bytes:
@@ -608,7 +602,10 @@ def render_page(
         result_html = f'<div class="error">{html.escape(error)}</div>'
     if not result_html:
         try:
-            result_html = run_builder_agent(agent_key, user_id, query, lang)
+            result_html, needs_clarification = run_builder_agent(agent_key, user_id, query, lang)
+            if needs_clarification:
+                conversation_context = query
+                query = ""
         except Exception as exc:
             result_html = f'<div class="error">{html.escape(str(exc))}</div>'
 
@@ -627,6 +624,8 @@ def render_page(
     other_lang = "zh" if lang == "ko" else "ko"
     other_label = "中文" if lang == "ko" else "한국어"
     placeholder = "다음 주에 칭다오 여행 가는데 옷 추천해줘" if lang == "ko" else "下周去青岛旅行，帮我推荐穿搭"
+    if conversation_context:
+        placeholder = text["followup_placeholder"]
 
     page = f"""
 <!doctype html>
@@ -653,6 +652,7 @@ def render_page(
     <form method="post" class="input-card">
       <input type="hidden" name="lang" value="{lang}">
       <input type="hidden" name="agent" value="{html.escape(agent_key)}">
+      <input type="hidden" name="conversation_context" value="{html.escape(conversation_context)}">
       <textarea name="query" placeholder="{html.escape(placeholder)}">{html.escape(query)}</textarea>
       <div class="input-bottom">
         <select name="user">{user_options}</select>
@@ -682,21 +682,27 @@ class DemoHandler(BaseHTTPRequestHandler):
         lang = get_lang(form.get("lang", [DEFAULT_LANG])[0])
         agent_key = form.get("agent", [DEFAULT_AGENT])[0]
         user_id = form.get("user", [DEFAULT_USER])[0]
-        query = form.get("query", [""])[0].strip()
+        previous_query = form.get("conversation_context", [""])[0].strip()
+        query = merge_followup_query(previous_query, form.get("query", [""])[0])
         if not query:
             query = str(get_agent_meta(agent_key)["default_query"])
 
         try:
-            result_html = run_builder_agent(agent_key, user_id, query, lang)
+            result_html, needs_clarification = run_builder_agent(agent_key, user_id, query, lang)
+            conversation_context = query if needs_clarification else ""
+            display_query = "" if needs_clarification else query
             error = ""
         except Exception as exc:
             result_html, error = "", str(exc)
+            conversation_context = previous_query
+            display_query = form.get("query", [""])[0].strip()
         self._send(
             render_page(
                 agent_key=agent_key,
                 user_id=user_id,
                 lang=lang,
-                query=query,
+                query=display_query,
+                conversation_context=conversation_context,
                 result_html=result_html,
                 error=error,
             )
@@ -710,7 +716,10 @@ class DemoHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(payload)))
         self.end_headers()
-        self.wfile.write(payload)
+        try:
+            self.wfile.write(payload)
+        except (BrokenPipeError, ConnectionAbortedError, ConnectionResetError):
+            return
 
 
 def find_port(start: int) -> int:
@@ -725,7 +734,7 @@ def find_port(start: int) -> int:
 def main() -> None:
     requested = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
     port = find_port(requested)
-    server = HTTPServer(("127.0.0.1", port), DemoHandler)
+    server = ThreadingHTTPServer(("127.0.0.1", port), DemoHandler)
     print(f"Personalized Outfit Recommendation Workflow MVP demo running at http://127.0.0.1:{port}", flush=True)
     server.serve_forever()
 

@@ -36,35 +36,11 @@ class AgentBuilderEngineTest(unittest.TestCase):
 
         self.assertEqual("Personalized Outfit Agent", result.agent_name)
         self.assertEqual(["Plan", "Act", "Analyze", "Decide", "Compose"], [s.name for s in result.trace])
+        self.assertIn("추천 순위", result.answer)
+        self.assertIn("1. ", result.answer)
         self.assertIn("보유 단품 기반 추천", result.answer)
         self.assertIn("쇼핑 기록 분석", result.answer)
         self.assertIn("블랙 후드티", result.answer)
-
-    def test_same_engine_runs_travel_config(self):
-        engine = AgentBuilderEngine(
-            ROOT / "configs" / "travel_pack_agent.json",
-            weather_tool=FakeWeatherTool(),
-        )
-
-        result = engine.run("서울 내일 여행 준비물 추천해줘", user_id="user_a")
-
-        self.assertEqual("Travel Packing Agent", result.agent_name)
-        self.assertIn("챙길 물건", result.answer)
-        self.assertIn("쇼핑 기록 분석", result.answer)
-        self.assertIn("보조 배터리", result.answer)
-
-    def test_same_engine_runs_commute_config(self):
-        engine = AgentBuilderEngine(
-            ROOT / "configs" / "commute_agent.json",
-            weather_tool=FakeWeatherTool(),
-        )
-
-        result = engine.run("서울 내일 학교 갈 때 뭐 챙겨야 해?", user_id="user_a")
-
-        self.assertEqual("Commute Preparation Agent", result.agent_name)
-        self.assertEqual(["Plan", "Act", "Analyze", "Decide", "Compose"], [s.name for s in result.trace])
-        self.assertIn("통학/출근 준비 방향", result.answer)
-        self.assertIn("교통카드", result.answer)
 
     def test_user_profile_changes_output_without_code_change(self):
         engine = AgentBuilderEngine(
@@ -100,6 +76,7 @@ class AgentBuilderEngineTest(unittest.TestCase):
             [s.name for s in result.trace],
         )
         self.assertIn("보유 단품 기반 추천", result.answer)
+        self.assertIn("추천 순위", result.answer)
         self.assertIn("블랙 후드티", result.answer)
         self.assertEqual(
             [
@@ -115,7 +92,7 @@ class AgentBuilderEngineTest(unittest.TestCase):
         self.assertFalse(result.context["needs_clarification"])
         self.assertIn("출근", result.context["detected_purpose"])
 
-    def test_question_agent_short_circuits_when_information_missing(self):
+    def test_question_agent_asks_city_first_when_information_missing(self):
         engine = MultiAgentWorkflowEngine(
             ROOT / "configs" / "outfit_workflow.json",
             weather_tool=FakeWeatherTool(),
@@ -132,8 +109,34 @@ class AgentBuilderEngineTest(unittest.TestCase):
             result.context["executed_agents"],
         )
         self.assertTrue(result.context["needs_clarification"])
-        self.assertIn("정보가 부족합니다", result.answer)
+        self.assertEqual("city", result.context["next_question_field"])
+        self.assertEqual(["city", "date", "purpose_or_style"], result.context["missing_fields"])
+        self.assertIn("어느 도시", result.answer)
         self.assertNotIn("weather", result.context.get("executed_tools", []))
+
+    def test_question_agent_continues_to_next_missing_field(self):
+        engine = MultiAgentWorkflowEngine(
+            ROOT / "configs" / "outfit_workflow.json",
+            weather_tool=FakeWeatherTool(),
+        )
+
+        result = engine.run("옷 추천해줘 칭다오", user_id="user_a")
+
+        self.assertTrue(result.context["needs_clarification"])
+        self.assertEqual("date", result.context["next_question_field"])
+        self.assertIn("언제", result.answer)
+
+    def test_question_agent_asks_purpose_or_style_last(self):
+        engine = MultiAgentWorkflowEngine(
+            ROOT / "configs" / "outfit_workflow.json",
+            weather_tool=FakeWeatherTool(),
+        )
+
+        result = engine.run("칭다오 다음 주 옷 추천해줘", user_id="user_a")
+
+        self.assertTrue(result.context["needs_clarification"])
+        self.assertEqual("purpose_or_style", result.context["next_question_field"])
+        self.assertIn("여행/출근/데이트", result.answer)
 
     def test_question_agent_passes_when_style_keyword_present(self):
         engine = MultiAgentWorkflowEngine(
@@ -146,6 +149,18 @@ class AgentBuilderEngineTest(unittest.TestCase):
         self.assertFalse(result.context["needs_clarification"])
         self.assertIn("캐주얼", result.context["detected_style"])
         self.assertEqual(6, len(result.trace))
+
+    def test_question_agent_passes_after_followup_context_is_complete(self):
+        engine = MultiAgentWorkflowEngine(
+            ROOT / "configs" / "outfit_workflow.json",
+            weather_tool=FakeWeatherTool(),
+        )
+
+        result = engine.run("옷 추천해줘 칭다오 다음 주 여행", user_id="user_a")
+
+        self.assertFalse(result.context["needs_clarification"])
+        self.assertEqual(6, len(result.trace))
+        self.assertIn("추천 순위", result.answer)
 
 
 if __name__ == "__main__":

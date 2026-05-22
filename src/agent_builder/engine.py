@@ -205,12 +205,23 @@ class AgentBuilderEngine:
             target_categories=rule.get("owned_item_categories", []),
         )
         extras = self._match_extras(context)
+        additional_items = items + [extra["item"] for extra in extras if extra.get("item")]
+
+        # Owned items rank higher (user already has them, zero cost).
+        owned_numbered = [f"{i + 1}. {item}" for i, item in enumerate(owned_items)]
+        owned_count = len(owned_items)
+        additional_numbered = [
+            f"{owned_count + i + 1}. {item}" for i, item in enumerate(additional_items)
+        ]
+
         context["owned_recommended_items"] = owned_items
-        context["owned_recommended_items_text"] = ", ".join(owned_items)
-        context["additional_items"] = items + [extra["item"] for extra in extras if extra.get("item")]
-        context["additional_items_text"] = ", ".join(context["additional_items"])
-        context["recommended_items"] = owned_items + context["additional_items"]
-        context["recommended_items_text"] = ", ".join(context["recommended_items"])
+        context["owned_recommended_items_text"] = ", ".join(owned_numbered)
+        context["additional_items"] = additional_items
+        context["additional_items_text"] = ", ".join(additional_numbered)
+        context["recommended_items"] = owned_items + additional_items
+        context["recommended_items_text"] = ", ".join(owned_numbered + additional_numbered)
+        context["ranked_items"] = owned_numbered + additional_numbered
+        context["ranked_items_text"] = " | ".join(owned_numbered + additional_numbered)
         context["extras"] = extras
         context["extras_text"] = ", ".join(extra["text"] for extra in extras if extra.get("text"))
 

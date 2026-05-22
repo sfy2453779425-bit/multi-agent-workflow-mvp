@@ -15,8 +15,9 @@ shopping history.
 This MVP proves one idea:
 
 > A user request like "다음 주에 칭다오 여행 가는데 옷 추천해줘" can be handled
-> by composing 6 small Workflow Nodes defined in JSON, so adding new
-> scenarios only requires filling a config template — not rewriting code.
+> by composing 6 small Workflow Nodes defined in JSON. If the request is too
+> vague, the Question Node asks for missing context before the weather and
+> shopping-history tools run.
 
 ## Do Not Open Python Files To Run The Frontend
 
@@ -60,7 +61,7 @@ Default workflow (6 Nodes):
 
 ```text
 Request Parser Node
--> Question Node                       (clarifies missing purpose / style)
+-> Question Node                       (clarifies missing city / date / purpose / style)
 -> Weather Tool Node
 -> Shopping History Analysis Node
 -> Recommendation Node
@@ -92,7 +93,7 @@ run_tests.cmd
 Expected result:
 
 ```text
-9 tests OK
+10 tests OK
 ```
 
 ## Project Structure
@@ -101,9 +102,7 @@ Expected result:
 .
 ├── configs/
 │   ├── outfit_workflow.json
-│   ├── outfit_agent.json
-│   ├── travel_pack_agent.json
-│   └── commute_agent.json
+│   └── outfit_agent.json
 ├── data/
 │   ├── shopping_history.json
 │   └── user_profiles.json
@@ -126,9 +125,10 @@ Expected result:
 - Sequential 6-Node Workflow execution
 - Config-driven Node behavior (JSON Workflow definition)
 - Open-Meteo weather API integration (supports Seoul, Tokyo, Qingdao, Beijing, etc.)
-- Question Node that detects missing context (purpose / style) and asks the user
+- Question Node that detects missing context and asks follow-up questions
+  in sequence (city -> date -> purpose/style)
 - Local simulated shopping history analysis
-- Personalized recommendation based on weather and purchase history
+- Ranked personalized recommendation based on weather and purchase history
 - Web UI for demo and Workflow Trace inspection
 - Unit tests for single-Config and Workflow behavior (including clarification short-circuit)
 

@@ -5,7 +5,7 @@ from typing import Any
 
 from agent_builder.engine import AgentBuilderEngine, TraceStep
 from agent_builder.shopping import analyze_shopping_history
-from weather_agent.tools import WeatherTool
+from weather_agent.tools import CITY_ALIASES, WeatherTool
 
 
 DEFAULT_PURPOSE_KEYWORDS = (
@@ -16,6 +16,17 @@ DEFAULT_STYLE_KEYWORDS = (
 )
 DEFAULT_CLARIFICATION_MESSAGE = (
     "정보가 부족합니다. 여행 목적과 선호 스타일을 알려주세요. (예: 출장 / 캐주얼 등)"
+)
+DEFAULT_CLARIFICATION_QUESTIONS = {
+    "city": "어느 도시나 여행지를 기준으로 추천할까요? (예: 서울, 칭다오)",
+    "date": "언제 입을 옷인가요? (예: 내일, 다음 주)",
+    "purpose_or_style": "여행/출근/데이트 같은 목적이나 캐주얼/포멀 같은 선호 스타일을 알려주세요.",
+}
+DATE_KEYWORDS = (
+    "다음 주", "다음주", "next week",
+    "모레", "day after tomorrow",
+    "내일", "tomorrow",
+    "오늘", "today",
 )
 
 
@@ -115,13 +126,40 @@ class MultiAgentWorkflowEngine:
         lower = context["query"].lower()
         detected_purpose = [kw for kw in purpose_keywords if kw.lower() in lower]
         detected_style = [kw for kw in style_keywords if kw.lower() in lower]
-        needs_clarification = not detected_purpose and not detected_style
+        missing_fields = self._find_missing_context(lower, detected_purpose, detected_style)
+        needs_clarification = bool(missing_fields)
+        next_question_field = missing_fields[0] if missing_fields else ""
+        clarification_questions = {
+            **DEFAULT_CLARIFICATION_QUESTIONS,
+            **question_config.get("clarification_questions", {}),
+        }
+        next_question = clarification_questions.get(next_question_field, clarification_message)
 
         context["detected_purpose"] = detected_purpose
         context["detected_style"] = detected_style
+        context["missing_fields"] = missing_fields
+        context["next_question_field"] = next_question_field
         context["needs_clarification"] = needs_clarification
-        context["clarification_message"] = clarification_message if needs_clarification else ""
+        context["clarification_message"] = next_question if needs_clarification else ""
         context["executed_agents"].append("question")
+
+    def _find_missing_context(
+        self,
+        lower: str,
+        detected_purpose: list[str],
+        detected_style: list[str],
+    ) -> list[str]:
+        missing_fields = []
+        if not self._has_explicit_city(lower):
+            missing_fields.append("city")
+        if not any(keyword in lower for keyword in DATE_KEYWORDS):
+            missing_fields.append("date")
+        if not detected_purpose and not detected_style:
+            missing_fields.append("purpose_or_style")
+        return missing_fields
+
+    def _has_explicit_city(self, lower: str) -> bool:
+        return any(alias in lower for alias in CITY_ALIASES)
 
     def _run_weather_agent(self, context: dict[str, Any]) -> None:
         weather = self.base_engine.weather_tool.get_daily_weather(
@@ -188,7 +226,8 @@ class MultiAgentWorkflowEngine:
 
     def _trace_question(self, context: dict[str, Any]) -> TraceStep:
         if context.get("needs_clarification"):
-            detail = "정보 부족 → 사용자에게 추가 질문"
+            missing = ", ".join(context.get("missing_fields", []))
+            detail = f"missing={missing} → {context.get('next_question_field')} 질문"
         else:
             purpose = ", ".join(context.get("detected_purpose", [])) or "(없음)"
             style = ", ".join(context.get("detected_style", [])) or "(없음)"
@@ -199,6 +238,8 @@ class MultiAgentWorkflowEngine:
             data={
                 "detected_purpose": context.get("detected_purpose", []),
                 "detected_style": context.get("detected_style", []),
+                "missing_fields": context.get("missing_fields", []),
+                "next_question_field": context.get("next_question_field", ""),
                 "needs_clarification": context.get("needs_clarification", False),
                 "clarification_message": context.get("clarification_message", ""),
             },
@@ -231,6 +272,7 @@ class MultiAgentWorkflowEngine:
             data={
                 "avg_temp": context["avg_temp"],
                 "recommended_items": context["recommended_items"],
+                "ranked_items": context.get("ranked_items", []),
                 "extras": context["extras"],
             },
         )

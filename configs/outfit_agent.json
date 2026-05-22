@@ -54,5 +54,5 @@
       "text": "일교차가 커서 겉옷을 추가하세요"
     }
   ],
-  "output_template": "[{agent_name}]\n{city_display}의 {date_label}({weather_date}) 날씨는 {weather_condition}, 평균 {avg_temp}°C입니다.\n쇼핑 기록 분석: 총 {shopping_item_count}개 구매 기록에서 선호 스타일은 {styles_text}, 선호 색상은 {colors_text}로 분석되었습니다.\n추천 방향: {recommendation}\n보유 단품 기반 추천: {owned_recommended_items_text}\n추가 추천: {additional_items_text}\n추가 조건: {extras_text}"
+  "output_template": "[{agent_name}]\n{city_display}의 {date_label}({weather_date}) 날씨는 {weather_condition}, 평균 {avg_temp}°C입니다.\n쇼핑 기록 분석: 총 {shopping_item_count}개 구매 기록에서 선호 스타일은 {styles_text}, 선호 색상은 {colors_text}로 분석되었습니다.\n추천 방향: {recommendation}\n추천 순위: {ranked_items_text}\n보유 단품 기반 추천: {owned_recommended_items_text}\n추가 추천: {additional_items_text}\n추가 조건: {extras_text}"
 }

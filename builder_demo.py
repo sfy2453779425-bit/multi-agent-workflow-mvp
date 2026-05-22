@@ -13,8 +13,6 @@ from agent_builder import AgentBuilderEngine, MultiAgentWorkflowEngine  # noqa: 
 
 DEFAULT_CONFIGS = [
     ROOT / "configs" / "outfit_agent.json",
-    ROOT / "configs" / "travel_pack_agent.json",
-    ROOT / "configs" / "commute_agent.json",
 ]
 DEFAULT_WORKFLOW_CONFIG = ROOT / "configs" / "outfit_workflow.json"
 
@@ -69,7 +67,7 @@ def main() -> None:
     parser.add_argument(
         "--all",
         action="store_true",
-        help="Run all demo configs to prove config switching.",
+        help="Run all current outfit demo configs.",
     )
     args = parser.parse_args()
 
