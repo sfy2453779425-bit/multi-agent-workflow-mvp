@@ -18,6 +18,9 @@ Thumbs.db
 *.pptx
 docs/
 docs/ppt_previews/
+team_research_package/
+team_research_package.zip
+USAGE.md
 experiments/
 scripts/
 scripts/generate_ppt.js

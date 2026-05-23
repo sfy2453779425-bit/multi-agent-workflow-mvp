@@ -19,6 +19,41 @@ This MVP proves one idea:
 > vague, the Question Node asks for missing context before the weather and
 > shopping-history tools run.
 
+## Main Desktop Demo
+
+Run this first. It opens a local desktop window and does not use a browser,
+localhost, or any port.
+
+On Windows:
+
+```bat
+run_desktop.cmd
+```
+
+The desktop app shows:
+
+- user input / follow-up answer box
+- user selection
+- workflow output
+- 6-Node Workflow execution trace
+- follow-up context state
+
+Example follow-up flow:
+
+```text
+User: 옷 추천해줘
+System: 어느 도시나 여행지를 기준으로 추천할까요?
+User: 칭다오
+System: 언제 입을 옷인가요?
+User: 다음 주 여행
+System: runs the full 6-Node Workflow and returns ranked recommendations
+```
+
+## Optional Web Demo
+
+The web demo still exists for development, but the desktop app is the stable
+demo path.
+
 ## Do Not Open Python Files To Run The Frontend
 
 If you click `builder_demo.py` or `web_app.py` in VS Code, you will see source
@@ -93,7 +128,7 @@ run_tests.cmd
 Expected result:
 
 ```text
-10 tests OK
+11 tests OK
 ```
 
 ## Project Structure
@@ -115,8 +150,10 @@ Expected result:
 │       ├── tools.py
 │       └── models.py
 ├── tests/
+├── desktop_app.py
 ├── web_app.py
 ├── builder_demo.py
+├── run_desktop.cmd
 └── run_web.cmd
 ```
 
@@ -129,6 +166,7 @@ Expected result:
   in sequence (city -> date -> purpose/style)
 - Local simulated shopping history analysis
 - Ranked personalized recommendation based on weather and purchase history
+- Desktop UI that runs without browser / localhost
 - Web UI for demo and Workflow Trace inspection
 - Unit tests for single-Config and Workflow behavior (including clarification short-circuit)
 

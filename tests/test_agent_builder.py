@@ -6,6 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from agent_builder import AgentBuilderEngine, MultiAgentWorkflowEngine  # noqa: E402
+from desktop_app import merge_followup_query  # noqa: E402
 from weather_agent import WeatherReport  # noqa: E402
 
 
@@ -161,6 +162,11 @@ class AgentBuilderEngineTest(unittest.TestCase):
         self.assertFalse(result.context["needs_clarification"])
         self.assertEqual(6, len(result.trace))
         self.assertIn("추천 순위", result.answer)
+
+    def test_desktop_followup_query_merge(self):
+        self.assertEqual("옷 추천해줘 칭다오", merge_followup_query("옷 추천해줘", "칭다오"))
+        self.assertEqual("칭다오", merge_followup_query("", "칭다오"))
+        self.assertEqual("옷 추천해줘", merge_followup_query("옷 추천해줘", ""))
 
 
 if __name__ == "__main__":
