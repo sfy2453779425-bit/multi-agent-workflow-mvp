@@ -67,6 +67,12 @@ On Windows:
 run_web.cmd
 ```
 
+or:
+
+```bat
+open_web_demo.cmd
+```
+
 Then open this URL in a browser:
 
 ```text
@@ -87,8 +93,8 @@ The web page shows:
 
 - user input
 - user selection
-- workflow output
-- 6-Node Workflow execution trace
+- workflow output after you click Run
+- 6-Node Workflow execution trace after execution
 - shopping history analysis
 - loaded config summary
 
@@ -154,6 +160,7 @@ Expected result:
 ├── web_app.py
 ├── builder_demo.py
 ├── run_desktop.cmd
+├── open_web_demo.cmd
 └── run_web.cmd
 ```
 

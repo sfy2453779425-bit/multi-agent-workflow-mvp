@@ -4,6 +4,7 @@ import socket
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+import urllib.parse
 from urllib.parse import parse_qs, urlparse
 
 ROOT = Path(__file__).resolve().parent
@@ -77,6 +78,16 @@ UI_TEXT = {
         "shopping_analysis": "Shopping History Analysis",
         "raw_trace": "Raw Trace",
         "followup_placeholder": "추가 답변을 입력하세요. 예: 칭다오 / 다음 주 / 여행",
+        "hint_label": "TIP",
+        "hint_text": "정보가 부족한 입력을 보내면 시스템이 도시 → 시간 → 목적 순으로 추가 질문합니다. 아래 예시를 눌러 시도해 보세요.",
+        "preset_minimal_label": "최소 입력 (추가 질문 시연)",
+        "preset_minimal_query": "옷 추천해줘",
+        "preset_partial_label": "부분 입력",
+        "preset_partial_query": "칭다오 옷 추천해줘",
+        "preset_full_label": "전체 한 문장",
+        "preset_full_query": "다음 주에 칭다오 여행 가는데 옷 추천해줘",
+        "context_label": "이미 입력된 정보",
+        "reset_label": "처음부터 다시",
     },
     "zh": {
         "html_lang": "zh-CN",
@@ -101,6 +112,16 @@ UI_TEXT = {
         "shopping_analysis": "购物记录分析",
         "raw_trace": "原始执行记录",
         "followup_placeholder": "请输入补充回答，例如：青岛 / 下周 / 旅行",
+        "hint_label": "提示",
+        "hint_text": "如果信息不足，系统会按 城市 → 时间 → 目的 顺序追问。点击下方示例可一键试用。",
+        "preset_minimal_label": "最少输入（演示追问）",
+        "preset_minimal_query": "옷 추천해줘",
+        "preset_partial_label": "部分输入",
+        "preset_partial_query": "칭다오 옷 추천해줘",
+        "preset_full_label": "完整一句话",
+        "preset_full_query": "다음 주에 칭다오 여행 가는데 옷 추천해줘",
+        "context_label": "已输入信息",
+        "reset_label": "重新开始",
     },
 }
 
@@ -225,6 +246,100 @@ main {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 10px;
+}
+
+.hint-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.hint-banner .hint-tag {
+  flex: 0 0 auto;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-top: 1px;
+}
+
+.presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.preset-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 999px;
+  text-decoration: none;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.preset-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent-dark);
+  background: var(--accent-soft);
+}
+
+.context-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  background: var(--soft);
+  border: 1px dashed var(--accent);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text);
+}
+
+.context-pill .ctx-label {
+  color: var(--accent-dark);
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+.context-pill .ctx-text {
+  flex: 1;
+  color: var(--muted);
+  word-break: break-word;
+}
+
+.context-pill .ctx-reset {
+  flex: 0 0 auto;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+}
+
+.context-pill .ctx-reset:hover {
+  color: var(--accent-dark);
+  border-color: var(--accent);
 }
 
 textarea {
@@ -591,6 +706,7 @@ def render_page(
     conversation_context: str = "",
     result_html: str = "",
     error: str = "",
+    auto_run: bool = False,
 ) -> bytes:
     lang = get_lang(lang)
     text = UI_TEXT[lang]
@@ -600,7 +716,7 @@ def render_page(
 
     if error:
         result_html = f'<div class="error">{html.escape(error)}</div>'
-    if not result_html:
+    if auto_run and not result_html:
         try:
             result_html, needs_clarification = run_builder_agent(agent_key, user_id, query, lang)
             if needs_clarification:
@@ -626,6 +742,40 @@ def render_page(
     placeholder = "다음 주에 칭다오 여행 가는데 옷 추천해줘" if lang == "ko" else "下周去青岛旅行，帮我推荐穿搭"
     if conversation_context:
         placeholder = text["followup_placeholder"]
+
+    presets_html = ""
+    if not conversation_context:
+        preset_items = [
+            (text["preset_minimal_label"], text["preset_minimal_query"]),
+            (text["preset_partial_label"], text["preset_partial_query"]),
+            (text["preset_full_label"], text["preset_full_query"]),
+        ]
+        chips = "".join(
+            f'<a class="preset-chip" href="?agent={html.escape(agent_key)}&lang={lang}'
+            f'&preset={urllib.parse.quote(p_query)}">{html.escape(p_label)}</a>'
+            for p_label, p_query in preset_items
+        )
+        presets_html = f'<div class="presets">{chips}</div>'
+
+    hint_html = ""
+    if not conversation_context:
+        hint_html = (
+            f'<div class="hint-banner">'
+            f'<span class="hint-tag">{html.escape(text["hint_label"])}</span>'
+            f'<span>{html.escape(text["hint_text"])}</span>'
+            f'</div>'
+        )
+
+    context_pill_html = ""
+    if conversation_context:
+        reset_href = f'?agent={html.escape(agent_key)}&lang={lang}'
+        context_pill_html = (
+            f'<div class="context-pill">'
+            f'<span><span class="ctx-label">{html.escape(text["context_label"])}:</span>'
+            f'<span class="ctx-text">{html.escape(conversation_context)}</span></span>'
+            f'<a class="ctx-reset" href="{reset_href}">↺ {html.escape(text["reset_label"])}</a>'
+            f'</div>'
+        )
 
     page = f"""
 <!doctype html>
@@ -653,6 +803,9 @@ def render_page(
       <input type="hidden" name="lang" value="{lang}">
       <input type="hidden" name="agent" value="{html.escape(agent_key)}">
       <input type="hidden" name="conversation_context" value="{html.escape(conversation_context)}">
+      {hint_html}
+      {presets_html}
+      {context_pill_html}
       <textarea name="query" placeholder="{html.escape(placeholder)}">{html.escape(query)}</textarea>
       <div class="input-bottom">
         <select name="user">{user_options}</select>
@@ -673,7 +826,13 @@ class DemoHandler(BaseHTTPRequestHandler):
         lang = get_lang(params.get("lang", [DEFAULT_LANG])[0])
         agent_key = params.get("agent", [DEFAULT_AGENT])[0]
         user_id = params.get("user", [DEFAULT_USER])[0]
-        self._send(render_page(agent_key=agent_key, user_id=user_id, lang=lang))
+        preset = params.get("preset", [""])[0].strip()
+        if preset:
+            self._send(render_page(
+                agent_key=agent_key, user_id=user_id, lang=lang, query=preset,
+            ))
+        else:
+            self._send(render_page(agent_key=agent_key, user_id=user_id, lang=lang))
 
     def do_POST(self) -> None:
         length = int(self.headers.get("Content-Length", "0"))
