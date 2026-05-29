@@ -5,7 +5,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from agent_builder import AgentBuilderEngine, MultiAgentWorkflowEngine  # noqa: E402
+from agent_builder import AgentBuilderEngine, MultiAgentWorkflowEngine, TemplateWorkflowBuilder  # noqa: E402
 from desktop_app import merge_followup_query  # noqa: E402
 from weather_agent import WeatherReport  # noqa: E402
 
@@ -167,6 +167,100 @@ class AgentBuilderEngineTest(unittest.TestCase):
         self.assertEqual("옷 추천해줘 칭다오", merge_followup_query("옷 추천해줘", "칭다오"))
         self.assertEqual("칭다오", merge_followup_query("", "칭다오"))
         self.assertEqual("옷 추천해줘", merge_followup_query("옷 추천해줘", ""))
+
+
+    def test_template_builder_generates_outfit_workflow_config(self):
+        builder = TemplateWorkflowBuilder(
+            ROOT / "configs" / "builder_templates" / "outfit_recommendation_template.json"
+        )
+
+        generated = builder.build_workflow_config()
+
+        self.assertEqual(
+            [
+                "request_parser",
+                "question",
+                "weather",
+                "shopping_analysis",
+                "recommendation",
+                "compose",
+            ],
+            generated["execution"]["order"],
+        )
+        self.assertEqual(6, len(generated["agents"]))
+        self.assertEqual("TemplateWorkflowBuilder", generated["execution"]["generated_by"])
+        self.assertIn("question_agent", generated)
+
+    def test_template_builder_rejects_missing_required_node(self):
+        builder = TemplateWorkflowBuilder(
+            ROOT / "configs" / "builder_templates" / "outfit_recommendation_template.json"
+        )
+
+        validation = builder.validate_node_ids(["request_parser", "question"])
+
+        self.assertFalse(validation.ok)
+        self.assertTrue(any("missing required nodes" in error for error in validation.errors))
+
+    def test_generated_template_workflow_runs(self):
+        import json
+        import tempfile
+
+        builder = TemplateWorkflowBuilder(
+            ROOT / "configs" / "builder_templates" / "outfit_recommendation_template.json"
+        )
+        generated = builder.build_workflow_config(absolute_base_config=True)
+
+        with tempfile.TemporaryDirectory(prefix="workflow_builder_test_") as temp_dir:
+            generated_path = Path(temp_dir) / "generated_outfit_workflow.json"
+            generated_path.write_text(
+                json.dumps(generated, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            engine = MultiAgentWorkflowEngine(generated_path, weather_tool=FakeWeatherTool())
+            result = engine.run("칭다오 다음 주 여행 캐주얼 옷 추천해줘", user_id="user_a")
+
+        self.assertFalse(result.context["needs_clarification"])
+        self.assertEqual(6, len(result.trace))
+        self.assertIn("추천", result.answer)
+
+
+    def test_builder_supports_multiple_recommendation_templates(self):
+        outfit_builder = TemplateWorkflowBuilder(
+            ROOT / "configs" / "builder_templates" / "outfit_recommendation_template.json"
+        )
+        commute_builder = TemplateWorkflowBuilder(
+            ROOT / "configs" / "builder_templates" / "commute_outfit_template.json"
+        )
+
+        outfit_config = outfit_builder.build_workflow_config()
+        commute_config = commute_builder.build_workflow_config()
+
+        self.assertNotEqual(outfit_builder.template_name, commute_builder.template_name)
+        self.assertNotEqual(outfit_config["workflow_id"], commute_config["workflow_id"])
+        self.assertEqual(outfit_config["execution"]["order"], commute_config["execution"]["order"])
+        self.assertIn("출근", commute_config["default_query"])
+
+    def test_generated_commute_template_workflow_runs(self):
+        import json
+        import tempfile
+
+        builder = TemplateWorkflowBuilder(
+            ROOT / "configs" / "builder_templates" / "commute_outfit_template.json"
+        )
+        generated = builder.build_workflow_config(absolute_base_config=True)
+
+        with tempfile.TemporaryDirectory(prefix="workflow_builder_commute_test_") as temp_dir:
+            generated_path = Path(temp_dir) / "generated_commute_workflow.json"
+            generated_path.write_text(
+                json.dumps(generated, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            engine = MultiAgentWorkflowEngine(generated_path, weather_tool=FakeWeatherTool())
+            result = engine.run("서울 내일 출근 포멀 옷 추천해줘", user_id="user_b")
+
+        self.assertFalse(result.context["needs_clarification"])
+        self.assertEqual(6, len(result.trace))
+        self.assertIn("추천", result.answer)
 
 
 if __name__ == "__main__":

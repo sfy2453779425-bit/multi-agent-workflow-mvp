@@ -1,7 +1,8 @@
 @echo off
 set "BUNDLED=%USERPROFILE%\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe"
 if exist "%BUNDLED%" (
-  "%BUNDLED%" "%~dp0builder_demo.py" --all
+  "%BUNDLED%" "%~dp0verify_project.py"
 ) else (
-  python "%~dp0builder_demo.py" --all
+  python "%~dp0verify_project.py"
 )
+pause

@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Outfit Recommendation Workflow Builder Preview</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f8fb;
+      --ink: #182033;
+      --muted: #677085;
+      --line: #d7dce8;
+      --primary: #2557a7;
+      --accent: #c25710;
+      --card: #ffffff;
+      --green: #0b7a53;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Malgun Gothic", "Microsoft YaHei UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+    }
+    header {
+      padding: 28px 36px 18px;
+      border-bottom: 1px solid var(--line);
+      background: #fff;
+    }
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: 0;
+    }
+    .subtitle {
+      margin-top: 8px;
+      max-width: 980px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    main {
+      display: grid;
+      grid-template-columns: minmax(620px, 1fr) 360px;
+      gap: 22px;
+      padding: 24px 36px 36px;
+    }
+    .canvas, .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 10px 24px rgba(20, 33, 61, 0.06);
+    }
+    .canvas {
+      padding: 24px;
+      min-height: 560px;
+      overflow: auto;
+    }
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(220px, 1fr));
+      gap: 24px 34px;
+      align-items: stretch;
+      position: relative;
+    }
+    .node {
+      min-height: 150px;
+      border: 1px solid var(--line);
+      border-top: 5px solid var(--primary);
+      border-radius: 8px;
+      padding: 16px;
+      background: linear-gradient(180deg, #fff, #fbfcff);
+      position: relative;
+    }
+    .node.question { border-top-color: var(--accent); }
+    .node.tool { border-top-color: var(--green); }
+    .node.output { border-top-color: #5b3aa4; }
+    .node::after {
+      content: "→";
+      position: absolute;
+      right: -27px;
+      top: 58px;
+      font-size: 24px;
+      color: #8993a8;
+    }
+    .node:nth-child(3)::after {
+      content: "↓";
+      right: 50%;
+      top: 150px;
+    }
+    .node:nth-child(4)::after, .node:nth-child(5)::after {
+      content: "←";
+      left: -27px;
+      right: auto;
+    }
+    .node:nth-child(6)::after { content: ""; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      height: 24px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: #eef3ff;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .node h2 {
+      margin: 12px 0 8px;
+      font-size: 18px;
+    }
+    .node p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+    .panel {
+      padding: 22px;
+    }
+    .panel h2 {
+      margin: 0 0 14px;
+      font-size: 20px;
+    }
+    .panel section {
+      padding: 14px 0;
+      border-top: 1px solid var(--line);
+    }
+    .panel section:first-of-type {
+      border-top: 0;
+      padding-top: 0;
+    }
+    .panel h3 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      color: var(--accent);
+    }
+    .panel p, .panel li {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+    ul {
+      margin: 8px 0 0;
+      padding-left: 18px;
+    }
+    code {
+      font-family: Consolas, "Courier New", monospace;
+      background: #f0f2f7;
+      padding: 2px 5px;
+      border-radius: 4px;
+    }
+    @media (max-width: 980px) {
+      main { grid-template-columns: 1fr; padding: 18px; }
+      header { padding: 22px 18px 14px; }
+      .flow { grid-template-columns: 1fr; }
+      .node::after, .node:nth-child(3)::after, .node:nth-child(4)::after, .node:nth-child(5)::after {
+        content: "↓";
+        left: 50%;
+        right: auto;
+        top: auto;
+        bottom: -27px;
+      }
+      .node:nth-child(6)::after { content: ""; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Personalized Outfit Workflow Builder Preview</h1>
+    <div class="subtitle">
+      This static page shows how the current Python sample workflow maps to a visual
+      Flowise/Dify/Langflow-style builder. The runnable local prototype is
+      <strong>run_builder_app.cmd</strong>.
+    </div>
+  </header>
+  <main>
+    <section class="canvas" aria-label="Workflow canvas">
+      <div class="flow">
+        <article class="node">
+          <span class="badge">1. Parser</span>
+          <h2>Request Parser Node</h2>
+          <p>Extracts city, date, user id, purpose, and style from the natural language request.</p>
+        </article>
+        <article class="node question">
+          <span class="badge">2. Question</span>
+          <h2>Question Node</h2>
+          <p>Checks missing context. If city, date, or purpose/style is missing, it asks a follow-up question first.</p>
+        </article>
+        <article class="node tool">
+          <span class="badge">3. Tool</span>
+          <h2>Weather Tool Node</h2>
+          <p>Calls the weather API and normalizes temperature, condition, and precipitation information.</p>
+        </article>
+        <article class="node output">
+          <span class="badge">6. Output</span>
+          <h2>Compose Node</h2>
+          <p>Renders the final answer with weather, shopping preference, and ranked outfit recommendations.</p>
+        </article>
+        <article class="node">
+          <span class="badge">5. Decide</span>
+          <h2>Recommendation Node</h2>
+          <p>Combines weather and shopping analysis, then ranks owned items and additional suggestions.</p>
+        </article>
+        <article class="node tool">
+          <span class="badge">4. Data</span>
+          <h2>Shopping History Analysis Node</h2>
+          <p>Loads simulated purchase records and extracts preferred styles, colors, categories, and items.</p>
+        </article>
+      </div>
+    </section>
+    <aside class="panel">
+      <h2>Project Position</h2>
+      <section>
+        <h3>What this is</h3>
+        <p>
+          A running sample workflow for personalized outfit recommendation. It
+          proves the execution structure before building a full visual Builder.
+        </p>
+      </section>
+      <section>
+        <h3>What this is not</h3>
+        <p>
+          It is not yet a production Builder. The current semester scope is sample
+          workflow implementation, local template-based Builder Prototype, tool
+          comparison, and builder mapping.
+        </p>
+      </section>
+      <section>
+        <h3>Flowise PoC Mapping</h3>
+        <ul>
+          <li><code>configs/outfit_workflow.json</code>: current executable workflow</li>
+          <li><code>configs/builder_templates/outfit_recommendation_template.json</code>: builder template</li>
+          <li><code>configs/builder_templates/commute_outfit_template.json</code>: second template</li>
+          <li><code>run_builder_app.cmd</code>: runnable local Builder Prototype</li>
+          <li><code>configs/flowise_poc_mapping.json</code>: builder-node mapping</li>
+          <li><code>deliverables/builder_tool_comparison_kr.md</code>: tool comparison</li>
+        </ul>
+      </section>
+      <section>
+        <h3>Core Answer</h3>
+        <p>
+          Existing builders are general-purpose. Our contribution is the
+          recommendation-domain workflow template: question, weather, shopping
+          analysis, ranking, and composed output.
+        </p>
+      </section>
+    </aside>
+  </main>
+</body>
+</html>

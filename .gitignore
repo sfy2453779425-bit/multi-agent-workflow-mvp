@@ -20,6 +20,10 @@ docs/
 docs/ppt_previews/
 team_research_package/
 team_research_package.zip
+external_tools/flowise_poc/node_modules/
+external_tools/flowise_poc/.flowise/
+external_tools/flowise_poc/package-lock.json
+external_tools/flowise_poc/npm-debug.log*
 USAGE.md
 experiments/
 scripts/

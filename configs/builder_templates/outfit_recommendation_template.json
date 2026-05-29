@@ -1,0 +1,89 @@
+{
+  "template_id": "outfit_recommendation_builder_template_v1",
+  "template_name": "Personalized Outfit Recommendation Template",
+  "target_domain": "personalized_recommendation",
+  "description": "A builder template for assembling the outfit recommendation sample workflow from reusable nodes.",
+  "base_agent_config": "../outfit_agent.json",
+  "default_query": "다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘",
+  "default_user_id": "user_a",
+  "recommended_sequence": [
+    "request_parser",
+    "question",
+    "weather",
+    "shopping_analysis",
+    "recommendation",
+    "compose"
+  ],
+  "node_palette": [
+    {
+      "id": "request_parser",
+      "name": "Request Parser Node",
+      "category": "input",
+      "required": true,
+      "role": "Extract city, date, user and intent from the user request.",
+      "builder_equivalent": "Start Node + Parser/Prompt Node",
+      "inputs": ["user_message", "user_id"],
+      "outputs": ["city", "date", "purpose", "style", "raw_request"]
+    },
+    {
+      "id": "question",
+      "name": "Question Node",
+      "category": "control",
+      "required": true,
+      "role": "Detect missing context and ask a follow-up question before tool calls.",
+      "builder_equivalent": "Condition Node + User Input Node",
+      "inputs": ["city", "date", "purpose", "style"],
+      "outputs": ["clarification_question", "complete_context"]
+    },
+    {
+      "id": "weather",
+      "name": "Weather Tool Node",
+      "category": "tool",
+      "required": true,
+      "role": "Call the weather tool and normalize weather data.",
+      "builder_equivalent": "HTTP/API Tool Node",
+      "inputs": ["city", "date"],
+      "outputs": ["weather_condition", "temp_min", "temp_max", "precipitation_probability"]
+    },
+    {
+      "id": "shopping_analysis",
+      "name": "Shopping History Analysis Node",
+      "category": "data",
+      "required": true,
+      "role": "Load purchase history and analyze user style preferences.",
+      "builder_equivalent": "Data Loader Node + Analysis Node",
+      "inputs": ["user_id", "shopping_history"],
+      "outputs": ["top_styles", "top_colors", "favorite_items", "top_categories"]
+    },
+    {
+      "id": "recommendation",
+      "name": "Recommendation Node",
+      "category": "decision",
+      "required": true,
+      "role": "Match weather and shopping analysis with recommendation rules.",
+      "builder_equivalent": "Rule/LLM Decision Node",
+      "inputs": ["weather_summary", "shopping_analysis", "purpose", "style"],
+      "outputs": ["ranked_recommendations", "reasoning"]
+    },
+    {
+      "id": "compose",
+      "name": "Compose Node",
+      "category": "output",
+      "required": true,
+      "role": "Render the final answer with the configured output template.",
+      "builder_equivalent": "Output Template Node",
+      "inputs": ["ranked_recommendations", "reasoning", "weather_summary"],
+      "outputs": ["final_answer"]
+    }
+  ],
+  "question_agent": {
+    "purpose_keywords": ["여행", "출장", "통학", "출근", "학교", "데이트", "행사", "휴가", "비즈니스", "쇼핑", "출퇴근"],
+    "style_keywords": ["캐주얼", "포멀", "스트릿", "미니멀", "스포티", "정장", "비즈니스"],
+    "clarification_message": "정보가 부족합니다. 여행 목적과 선호 스타일을 알려주세요. (예: 출장 / 캐주얼 등)",
+    "clarification_questions": {
+      "city": "어느 도시나 여행지를 기준으로 추천할까요? (예: 서울, 칭다오)",
+      "date": "언제 입을 옷인가요? (예: 내일, 다음 주)",
+      "purpose_or_style": "여행/출근/데이트 같은 목적이나 캐주얼/포멀 같은 선호 스타일을 알려주세요."
+    }
+  }
+}

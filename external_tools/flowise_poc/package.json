@@ -1,0 +1,10 @@
+{
+  "name": "flowise-poc-for-outfit-workflow",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Reproducible Flowise PoC environment for the outfit recommendation workflow builder MVP.",
+  "scripts": {
+    "start": "npx flowise@3.1.2 start --PORT 3100 --FLOWISE_USERNAME admin --FLOWISE_PASSWORD admin",
+    "version": "npm view flowise@3.1.2 version"
+  }
+}

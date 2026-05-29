@@ -1,127 +1,184 @@
-# Personalized Outfit Recommendation Workflow MVP
+# Personalized Outfit Recommendation Builder MVP
 
-This repository contains a clean technical MVP for a **personalized outfit
-recommendation system** that integrates weather, user preferences, and
-shopping history.
+This project is no longer just an outfit recommendation demo. It is now a
+**Sample Workflow + Template-based Builder Prototype** for personalized
+recommendation workflows.
 
-- **Product goal**: personalized outfit recommendation for travel and daily
-  scenarios.
-- **Implementation strategy**: JSON-based Workflow composed of 6 reusable
-  Workflow Nodes (Request Parser → Question → Weather Tool → Shopping History
-  Analysis → Recommendation → Compose).
-- **Future extension**: visual Builder UI, real shopping platform API, larger
-  recommendation rule sets.
+The current semester scope is intentionally limited:
 
-This MVP proves one idea:
+- Build a working recommendation Sample Workflow.
+- Define reusable Workflow Templates.
+- Generate executable Workflow JSON from templates.
+- Show how the same idea maps to Flowise / Dify / Langflow style builders.
 
-> A user request like "다음 주에 칭다오 여행 가는데 옷 추천해줘" can be handled
-> by composing 6 small Workflow Nodes defined in JSON. If the request is too
-> vague, the Question Node asks for missing context before the weather and
-> shopping-history tools run.
+## Project Position
 
-## Main Desktop Demo
+Existing tools such as Flowise, Dify, and Langflow already provide general
+workflow builders. This project does not try to replace them.
 
-Run this first. It opens a local desktop window and does not use a browser,
-localhost, or any port.
-
-On Windows:
-
-```bat
-run_desktop.cmd
-```
-
-The desktop app shows:
-
-- user input / follow-up answer box
-- user selection
-- workflow output
-- 6-Node Workflow execution trace
-- follow-up context state
-
-Example follow-up flow:
+Our contribution is the recommendation-domain workflow structure:
 
 ```text
-User: 옷 추천해줘
-System: 어느 도시나 여행지를 기준으로 추천할까요?
-User: 칭다오
-System: 언제 입을 옷인가요?
-User: 다음 주 여행
-System: runs the full 6-Node Workflow and returns ranked recommendations
-```
-
-## Optional Web Demo
-
-The web demo still exists for development, but the desktop app is the stable
-demo path.
-
-## Do Not Open Python Files To Run The Frontend
-
-If you click `builder_demo.py` or `web_app.py` in VS Code, you will see source
-code. That is expected.
-
-To see the frontend UI, you must start the local web server first.
-
-On Windows:
-
-```bat
-run_web.cmd
-```
-
-or:
-
-```bat
-open_web_demo.cmd
-```
-
-Then open this URL in a browser:
-
-```text
-http://127.0.0.1:8000
-```
-
-If the terminal prints another port, open the printed URL instead.
-
-## Main Web Demo
-
-Run:
-
-```bat
-run_web.cmd
-```
-
-The web page shows:
-
-- user input
-- user selection
-- workflow output after you click Run
-- 6-Node Workflow execution trace after execution
-- shopping history analysis
-- loaded config summary
-
-Default workflow (6 Nodes):
-
-```text
-Request Parser Node
--> Question Node                       (clarifies missing city / date / purpose / style)
+User Input
+-> Question Node
 -> Weather Tool Node
 -> Shopping History Analysis Node
 -> Recommendation Node
 -> Compose Node
 ```
 
-## Command Line Demo
+In Korean:
 
-Run the 6-Node Workflow:
-
-```powershell
-python builder_demo.py --workflow
+```text
+기존 Builder를 대체하는 것이 아니라,
+개인화 추천 도메인에 필요한 Workflow Template을 정의하고
+실행 가능한 MVP로 검증한다.
 ```
 
-Run all single-Config demos:
+## Main Demo
+
+Run the stable desktop Sample Workflow:
 
 ```bat
-run_builder_demo.cmd
+run_desktop.cmd
 ```
+
+Example query:
+
+```text
+다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘
+```
+
+The app runs the 6-node workflow and returns:
+
+- weather-based context
+- shopping-history style analysis
+- ranked outfit recommendations
+- execution trace
+
+## Builder Prototype
+
+Run the local Builder Prototype:
+
+```bat
+run_builder_app.cmd
+```
+
+The Builder Prototype supports:
+
+- reusable node palette
+- template selection
+- required-node validation
+- Workflow JSON generation
+- generated Workflow execution
+- multiple recommendation templates
+
+Current templates:
+
+```text
+configs/builder_templates/outfit_recommendation_template.json
+configs/builder_templates/commute_outfit_template.json
+```
+
+## Visual Web Verification
+
+If you do not want to inspect backend code, run the visual web page:
+
+```bat
+run_web.cmd
+```
+
+Then open:
+
+```text
+http://127.0.0.1:8000
+```
+
+The page shows:
+
+- selected Workflow Template
+- Node Palette and sequential Workflow structure
+- Builder mapping table
+- generated Workflow JSON
+- visual run result and execution trace
+
+## Static Builder Preview
+
+Open this directly in a browser:
+
+```text
+workflow_builder_preview.html
+```
+
+This is a static visual explanation page for presentation. The runnable builder
+is `run_builder_app.cmd`.
+
+## Command Line Verification
+
+List available templates:
+
+```powershell
+python builder_demo.py --list-templates
+```
+
+Show the default builder template:
+
+```powershell
+python builder_demo.py --show-builder
+```
+
+Generate and run the travel/outfit template:
+
+```powershell
+python builder_demo.py --run-generated "칭다오 다음 주 여행 캐주얼 옷 추천해줘" --user user_a
+```
+
+Generate and run the commute/work template:
+
+```powershell
+python builder_demo.py --run-generated --builder-template configs\builder_templates\commute_outfit_template.json "서울 내일 출근 포멀 옷 추천해줘" --user user_b
+```
+
+Run project verification:
+
+```bat
+run_verify.cmd
+```
+
+## External Builder Tool PoC
+
+These folders document external builder validation paths:
+
+```text
+external_tools/flowise_poc/
+external_tools/dify_poc/
+external_tools/langflow_poc/
+```
+
+Start Flowise PoC entry point:
+
+```bat
+external_tools\flowise_poc\run_flowise_poc.cmd
+```
+
+Start Langflow PoC entry point:
+
+```bat
+external_tools\langflow_poc\run_langflow_poc.cmd
+```
+
+Check Dify requirement:
+
+```bat
+external_tools\dify_poc\run_dify_poc.cmd
+```
+
+Current verified external-tool facts:
+
+- Flowise npm package exists at version `3.1.2`.
+- Langflow package index shows latest version `1.9.4`.
+- Dify needs Docker / Docker Compose; Docker is not installed on this machine.
+- Flowise local install/start was attempted but timed out because of its large dependency tree, so the stable demo remains the local Python Builder Prototype.
 
 ## Tests
 
@@ -134,65 +191,93 @@ run_tests.cmd
 Expected result:
 
 ```text
-11 tests OK
+16 tests OK
 ```
 
 ## Project Structure
 
 ```text
 .
-├── configs/
-│   ├── outfit_workflow.json
-│   └── outfit_agent.json
-├── data/
-│   ├── shopping_history.json
-│   └── user_profiles.json
-├── src/
-│   ├── agent_builder/
-│   │   ├── engine.py
-│   │   ├── workflow.py
-│   │   └── shopping.py
-│   └── weather_agent/
-│       ├── tools.py
-│       └── models.py
-├── tests/
-├── desktop_app.py
-├── web_app.py
-├── builder_demo.py
-├── run_desktop.cmd
-├── open_web_demo.cmd
-└── run_web.cmd
+|-- configs/
+|   |-- outfit_workflow.json
+|   |-- outfit_agent.json
+|   |-- flowise_poc_mapping.json
+|   `-- builder_templates/
+|       |-- outfit_recommendation_template.json
+|       `-- commute_outfit_template.json
+|-- data/
+|   |-- shopping_history.json
+|   `-- user_profiles.json
+|-- deliverables/
+|   |-- builder_tool_comparison_kr.md
+|   |-- competitor_positioning_kr.md
+|   |-- dataset_research_kr.md
+|   |-- external_builder_tool_verification_zh.md
+|   |-- final_acceptance_checklist_zh.md
+|   |-- mentor_requirement_alignment_zh.md
+|   |-- next_presentation_outline_kr.md
+|   |-- ppt_4_slides_builder_addon_kr.md
+|   `-- professor_answer_drill_kr.md
+|-- external_tools/
+|   |-- flowise_poc/
+|   |-- dify_poc/
+|   `-- langflow_poc/
+|-- src/
+|   |-- agent_builder/
+|   |   |-- engine.py
+|   |   |-- workflow.py
+|   |   |-- template_builder.py
+|   |   `-- shopping.py
+|   `-- weather_agent/
+|-- tests/
+|-- desktop_app.py
+|-- builder_app.py
+|-- web_app.py
+|-- builder_demo.py
+|-- verify_project.py
+|-- workflow_builder_preview.html
+|-- run_desktop.cmd
+|-- run_builder_app.cmd
+|-- run_verify.cmd
+`-- run_tests.cmd
 ```
 
 ## Current Features
 
-- Sequential 6-Node Workflow execution
-- Config-driven Node behavior (JSON Workflow definition)
-- Open-Meteo weather API integration (supports Seoul, Tokyo, Qingdao, Beijing, etc.)
-- Question Node that detects missing context and asks follow-up questions
-  in sequence (city -> date -> purpose/style)
-- Local simulated shopping history analysis
-- Ranked personalized recommendation based on weather and purchase history
-- Desktop UI that runs without browser / localhost
-- Web UI for demo and Workflow Trace inspection
-- Unit tests for single-Config and Workflow behavior (including clarification short-circuit)
+- Sequential 6-node recommendation workflow
+- Question Node for missing city/date/purpose/style
+- Weather API integration
+- simulated shopping history analysis
+- ranked recommendation output
+- local desktop Sample Workflow demo
+- local template-based Builder Prototype
+- two recommendation templates using the same Builder mechanism
+- generated Workflow JSON execution
+- Flowise / Dify / Langflow comparison and PoC entry points
+- presentation and Q&A deliverables
 
-## Current MVP Scope
+## Out of Scope
 
-In scope:
+The current MVP does not claim to be:
 
-- JSON workflow definition
-- sequential 6-Node Workflow execution
-- weather tool call
-- shopping history analysis
-- recommendation rule matching
-- web UI trace display
-- tests
+- a full production drag-and-drop Builder
+- a complete commercial recommendation engine
+- a real shopping-platform OAuth integration
+- a local LLM training system
+- an enterprise monitoring/admin system
 
-Out of scope:
+## Presentation Answer
 
-- full drag-and-drop Builder
-- admin dashboard
-- real shopping-platform OAuth integration
-- local LLM training
-- complex orchestration such as retry, branching, or monitoring
+Use this if asked why this project matters when Flowise / Dify / Langflow
+already exist:
+
+```text
+저희는 기존 Builder 자체를 대체하려는 것이 아닙니다.
+기존 Builder는 범용 도구이기 때문에 추천 도메인에 필요한
+사용자 정보 보완, 쇼핑 기록 분석, 날씨 반영, 추천 우선순위화 같은
+도메인 특화 Workflow Template은 직접 정의해야 합니다.
+
+그래서 저희는 기존 Builder를 참고하면서,
+개인화 추천 Agent Workflow의 구조를 설계하고
+로컬 Builder Prototype으로 검증했습니다.
+```

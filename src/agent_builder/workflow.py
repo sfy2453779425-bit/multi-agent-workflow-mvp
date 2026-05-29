@@ -14,6 +14,14 @@ DEFAULT_PURPOSE_KEYWORDS = (
 DEFAULT_STYLE_KEYWORDS = (
     "캐주얼", "포멀", "스트릿", "미니멀", "스포티", "정장", "비즈니스",
 )
+DEFAULT_PURPOSE_KEYWORDS = DEFAULT_PURPOSE_KEYWORDS + (
+    "travel", "trip", "tour", "commute", "work", "office", "business",
+    "casual", "date", "旅行", "旅游", "通勤", "上班", "出差", "约会",
+)
+DEFAULT_STYLE_KEYWORDS = DEFAULT_STYLE_KEYWORDS + (
+    "casual", "formal", "minimal", "business", "sporty", "street",
+    "休闲", "正式", "极简", "商务", "运动", "街头",
+)
 DEFAULT_CLARIFICATION_MESSAGE = (
     "정보가 부족합니다. 여행 목적과 선호 스타일을 알려주세요. (예: 출장 / 캐주얼 등)"
 )
@@ -117,8 +125,12 @@ class MultiAgentWorkflowEngine:
 
     def _run_question_agent(self, context: dict[str, Any]) -> None:
         question_config = self.workflow_config.get("question_agent", {})
-        purpose_keywords = question_config.get("purpose_keywords", list(DEFAULT_PURPOSE_KEYWORDS))
-        style_keywords = question_config.get("style_keywords", list(DEFAULT_STYLE_KEYWORDS))
+        purpose_keywords = list(DEFAULT_PURPOSE_KEYWORDS) + list(
+            question_config.get("purpose_keywords", [])
+        )
+        style_keywords = list(DEFAULT_STYLE_KEYWORDS) + list(
+            question_config.get("style_keywords", [])
+        )
         clarification_message = question_config.get(
             "clarification_message", DEFAULT_CLARIFICATION_MESSAGE
         )

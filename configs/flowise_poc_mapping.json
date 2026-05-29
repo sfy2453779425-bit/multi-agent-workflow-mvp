@@ -1,0 +1,63 @@
+{
+  "poc_name": "Outfit Recommendation Workflow - Builder Mapping",
+  "purpose": "Map the current JSON-based sample workflow to a Flowise/Dify/Langflow-style visual builder. This is a presentation and design artifact, not a complete Flowise export.",
+  "current_workflow_config": "configs/outfit_workflow.json",
+  "recommended_first_tool": "Flowise",
+  "reason_for_flowise_first": "Flowise is the closest match for a quick visual workflow PoC because its AgentFlow concept focuses on explicit workflow orchestration and visual nodes.",
+  "workflow_nodes": [
+    {
+      "order": 1,
+      "current_node": "Request Parser Node",
+      "builder_equivalent": "Start Node + Parser/Prompt Node",
+      "input": ["user_message", "user_id"],
+      "output": ["city", "date", "purpose", "style", "raw_request"],
+      "notes": "Extracts structured request context from natural language."
+    },
+    {
+      "order": 2,
+      "current_node": "Question Node",
+      "builder_equivalent": "Condition Node + User Input Node",
+      "input": ["city", "date", "purpose", "style"],
+      "output": ["clarification_question", "complete_context"],
+      "notes": "Stops the workflow and asks a follow-up question when city/date/purpose/style is missing."
+    },
+    {
+      "order": 3,
+      "current_node": "Weather Tool Node",
+      "builder_equivalent": "HTTP/API Tool Node",
+      "input": ["city", "date"],
+      "output": ["weather_condition", "temp_min", "temp_max", "precipitation_probability"],
+      "notes": "Calls the weather tool and normalizes external data."
+    },
+    {
+      "order": 4,
+      "current_node": "Shopping History Analysis Node",
+      "builder_equivalent": "Data Loader Node + Analysis Node",
+      "input": ["user_id", "shopping_history"],
+      "output": ["top_styles", "top_colors", "favorite_items", "top_categories"],
+      "notes": "Loads purchase history and summarizes user preference."
+    },
+    {
+      "order": 5,
+      "current_node": "Recommendation Node",
+      "builder_equivalent": "Rule/LLM Decision Node",
+      "input": ["weather_summary", "shopping_analysis", "purpose", "style"],
+      "output": ["ranked_recommendations", "reasoning"],
+      "notes": "Combines weather and preference data, then ranks owned and additional items."
+    },
+    {
+      "order": 6,
+      "current_node": "Compose Node",
+      "builder_equivalent": "Output Template Node",
+      "input": ["ranked_recommendations", "reasoning", "weather_summary"],
+      "output": ["final_answer"],
+      "notes": "Renders the final user-facing answer from a configured template."
+    }
+  ],
+  "acceptance_checks": [
+    "The current desktop demo can run the full 6-node workflow.",
+    "The static builder preview shows the same node sequence visually.",
+    "The presentation explains that this is a sample workflow, not a completed drag-and-drop builder.",
+    "The final answer to evaluators explains why domain-specific templates are still needed even when generic builders exist."
+  ]
+}
