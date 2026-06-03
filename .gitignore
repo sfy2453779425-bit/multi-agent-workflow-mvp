@@ -17,7 +17,9 @@ Thumbs.db
 *.lnk
 *.pptx
 gpu_llm_experiment.zip
+gpu_llm_training.zip
 gpu_llm_results/
+gpu_lora_outputs/
 Next_Presentation_*.md
 docs/
 docs/ppt_previews/
