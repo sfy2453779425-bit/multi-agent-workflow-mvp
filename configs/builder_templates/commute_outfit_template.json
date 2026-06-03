@@ -2,6 +2,7 @@
   "template_id": "commute_outfit_builder_template_v1",
   "template_name": "Commute Outfit Recommendation Template",
   "target_domain": "work_commute_recommendation",
+  "runtime_type": "outfit_recommendation",
   "description": "A builder template for assembling a commute/work outfit recommendation workflow from reusable nodes.",
   "base_agent_config": "../outfit_agent.json",
   "default_query": "서울 내일 출근 포멀 옷 추천해줘",

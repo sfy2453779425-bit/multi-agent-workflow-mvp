@@ -1,0 +1,87 @@
+{
+  "template_id": "customer_support_ticket_builder_template_v1",
+  "template_name": "Customer Support Ticket Template",
+  "target_domain": "customer_support_ticket_routing",
+  "runtime_type": "customer_support",
+  "description": "A builder template for classifying a customer support request, selecting a policy and routing the ticket to the right team.",
+  "base_agent_config": null,
+  "data_file": "support_policy.json",
+  "default_query": "Customer says the delivery is late and asks whether the order can be refunded.",
+  "default_user_id": "user_a",
+  "recommended_sequence": [
+    "request_parser",
+    "question",
+    "ticket_classification",
+    "policy_lookup",
+    "routing_decision",
+    "compose"
+  ],
+  "node_palette": [
+    {
+      "id": "request_parser",
+      "name": "Support Request Parser Node",
+      "category": "input",
+      "required": true,
+      "role": "Extract issue keywords, customer intent and available ticket context.",
+      "builder_equivalent": "Start Node + Parser/Prompt Node",
+      "inputs": ["user_message", "user_id"],
+      "outputs": ["issue_text", "intent", "raw_request"]
+    },
+    {
+      "id": "question",
+      "name": "Support Question Node",
+      "category": "control",
+      "required": true,
+      "role": "Ask for missing issue details before routing the ticket.",
+      "builder_equivalent": "Condition Node + User Input Node",
+      "inputs": ["issue_text", "intent"],
+      "outputs": ["clarification_question", "complete_context"]
+    },
+    {
+      "id": "ticket_classification",
+      "name": "Ticket Classification Node",
+      "category": "data",
+      "required": true,
+      "role": "Classify the ticket category by matching local policy keywords.",
+      "builder_equivalent": "Classifier Node",
+      "inputs": ["issue_text"],
+      "outputs": ["category", "priority_candidate", "matched_keywords"]
+    },
+    {
+      "id": "policy_lookup",
+      "name": "Policy Lookup Node",
+      "category": "tool",
+      "required": true,
+      "role": "Load the local support policy for the matched ticket category.",
+      "builder_equivalent": "Local Knowledge / RAG Node",
+      "inputs": ["category"],
+      "outputs": ["policy", "sla", "owner_team"]
+    },
+    {
+      "id": "routing_decision",
+      "name": "Routing Decision Node",
+      "category": "decision",
+      "required": true,
+      "role": "Decide ticket owner, priority and next actions from classification and policy.",
+      "builder_equivalent": "Rule/LLM Decision Node",
+      "inputs": ["category", "policy", "customer_intent"],
+      "outputs": ["owner_team", "priority", "next_actions"]
+    },
+    {
+      "id": "compose",
+      "name": "Support Compose Node",
+      "category": "output",
+      "required": true,
+      "role": "Render the ticket summary, routing decision and response draft.",
+      "builder_equivalent": "Output Template Node",
+      "inputs": ["owner_team", "priority", "next_actions", "policy"],
+      "outputs": ["final_answer"]
+    }
+  ],
+  "question_agent": {
+    "required_fields": ["issue_text"],
+    "clarification_questions": {
+      "issue_text": "Please describe the customer issue before routing the ticket."
+    }
+  }
+}

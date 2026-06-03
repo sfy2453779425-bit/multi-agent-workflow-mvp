@@ -1,0 +1,87 @@
+{
+  "template_id": "presentation_planning_builder_template_v1",
+  "template_name": "Presentation Planning Template",
+  "target_domain": "study_presentation_planning",
+  "runtime_type": "presentation_planning",
+  "description": "A builder template for turning a presentation topic into a structured outline with supporting knowledge and traceable planning steps.",
+  "base_agent_config": null,
+  "data_file": "presentation_knowledge.json",
+  "default_query": "Prepare a 15-minute presentation outline about Harness Engineering and Multi-Agent Workflow Builder MVP.",
+  "default_user_id": "user_a",
+  "recommended_sequence": [
+    "request_parser",
+    "question",
+    "topic_analysis",
+    "knowledge_lookup",
+    "outline_generation",
+    "compose"
+  ],
+  "node_palette": [
+    {
+      "id": "request_parser",
+      "name": "Presentation Request Parser Node",
+      "category": "input",
+      "required": true,
+      "role": "Extract presentation topic, target duration and expected output from the user request.",
+      "builder_equivalent": "Start Node + Parser/Prompt Node",
+      "inputs": ["user_message", "user_id"],
+      "outputs": ["topic", "duration", "output_type", "raw_request"]
+    },
+    {
+      "id": "question",
+      "name": "Presentation Question Node",
+      "category": "control",
+      "required": true,
+      "role": "Ask for the missing presentation topic before planning.",
+      "builder_equivalent": "Condition Node + User Input Node",
+      "inputs": ["topic", "duration", "output_type"],
+      "outputs": ["clarification_question", "complete_context"]
+    },
+    {
+      "id": "topic_analysis",
+      "name": "Topic Analysis Node",
+      "category": "data",
+      "required": true,
+      "role": "Identify relevant concepts and decide which knowledge notes are needed.",
+      "builder_equivalent": "Classifier Node + Tag Extraction Node",
+      "inputs": ["topic", "raw_request"],
+      "outputs": ["matched_topics", "planning_goal"]
+    },
+    {
+      "id": "knowledge_lookup",
+      "name": "Knowledge Lookup Node",
+      "category": "tool",
+      "required": true,
+      "role": "Load local knowledge notes for the matched presentation topics.",
+      "builder_equivalent": "Local Knowledge / RAG Node",
+      "inputs": ["matched_topics"],
+      "outputs": ["knowledge_points", "slide_suggestions"]
+    },
+    {
+      "id": "outline_generation",
+      "name": "Outline Generation Node",
+      "category": "decision",
+      "required": true,
+      "role": "Create a section-by-section presentation outline from the topic and knowledge notes.",
+      "builder_equivalent": "Planning / LLM Decision Node",
+      "inputs": ["knowledge_points", "duration", "planning_goal"],
+      "outputs": ["outline_sections", "speaker_focus"]
+    },
+    {
+      "id": "compose",
+      "name": "Presentation Compose Node",
+      "category": "output",
+      "required": true,
+      "role": "Render the final outline with evidence points and execution trace.",
+      "builder_equivalent": "Output Template Node",
+      "inputs": ["outline_sections", "knowledge_points", "speaker_focus"],
+      "outputs": ["final_answer"]
+    }
+  ],
+  "question_agent": {
+    "required_fields": ["topic"],
+    "clarification_questions": {
+      "topic": "Please provide the presentation topic before generating an outline."
+    }
+  }
+}

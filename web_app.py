@@ -2,6 +2,7 @@ import dataclasses
 import html
 import json
 import mimetypes
+import re
 import socket
 import sys
 import tempfile
@@ -28,10 +29,130 @@ USERS = {
     "user_a": "User A - casual / dark color / hoodie-heavy history",
     "user_b": "User B - minimal / white-gray / shirt-heavy history",
 }
+CONTEXT_OPTIONS = {
+    "outfit_recommendation": {
+        "label": {
+            "ko": "3. 사용자 (쇼핑 이력)",
+            "zh": "3. 用户 (购物历史)",
+        },
+        "query_label": {
+            "ko": "4. 사용자 입력",
+            "zh": "4. 用户输入",
+        },
+        "options": [
+            {
+                "id": "user_a",
+                "label": {
+                    "ko": "User A - casual / dark color / hoodie-heavy history",
+                    "zh": "User A - 休闲 / 深色 / 连帽衫购买历史",
+                },
+            },
+            {
+                "id": "user_b",
+                "label": {
+                    "ko": "User B - minimal / white-gray / shirt-heavy history",
+                    "zh": "User B - 极简 / 白灰色 / 衬衫购买历史",
+                },
+            },
+        ],
+    },
+    "presentation_planning": {
+        "label": {
+            "ko": "3. 발표 조건",
+            "zh": "3. 发表场景",
+        },
+        "query_label": {
+            "ko": "4. 발표 요청",
+            "zh": "4. 发表需求",
+        },
+        "options": [
+            {
+                "id": "user_a",
+                "label": {
+                    "ko": "15분 최종 발표 / 교수 질문 대비",
+                    "zh": "15 分钟最终发表 / 准备教授提问",
+                },
+            },
+            {
+                "id": "user_b",
+                "label": {
+                    "ko": "전시회 심사 발표 / 차별점 강조",
+                    "zh": "展会评审发表 / 强调项目差异点",
+                },
+            },
+        ],
+    },
+    "customer_support": {
+        "label": {
+            "ko": "3. 고객/채널 조건",
+            "zh": "3. 客户/渠道条件",
+        },
+        "query_label": {
+            "ko": "4. 고객 문의 내용",
+            "zh": "4. 客户问题内容",
+        },
+        "options": [
+            {
+                "id": "user_a",
+                "label": {
+                    "ko": "일반 고객 / 웹 채널 / 배송 문의",
+                    "zh": "普通客户 / 网页渠道 / 配送问题",
+                },
+            },
+            {
+                "id": "user_b",
+                "label": {
+                    "ko": "VIP 고객 / 앱 채널 / 환불·계정 문의",
+                    "zh": "VIP 客户 / App 渠道 / 退款或账号问题",
+                },
+            },
+        ],
+    },
+}
 WEB_DEFAULT_QUERIES = {
+    "presentation_planning_template.json": "Prepare a 15-minute presentation outline about Harness Engineering and Multi-Agent Workflow Builder MVP.",
+    "customer_support_ticket_template.json": "Customer says the delivery is late and asks whether the order can be refunded.",
     "outfit_recommendation_template.json": "다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘",
     "commute_outfit_template.json": "내일 서울 출근용 포멀 옷 추천해줘",
 }
+BUILDER_PRESETS = [
+    {
+        "id": "travel_recommendation",
+        "template": "outfit_recommendation_template.json",
+        "label": {
+            "ko": "여행/개인화 추천 Workflow",
+            "zh": "旅行/个性化推荐 Workflow",
+        },
+        "default_workflow_name": "Custom Travel Recommendation Workflow",
+    },
+    {
+        "id": "commute_recommendation",
+        "template": "commute_outfit_template.json",
+        "label": {
+            "ko": "출근/통근 추천 Workflow",
+            "zh": "通勤/上班推荐 Workflow",
+        },
+        "default_workflow_name": "Custom Commute Recommendation Workflow",
+    },
+    {
+        "id": "presentation_planning",
+        "template": "presentation_planning_template.json",
+        "label": {
+            "ko": "발표 기획 Workflow",
+            "zh": "发表规划 Workflow",
+        },
+        "default_workflow_name": "Custom Presentation Planning Workflow",
+    },
+    {
+        "id": "customer_support",
+        "template": "customer_support_ticket_template.json",
+        "label": {
+            "ko": "고객 문의 분류 Workflow",
+            "zh": "客服工单分流 Workflow",
+        },
+        "default_workflow_name": "Custom Customer Support Workflow",
+    },
+]
 
 
 # ---------------------------------------------------------------------------
@@ -62,6 +183,15 @@ def generated_config(builder: TemplateWorkflowBuilder) -> dict[str, object]:
     return builder.build_workflow_config(absolute_base_config=True)
 
 
+def context_options_for(builder: TemplateWorkflowBuilder) -> dict[str, object]:
+    runtime_type = builder.template.get("runtime_type", "outfit_recommendation")
+    return context_options_for_runtime(runtime_type)
+
+
+def context_options_for_runtime(runtime_type: str) -> dict[str, object]:
+    return CONTEXT_OPTIONS.get(runtime_type, CONTEXT_OPTIONS["outfit_recommendation"])
+
+
 def run_generated_workflow(builder: TemplateWorkflowBuilder, query: str, user_id: str):
     config = generated_config(builder)
     with tempfile.TemporaryDirectory(prefix="builder_web_") as temp_dir:
@@ -69,6 +199,67 @@ def run_generated_workflow(builder: TemplateWorkflowBuilder, query: str, user_id
         config_path.write_text(json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8")
         engine = MultiAgentWorkflowEngine(config_path)
         return engine.run(query, user_id=user_id), config
+
+
+def run_workflow_config(config: dict[str, object], query: str, user_id: str):
+    with tempfile.TemporaryDirectory(prefix="builder_workspace_") as temp_dir:
+        config_path = Path(temp_dir) / "custom_workflow.json"
+        config_path.write_text(json.dumps(config, ensure_ascii=False, indent=2), encoding="utf-8")
+        engine = MultiAgentWorkflowEngine(config_path)
+        return engine.run(query, user_id=user_id)
+
+
+def slugify(value: str) -> str:
+    slug = re.sub(r"[^a-zA-Z0-9]+", "_", value.strip().lower()).strip("_")
+    return slug or "custom"
+
+
+def builder_preset_by_id(preset_id: str | None) -> dict[str, object]:
+    for preset in BUILDER_PRESETS:
+        if preset["id"] == preset_id:
+            return preset
+    return BUILDER_PRESETS[0]
+
+
+def nodes_from_builder(
+    builder: TemplateWorkflowBuilder,
+    sequence: list[str] | None = None,
+) -> list[dict[str, object]]:
+    by_id = {node["id"]: node for node in builder.available_nodes}
+    selected = builder.recommended_sequence if sequence is None else sequence
+    nodes = []
+    for index, node_id in enumerate(selected, start=1):
+        node = by_id[node_id]
+        nodes.append(
+            {
+                "index": index,
+                "id": node["id"],
+                "name": node["name"],
+                "role": node.get("role", ""),
+                "category": node.get("category", ""),
+                "builder_equivalent": node.get("builder_equivalent", ""),
+                "inputs": node.get("inputs", []),
+                "outputs": node.get("outputs", []),
+                "required": bool(node.get("required", False)),
+            }
+        )
+    return nodes
+
+
+def palette_from_builder(builder: TemplateWorkflowBuilder) -> list[dict[str, object]]:
+    return [
+        {
+            "id": node["id"],
+            "name": node["name"],
+            "role": node.get("role", ""),
+            "category": node.get("category", ""),
+            "builder_equivalent": node.get("builder_equivalent", ""),
+            "inputs": node.get("inputs", []),
+            "outputs": node.get("outputs", []),
+            "required": bool(node.get("required", False)),
+        }
+        for node in builder.available_nodes
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -127,37 +318,9 @@ def api_templates() -> dict:
 
 def api_template_detail(name: str) -> dict:
     builder = load_builder(name)
-    by_id = {node["id"]: node for node in builder.available_nodes}
     sequence = builder.recommended_sequence
-    nodes = []
-    for index, node_id in enumerate(sequence, start=1):
-        node = by_id[node_id]
-        nodes.append(
-            {
-                "index": index,
-                "id": node["id"],
-                "name": node["name"],
-                "role": node.get("role", ""),
-                "category": node.get("category", ""),
-                "builder_equivalent": node.get("builder_equivalent", ""),
-                "inputs": node.get("inputs", []),
-                "outputs": node.get("outputs", []),
-                "required": bool(node.get("required", False)),
-            }
-        )
-    palette = [
-        {
-            "id": node["id"],
-            "name": node["name"],
-            "role": node.get("role", ""),
-            "category": node.get("category", ""),
-            "builder_equivalent": node.get("builder_equivalent", ""),
-            "inputs": node.get("inputs", []),
-            "outputs": node.get("outputs", []),
-            "required": bool(node.get("required", False)),
-        }
-        for node in builder.available_nodes
-    ]
+    nodes = nodes_from_builder(builder, sequence)
+    palette = palette_from_builder(builder)
     validation = builder.validate_node_ids()
     config = generated_config(builder)
     return {
@@ -168,6 +331,7 @@ def api_template_detail(name: str) -> dict:
         "description": builder.template.get("description", ""),
         "default_query": default_query_for(safe_template_name(name), builder),
         "default_user_id": builder.template.get("default_user_id", "user_a"),
+        "context_options": context_options_for(builder),
         "recommended_sequence": sequence,
         "nodes": nodes,
         "palette": palette,
@@ -182,17 +346,28 @@ def api_template_detail(name: str) -> dict:
 
 
 def api_users() -> dict:
-    return {"users": [{"id": uid, "label": label} for uid, label in USERS.items()]}
+    options = CONTEXT_OPTIONS["outfit_recommendation"]["options"]
+    return {
+        "users": [
+            {
+                "id": option["id"],
+                "label": option["label"]["ko"],
+                "labels": option["label"],
+            }
+            for option in options
+        ]
+    }
 
 
-def api_run(payload: dict) -> dict:
-    template_name = safe_template_name(payload.get("template"))
-    user_id = payload.get("user") or "user_a"
-    builder = load_builder(template_name)
-    query = (payload.get("query") or "").strip()
-    if not query:
-        query = default_query_for(template_name, builder)
-    result, config = run_generated_workflow(builder, query, user_id)
+def workflow_result_payload(
+    *,
+    template_name: str,
+    user_id: str,
+    query: str,
+    result,
+    config: dict[str, object],
+    builder_mode: str = "template_library",
+) -> dict:
     trace = [
         {"name": step.name, "detail": step.detail, "data": _safe(step.data)}
         for step in result.trace
@@ -200,6 +375,7 @@ def api_run(payload: dict) -> dict:
     context = _safe(result.context)
     return {
         "template": template_name,
+        "builder_mode": builder_mode,
         "user": user_id,
         "query": query,
         "workflow_name": result.workflow_name,
@@ -217,10 +393,128 @@ def api_run(payload: dict) -> dict:
             "missing_fields": context.get("missing_fields") or [],
             "next_question_field": context.get("next_question_field", ""),
             "clarification_message": context.get("clarification_message", ""),
+            "summary_cards": context.get("summary_cards") or [],
+            "runtime_type": context.get("runtime_type", ""),
         },
         "context": context,
         "generated_config": config,
     }
+
+
+def api_builder_presets() -> dict:
+    presets = []
+    for preset in BUILDER_PRESETS:
+        builder = load_builder(str(preset["template"]))
+        runtime_type = builder.template.get("runtime_type", "outfit_recommendation")
+        presets.append(
+            {
+                "id": preset["id"],
+                "source_template": preset["template"],
+                "label": preset["label"],
+                "default_workflow_name": preset["default_workflow_name"],
+                "runtime_type": runtime_type,
+                "target_domain": builder.template.get("target_domain", ""),
+                "description": builder.template.get("description", ""),
+                "default_query": default_query_for(str(preset["template"]), builder),
+                "default_user_id": builder.template.get("default_user_id", "user_a"),
+                "context_options": context_options_for_runtime(runtime_type),
+                "nodes": nodes_from_builder(builder),
+            }
+        )
+    return {"presets": presets, "default": BUILDER_PRESETS[0]["id"]}
+
+
+def api_builder_compose(payload: dict | None = None) -> dict:
+    payload = payload or {}
+    preset = builder_preset_by_id(payload.get("preset"))
+    template_name = str(preset["template"])
+    builder = load_builder(template_name)
+    node_ids = payload.get("node_ids") or builder.recommended_sequence
+    if not isinstance(node_ids, list):
+        raise ValueError("node_ids must be a list")
+
+    validation = builder.validate_node_ids(node_ids)
+    if not validation.ok:
+        raise ValueError("; ".join(validation.errors))
+
+    workflow_name = (payload.get("workflow_name") or "").strip()
+    if not workflow_name:
+        workflow_name = str(preset["default_workflow_name"])
+
+    description = (
+        (payload.get("description") or "").strip()
+        or f"Custom workflow composed in Builder Workspace from {template_name}."
+    )
+    config = builder.build_workflow_config(node_ids, absolute_base_config=True)
+    config["workflow_id"] = f"custom_{preset['id']}_{slugify(workflow_name)}_workflow"
+    config["workflow_name"] = workflow_name
+    config["description"] = description
+    config["execution"]["generated_by"] = "BuilderWorkspace"
+    config["execution"]["builder_mode"] = "custom_workspace"
+    config["execution"]["source_template"] = template_name
+    config["builder_workspace"] = {
+        "preset_id": preset["id"],
+        "source_template": template_name,
+        "selected_nodes": node_ids,
+        "workflow_name": workflow_name,
+    }
+
+    runtime_type = config.get("runtime_type", "outfit_recommendation")
+    return {
+        "file": f"builder:{preset['id']}",
+        "builder_mode": "custom_workspace",
+        "source_template": template_name,
+        "template_id": builder.template.get("template_id", ""),
+        "name": workflow_name,
+        "target_domain": builder.template.get("target_domain", ""),
+        "description": description,
+        "default_query": payload.get("query") or default_query_for(template_name, builder),
+        "default_user_id": builder.template.get("default_user_id", "user_a"),
+        "context_options": context_options_for_runtime(str(runtime_type)),
+        "recommended_sequence": node_ids,
+        "nodes": nodes_from_builder(builder, node_ids),
+        "palette": palette_from_builder(builder),
+        "mapping": builder.mapping_rows(),
+        "validation": {
+            "ok": validation.ok,
+            "errors": list(validation.errors),
+            "warnings": list(validation.warnings),
+        },
+        "generated_config": config,
+    }
+
+
+def api_builder_run(payload: dict) -> dict:
+    detail = api_builder_compose(payload)
+    config = detail["generated_config"]
+    user_id = payload.get("user") or detail.get("default_user_id") or "user_a"
+    query = (payload.get("query") or detail.get("default_query") or "").strip()
+    result = run_workflow_config(config, query, user_id)
+    return workflow_result_payload(
+        template_name=str(detail["file"]),
+        user_id=user_id,
+        query=query,
+        result=result,
+        config=config,
+        builder_mode="custom_workspace",
+    )
+
+
+def api_run(payload: dict) -> dict:
+    template_name = safe_template_name(payload.get("template"))
+    user_id = payload.get("user") or "user_a"
+    builder = load_builder(template_name)
+    query = (payload.get("query") or "").strip()
+    if not query:
+        query = default_query_for(template_name, builder)
+    result, config = run_generated_workflow(builder, query, user_id)
+    return workflow_result_payload(
+        template_name=template_name,
+        user_id=user_id,
+        query=query,
+        result=result,
+        config=config,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -285,18 +579,22 @@ def render_legacy_page(
         f'{html.escape(TemplateWorkflowBuilder(p).template_name)}</option>'
         for p in template_paths()
     )
+    context_options = context_options_for(builder)
     users = "\n".join(
-        f'<option value="{html.escape(uid)}"{" selected" if uid == user_id else ""}>{html.escape(label)}</option>'
-        for uid, label in USERS.items()
+        f'<option value="{html.escape(option["id"])}"{" selected" if option["id"] == user_id else ""}>'
+        f'{html.escape(option["label"]["ko"])}</option>'
+        for option in context_options["options"]
     )
+    context_label = context_options["label"]["ko"]
+    query_label = context_options["query_label"]["ko"]
 
     page = f"""<!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><title>Legacy</title><style>{LEGACY_STYLE}</style></head>
 <body><main class="shell">
 <div class="card"><form method="post" action="/legacy">
 <label>Template</label><select name="template">{options}</select>
-<label>User</label><select name="user">{users}</select>
-<label>Query</label><textarea name="query">{html.escape(query_text)}</textarea>
+<label>{html.escape(context_label)}</label><select name="user">{users}</select>
+<label>{html.escape(query_label)}</label><textarea name="query">{html.escape(query_text)}</textarea>
 <div class="buttons">
 <button class="secondary" name="action" value="generate">Generate JSON</button>
 <button name="action" value="run">Run Workflow</button>
@@ -351,6 +649,9 @@ class VisualBuilderHandler(BaseHTTPRequestHandler):
             except Exception as exc:
                 self._send_json({"error": str(exc)}, status=400)
             return
+        if path == "/api/builder/presets":
+            self._send_json(api_builder_presets())
+            return
         if path == "/api/users":
             self._send_json(api_users())
             return
@@ -379,6 +680,30 @@ class VisualBuilderHandler(BaseHTTPRequestHandler):
                 return
             try:
                 self._send_json(api_run(payload))
+            except Exception as exc:
+                self._send_json({"error": str(exc)}, status=500)
+            return
+
+        if parsed.path == "/api/builder/compose":
+            try:
+                payload = json.loads(raw.decode("utf-8") or "{}")
+            except json.JSONDecodeError:
+                self._send_json({"error": "invalid json"}, status=400)
+                return
+            try:
+                self._send_json(api_builder_compose(payload))
+            except Exception as exc:
+                self._send_json({"error": str(exc)}, status=400)
+            return
+
+        if parsed.path == "/api/builder/run":
+            try:
+                payload = json.loads(raw.decode("utf-8") or "{}")
+            except json.JSONDecodeError:
+                self._send_json({"error": "invalid json"}, status=400)
+                return
+            try:
+                self._send_json(api_builder_run(payload))
             except Exception as exc:
                 self._send_json({"error": str(exc)}, status=500)
             return
@@ -438,12 +763,19 @@ def ensure_port_available(port: int) -> None:
             raise OSError(f"port {port} is already in use; stop the old server or run: python web_app.py {port + 1}")
 
 
+def console_notice(message: str) -> None:
+    try:
+        print(message, flush=True)
+    except Exception:
+        pass
+
+
 def main() -> None:
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
     ensure_port_available(port)
     server = ThreadingHTTPServer(("127.0.0.1", port), VisualBuilderHandler)
-    print(f"Visual Builder frontend: http://127.0.0.1:{port}", flush=True)
-    print("Keep this window open while using the page.", flush=True)
+    console_notice(f"Visual Builder frontend: http://127.0.0.1:{port}")
+    console_notice("Keep this window open while using the page.")
     server.serve_forever()
 
 

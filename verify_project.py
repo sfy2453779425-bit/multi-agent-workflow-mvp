@@ -59,7 +59,7 @@ def check_tests() -> CheckResult:
     code, output = run_command([sys.executable, "-m", "unittest", "discover", "-s", "tests"])
     return CheckResult(
         "unit tests",
-        code == 0 and "Ran 16 tests" in output and "OK" in output,
+        code == 0 and "Ran 23 tests" in output and "OK" in output,
         output.strip().splitlines()[-1] if output.strip() else "no output",
     )
 
@@ -70,8 +70,10 @@ def check_template_list() -> CheckResult:
         code == 0
         and "outfit_recommendation_template.json" in output
         and "commute_outfit_template.json" in output
+        and "presentation_planning_template.json" in output
+        and "customer_support_ticket_template.json" in output
     )
-    return CheckResult("builder lists multiple templates", ok, output.strip())
+    return CheckResult("builder lists four templates", ok, output.strip())
 
 
 def check_web_frontend() -> CheckResult:
@@ -84,10 +86,29 @@ def check_web_frontend() -> CheckResult:
                 "import web_app; "
                 "index = web_app.index_bytes().decode('utf-8'); "
                 "detail = web_app.api_template_detail('outfit_recommendation_template.json'); "
+                "presentation = web_app.api_template_detail('presentation_planning_template.json'); "
+                "support = web_app.api_template_detail('customer_support_ticket_template.json'); "
+                "presets = web_app.api_builder_presets(); "
+                "custom = web_app.api_builder_compose({'preset': 'presentation_planning', 'workflow_name': 'Custom Built Presentation Workflow'}); "
+                "custom_run = web_app.api_builder_run({'preset': 'customer_support', 'workflow_name': 'Custom Built Support Workflow'}); "
+                "presentation_run = web_app.api_run({'template': 'presentation_planning_template.json'}); "
+                "support_run = web_app.api_run({'template': 'customer_support_ticket_template.json'}); "
                 "assert '/static/app.js' in index; "
                 "assert 'nodes-container' in index; "
+                "assert 'builder-preset-select' in index; "
                 "assert any(node['id'] == 'question' for node in detail['nodes']); "
                 "assert detail['generated_config']['execution']['type'] == 'sequential'; "
+                "assert presentation['generated_config']['runtime_type'] == 'presentation_planning'; "
+                "assert support['generated_config']['runtime_type'] == 'customer_support'; "
+                "assert presentation['context_options']['label']['zh'] == '3. 发表场景'; "
+                "assert support['context_options']['label']['zh'] == '3. 客户/渠道条件'; "
+                "assert len(presets['presets']) == 4; "
+                "assert custom['builder_mode'] == 'custom_workspace'; "
+                "assert custom['generated_config']['execution']['generated_by'] == 'BuilderWorkspace'; "
+                "assert custom_run['builder_mode'] == 'custom_workspace'; "
+                "assert len(custom_run['trace']) == 6; "
+                "assert presentation_run['summary']['summary_cards']; "
+                "assert support_run['summary']['summary_cards']; "
                 "print('web frontend API/static OK')"
             ),
         ]
@@ -99,6 +120,29 @@ def check_generated_workflow(name: str, command: list[str], expected: str) -> Ch
     code, output = run_command(command, timeout=180)
     ok = code == 0 and "Workflow Trace (6 Nodes)" in output and "Question Node" in output and expected in output
     return CheckResult(name, ok, "exit=" + str(code))
+
+
+def check_harness_comparison() -> CheckResult:
+    code, output = run_command([sys.executable, "experiments\\harness_comparison.py"], timeout=180)
+    result_path = ROOT / "outputs" / "harness_comparison" / "harness_comparison_results.json"
+    report_zh = ROOT / "outputs" / "harness_comparison" / "harness_comparison_report_zh.md"
+    report_kr = ROOT / "outputs" / "harness_comparison" / "harness_comparison_report_kr.md"
+    try:
+        data = json.loads(result_path.read_text(encoding="utf-8"))
+        ok = (
+            code == 0
+            and data["summary"]["case_count"] == 2
+            and data["summary"]["average_manual_touch_points"] == 17.0
+            and data["summary"]["average_builder_touch_points"] == 3.0
+            and all(case["builder_workspace"]["generated_by"] == "BuilderWorkspace" for case in data["cases"])
+            and report_zh.exists()
+            and report_kr.exists()
+        )
+        detail = f"exit={code}; reduced={data['summary']['average_touch_points_reduced']}; reports generated"
+    except Exception as exc:
+        ok = False
+        detail = f"exit={code}; {output.strip()}; {exc!r}"
+    return CheckResult("Harness comparison experiment", ok, detail)
 
 
 def check_external_tools() -> list[CheckResult]:
@@ -150,13 +194,20 @@ def main() -> int:
         "run_desktop.cmd",
         "run_web.cmd",
         "run_verify.cmd",
+        "run_harness_comparison.cmd",
         "builder_app.py",
         "builder_demo.py",
         "web_app.py",
+        "web_launcher.py",
         "workflow_builder_preview.html",
         "configs/builder_templates/outfit_recommendation_template.json",
         "configs/builder_templates/commute_outfit_template.json",
+        "configs/builder_templates/presentation_planning_template.json",
+        "configs/builder_templates/customer_support_ticket_template.json",
+        "data/presentation_knowledge.json",
+        "data/support_policy.json",
         "src/agent_builder/template_builder.py",
+        "experiments/harness_comparison.py",
         "deliverables/mentor_requirement_alignment_zh.md",
         "deliverables/builder_tool_comparison_kr.md",
         "deliverables/external_builder_tool_verification_zh.md",
@@ -173,6 +224,10 @@ def main() -> int:
         "configs/flowise_poc_mapping.json",
         "configs/builder_templates/outfit_recommendation_template.json",
         "configs/builder_templates/commute_outfit_template.json",
+        "configs/builder_templates/presentation_planning_template.json",
+        "configs/builder_templates/customer_support_ticket_template.json",
+        "data/presentation_knowledge.json",
+        "data/support_policy.json",
     ]
 
     results: list[CheckResult] = []
@@ -181,6 +236,7 @@ def main() -> int:
     results.append(check_tests())
     results.append(check_template_list())
     results.append(check_web_frontend())
+    results.append(check_harness_comparison())
     results.append(
         check_generated_workflow(
             "generated travel/outfit workflow",
@@ -209,6 +265,32 @@ def main() -> int:
                 "user_b",
             ],
             "추천 순위",
+        )
+    )
+    results.append(
+        check_generated_workflow(
+            "generated presentation planning workflow",
+            [
+                sys.executable,
+                "builder_demo.py",
+                "--run-generated",
+                "--builder-template",
+                "configs\\builder_templates\\presentation_planning_template.json",
+            ],
+            "Presentation Planning Workflow",
+        )
+    )
+    results.append(
+        check_generated_workflow(
+            "generated customer support workflow",
+            [
+                sys.executable,
+                "builder_demo.py",
+                "--run-generated",
+                "--builder-template",
+                "configs\\builder_templates\\customer_support_ticket_template.json",
+            ],
+            "Customer Support Ticket Workflow",
         )
     )
     if args.external:

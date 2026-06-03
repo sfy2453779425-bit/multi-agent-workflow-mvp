@@ -11,6 +11,8 @@
   let lang = localStorage.getItem(STORAGE_LANG) || "ko";
   let templates = [];
   let users = [];
+  let builderPresets = [];
+  let currentBuilderPreset = null;
   let currentDetail = null;
   let lastRunResult = null;
   let selectedNodeId = null;
@@ -21,6 +23,13 @@
 
   function t(key) {
     return (I18N[lang] && I18N[lang][key]) || (I18N.ko && I18N.ko[key]) || key;
+  }
+
+  function localized(value) {
+    if (value && typeof value === "object") {
+      return value[lang] || value.ko || value.zh || Object.values(value)[0] || "";
+    }
+    return value || "";
   }
 
   function escapeHtml(value) {
@@ -56,11 +65,13 @@
     renderLegend();
     if (currentDetail) {
       renderTemplateMeta(currentDetail);
+      renderControlContext(currentDetail);
       refreshNodeLabels();
     }
     if (selectedNodeId && currentDetail) showNodeDetail(selectedNodeId);
     if (lastRunResult) renderResult(lastRunResult);
     refreshStatusPills();
+    renderBuilderWorkspace();
   }
 
   function refreshStatusPills() {
@@ -102,13 +113,16 @@
     applyI18n();
 
     try {
-      const [tplResp, usersResp] = await Promise.all([
+      const [tplResp, usersResp, builderResp] = await Promise.all([
         fetchJSON("/api/templates"),
         fetchJSON("/api/users"),
+        fetchJSON("/api/builder/presets"),
       ]);
       templates = tplResp.templates;
       users = usersResp.users;
+      builderPresets = builderResp.presets || [];
       fillTemplateSelect(tplResp.default);
+      fillBuilderPresetSelect(builderResp.default);
       fillUserSelect();
       await loadTemplateDetail(tplResp.default);
     } catch (err) {
@@ -123,6 +137,8 @@
     }
 
     $("#template-select").addEventListener("change", (e) => loadTemplateDetail(e.target.value));
+    $("#builder-preset-select").addEventListener("change", (e) => selectBuilderPreset(e.target.value, true));
+    $("#btn-compose-builder").addEventListener("click", onComposeBuilder);
     $("#btn-generate").addEventListener("click", onGenerate);
     $("#btn-run").addEventListener("click", onRun);
     $("#copy-json").addEventListener("click", onCopyJson);
@@ -154,19 +170,83 @@
       .join("");
   }
 
-  function fillUserSelect() {
-    const sel = $("#user-select");
-    sel.innerHTML = users
+  function fillBuilderPresetSelect(selected) {
+    const sel = $("#builder-preset-select");
+    if (!sel) return;
+    sel.innerHTML = builderPresets
       .map(
-        (u) => `<option value="${escapeHtml(u.id)}">${escapeHtml(u.label)}</option>`
+        (preset) =>
+          `<option value="${escapeHtml(preset.id)}"${preset.id === selected ? " selected" : ""}>${escapeHtml(
+            localized(preset.label) || preset.id
+          )}</option>`
       )
       .join("");
+    selectBuilderPreset(selected || (builderPresets[0] && builderPresets[0].id), false);
+  }
+
+  function selectBuilderPreset(id, updateQuery) {
+    currentBuilderPreset = builderPresets.find((preset) => preset.id === id) || builderPresets[0] || null;
+    if (!currentBuilderPreset) return;
+    const nameInput = $("#builder-workflow-name");
+    if (nameInput) nameInput.value = currentBuilderPreset.default_workflow_name || "";
+    if (updateQuery && currentBuilderPreset.default_query) {
+      $("#query-input").value = currentBuilderPreset.default_query;
+    }
+    renderBuilderWorkspace();
+  }
+
+  function renderBuilderWorkspace() {
+    const list = $("#builder-node-list");
+    if (!list || !currentBuilderPreset) return;
+    list.innerHTML = (currentBuilderPreset.nodes || [])
+      .map(
+        (node, index) => `
+        <div class="builder-node-item">
+          <span class="builder-node-index">${String(index + 1).padStart(2, "0")}</span>
+          <span class="builder-node-name" title="${escapeHtml(node.name)}">${escapeHtml(node.name)}</span>
+          <span class="builder-node-required">${escapeHtml(node.required ? t("builder_required") : "")}</span>
+        </div>`
+      )
+      .join("");
+    const status = $("#builder-status");
+    if (status) {
+      status.textContent = t("builder_status_ready");
+    }
+  }
+
+  function builderPayloadFromUI() {
+    const preset = currentBuilderPreset || builderPresets[0] || {};
+    return {
+      preset: preset.id,
+      workflow_name: ($("#builder-workflow-name") && $("#builder-workflow-name").value) || preset.default_workflow_name,
+      node_ids: (preset.nodes || []).map((node) => node.id),
+      query: $("#query-input") ? $("#query-input").value : preset.default_query,
+    };
+  }
+
+  function fillUserSelect() {
+    const sel = $("#user-select");
+    const optionRows =
+      (currentDetail && currentDetail.context_options && currentDetail.context_options.options) || users;
+    sel.innerHTML = optionRows
+      .map(
+        (u) => {
+          const label = localized(u.label || u.labels) || u.id;
+          return `<option value="${escapeHtml(u.id)}">${escapeHtml(label)}</option>`;
+        }
+      )
+      .join("");
+    const selected = currentDetail && currentDetail.default_user_id;
+    if (selected && optionRows.some((u) => u.id === selected)) {
+      sel.value = selected;
+    }
   }
 
   // ---------- template detail load ------------------------------------
   async function loadTemplateDetail(name) {
     currentDetail = await fetchJSON("/api/template?name=" + encodeURIComponent(name));
     $("#query-input").value = currentDetail.default_query || "";
+    renderControlContext(currentDetail);
     selectedNodeId = null;
     lastRunResult = null;
     $("#result-area").hidden = true;
@@ -175,6 +255,15 @@
     renderNodes(currentDetail.nodes);
     showNodeDetail(null);
     requestAnimationFrame(() => drawEdges());
+  }
+
+  function renderControlContext(detail) {
+    const cfg = detail && detail.context_options;
+    const contextTitle = document.querySelector('[data-i18n="controls_user"]');
+    const queryTitle = document.querySelector('[data-i18n="controls_query"]');
+    if (contextTitle) contextTitle.textContent = localized(cfg && cfg.label) || t("controls_user");
+    if (queryTitle) queryTitle.textContent = localized(cfg && cfg.query_label) || t("controls_query");
+    fillUserSelect();
   }
 
   function renderTemplateMeta(detail) {
@@ -410,29 +499,142 @@
   // ---------- actions: generate ---------------------------------------
   async function onGenerate() {
     if (!currentDetail) return;
-    const name = $("#template-select").value;
-    try {
-      currentDetail = await fetchJSON("/api/template?name=" + encodeURIComponent(name));
-    } catch (err) {
-      alert(err.message);
-      return;
+    if (currentDetail.builder_mode === "custom_workspace") {
+      try {
+        currentDetail = await fetchJSON("/api/builder/compose", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(builderPayloadFromUI()),
+        });
+      } catch (err) {
+        alert(err.message);
+        return;
+      }
+    } else {
+      const name = $("#template-select").value;
+      try {
+        currentDetail = await fetchJSON("/api/template?name=" + encodeURIComponent(name));
+      } catch (err) {
+        alert(err.message);
+        return;
+      }
     }
     lastRunResult = null;
     setAllNodesState("idle");
     resetEdges();
+    renderTemplateMeta(currentDetail);
+    renderControlContext(currentDetail);
+    renderNodes(currentDetail.nodes);
+    requestAnimationFrame(() => drawEdges());
     showGeneratedOnly(currentDetail);
   }
 
   function showGeneratedOnly(detail) {
     $("#result-area").hidden = false;
     setResultStatus("done");
-    const placeholder = `<span class="muted small">—</span>`;
-    $("#result-weather").innerHTML = placeholder;
-    $("#result-shopping").innerHTML = placeholder;
-    $("#result-ranking").innerHTML = placeholder;
+    renderResultCards([]);
     $("#result-trace").innerHTML = "";
     $("#result-answer").textContent = "";
     $("#result-json").textContent = JSON.stringify(detail.generated_config, null, 2);
+  }
+
+  function rowsHtml(rows) {
+    return (rows || [])
+      .map((row) => {
+        const value = row.value == null || row.value === "" ? "-" : row.value;
+        return `<div class="row"><span>${escapeHtml(row.label || "")}</span><span>${escapeHtml(value)}</span></div>`;
+      })
+      .join("");
+  }
+
+  function cardHtml(card) {
+    let body;
+    if (card.items && card.items.length) {
+      body = card.items.map((item) => `<div>${escapeHtml(item)}</div>`).join("");
+    } else if (card.rows && card.rows.length) {
+      body = rowsHtml(card.rows);
+    } else {
+      body = `<span class="muted small">—</span>`;
+    }
+    return `<div class="result-card">
+        <div class="result-card-title">${escapeHtml(card.title || "")}</div>
+        <div class="result-card-body">${body}</div>
+      </div>`;
+  }
+
+  function renderResultCards(cards) {
+    const grid = $("#result-grid");
+    if (!grid) return;
+    if (!cards || !cards.length) {
+      grid.innerHTML = `<div class="result-card result-card-empty"><span class="muted small">${escapeHtml(
+        t("result_placeholder")
+      )}</span></div>`;
+      return;
+    }
+    grid.innerHTML = cards.map(cardHtml).join("");
+  }
+
+  // Outfit runtime returns typed summary fields instead of generic summary_cards;
+  // normalize both shapes into one card model so the result grid has a single render path.
+  function buildResultCards(result) {
+    const summary = result.summary || {};
+    if (summary.summary_cards && summary.summary_cards.length) {
+      return summary.summary_cards;
+    }
+    const w = summary.weather_summary || {};
+    const s = summary.shopping_analysis_summary || {};
+    const ranked = summary.ranked_items || [];
+    return [
+      {
+        title: t("result_weather"),
+        rows: [
+          { label: t("field_city"), value: summary.city_display || "-" },
+          { label: t("field_date"), value: summary.date_label || "-" },
+          { label: t("field_temp"), value: `${w.temp_min ?? "-"} ~ ${w.temp_max ?? "-"} °C` },
+          { label: t("field_condition"), value: w.condition || "-" },
+        ],
+      },
+      {
+        title: t("result_shopping"),
+        rows: [
+          { label: t("field_items"), value: String(s.total_items ?? "-") },
+          { label: t("field_styles"), value: (s.top_styles || []).join(", ") || "-" },
+          { label: t("field_colors"), value: (s.top_colors || []).join(", ") || "-" },
+        ],
+      },
+      {
+        title: t("result_ranking"),
+        items: ranked.length ? ranked : [(result.answer || "").slice(0, 240)],
+      },
+    ];
+  }
+
+  // ---------- actions: builder compose --------------------------------
+  async function onComposeBuilder() {
+    if (!currentBuilderPreset) return;
+    try {
+      currentDetail = await fetchJSON("/api/builder/compose", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(builderPayloadFromUI()),
+      });
+    } catch (err) {
+      alert(err.message);
+      return;
+    }
+
+    selectedNodeId = null;
+    lastRunResult = null;
+    $("#result-area").hidden = true;
+    setRunStatus("idle");
+    renderTemplateMeta(currentDetail);
+    renderControlContext(currentDetail);
+    renderNodes(currentDetail.nodes);
+    showNodeDetail(null);
+    showGeneratedOnly(currentDetail);
+    const status = $("#builder-status");
+    if (status) status.textContent = t("builder_status_composed");
+    requestAnimationFrame(() => drawEdges());
   }
 
   // ---------- actions: run --------------------------------------------
@@ -447,12 +649,15 @@
     $("#result-area").hidden = true;
 
     try {
-      const payload = {
-        template: $("#template-select").value,
-        user: $("#user-select").value,
-        query: $("#query-input").value,
-      };
-      const result = await fetchJSON("/api/run", {
+      const isCustom = currentDetail.builder_mode === "custom_workspace";
+      const payload = isCustom
+        ? { ...builderPayloadFromUI(), user: $("#user-select").value, query: $("#query-input").value }
+        : {
+            template: $("#template-select").value,
+            user: $("#user-select").value,
+            query: $("#query-input").value,
+          };
+      const result = await fetchJSON(isCustom ? "/api/builder/run" : "/api/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -498,24 +703,7 @@
 
   function renderResult(result) {
     $("#result-area").hidden = false;
-    const w = result.summary.weather_summary || {};
-    const s = result.summary.shopping_analysis_summary || {};
-    const ranked = result.summary.ranked_items || [];
-
-    $("#result-weather").innerHTML = `
-      <div class="row"><span>${escapeHtml(t("field_city"))}</span><span>${escapeHtml(result.summary.city_display || "-")}</span></div>
-      <div class="row"><span>${escapeHtml(t("field_date"))}</span><span>${escapeHtml(result.summary.date_label || "-")}</span></div>
-      <div class="row"><span>${escapeHtml(t("field_temp"))}</span><span>${escapeHtml(`${w.temp_min ?? "-"} ~ ${w.temp_max ?? "-"} °C`)}</span></div>
-      <div class="row"><span>${escapeHtml(t("field_condition"))}</span><span>${escapeHtml(w.condition || "-")}</span></div>
-    `;
-    $("#result-shopping").innerHTML = `
-      <div class="row"><span>${escapeHtml(t("field_items"))}</span><span>${escapeHtml(String(s.total_items ?? "-"))}</span></div>
-      <div class="row"><span>${escapeHtml(t("field_styles"))}</span><span>${(s.top_styles || []).map(escapeHtml).join(", ") || "-"}</span></div>
-      <div class="row"><span>${escapeHtml(t("field_colors"))}</span><span>${(s.top_colors || []).map(escapeHtml).join(", ") || "-"}</span></div>
-    `;
-    $("#result-ranking").innerHTML = ranked.length
-      ? ranked.map((item) => `<div>${escapeHtml(item)}</div>`).join("")
-      : `<div class="muted small">${escapeHtml((result.answer || "").slice(0, 240))}</div>`;
+    renderResultCards(buildResultCards(result));
 
     $("#result-trace").innerHTML = result.trace
       .map(

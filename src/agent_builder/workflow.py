@@ -57,19 +57,39 @@ class MultiAgentWorkflowEngine:
     ):
         self.workflow_config_path = Path(workflow_config_path)
         self.workflow_config = self._load_json(self.workflow_config_path)
-        base_config = Path(self.workflow_config["base_agent_config"])
-        if not base_config.is_absolute():
-            base_config = self.workflow_config_path.parent / base_config
-        self.base_engine = AgentBuilderEngine(
-            base_config,
-            data_dir=data_dir,
-            weather_tool=weather_tool,
-        )
-        self.data_dir = self.base_engine.data_dir
+        self.runtime_type = self.workflow_config.get("runtime_type", "outfit_recommendation")
+        base_config_value = self.workflow_config.get("base_agent_config")
+        if base_config_value:
+            base_config = Path(base_config_value)
+            if not base_config.is_absolute():
+                base_config = self.workflow_config_path.parent / base_config
+            self.base_engine = AgentBuilderEngine(
+                base_config,
+                data_dir=data_dir,
+                weather_tool=weather_tool,
+            )
+            self.data_dir = self.base_engine.data_dir
+        else:
+            self.base_engine = None
+            configured_data_dir = self.workflow_config.get("data_dir")
+            if configured_data_dir:
+                self.data_dir = Path(configured_data_dir)
+            elif data_dir:
+                self.data_dir = Path(data_dir)
+            else:
+                self.data_dir = self.workflow_config_path.parent.parent / "data"
 
     def run(self, user_message: str | None = None, user_id: str | None = None) -> WorkflowResult:
         query = (user_message or self.workflow_config.get("default_query") or "").strip()
         selected_user = user_id or self.workflow_config.get("default_user_id", "user_a")
+
+        if self.runtime_type == "presentation_planning":
+            return self._run_presentation_planning(query, selected_user)
+        if self.runtime_type == "customer_support":
+            return self._run_customer_support(query, selected_user)
+
+        if self.base_engine is None:
+            raise ValueError("outfit workflow requires base_agent_config")
 
         trace: list[TraceStep] = []
         context = self._run_request_parser(query, selected_user)
@@ -99,6 +119,274 @@ class MultiAgentWorkflowEngine:
         context["executed_agents"].append("compose")
         trace.append(self._trace_compose(context))
 
+        return self._finalize(trace, context, answer=answer)
+
+    def _run_presentation_planning(self, query: str, user_id: str) -> WorkflowResult:
+        trace: list[TraceStep] = []
+        context: dict[str, Any] = {
+            "query": query,
+            "user_id": user_id,
+            "runtime_type": self.runtime_type,
+            "executed_agents": [],
+            "executed_tools": [],
+        }
+
+        context["topic"] = query
+        context["duration_minutes"] = self._extract_duration_minutes(query, default=15)
+        context["output_type"] = "presentation_outline"
+        context["executed_agents"].append("request_parser")
+        trace.append(
+            self._runtime_trace(
+                "request_parser",
+                f"topic extracted, duration={context['duration_minutes']} minutes",
+                {
+                    "topic": context["topic"],
+                    "duration_minutes": context["duration_minutes"],
+                    "output_type": context["output_type"],
+                },
+            )
+        )
+
+        context["missing_fields"] = [] if context["topic"] else ["topic"]
+        context["needs_clarification"] = bool(context["missing_fields"])
+        context["next_question_field"] = "topic" if context["needs_clarification"] else ""
+        context["clarification_message"] = (
+            self.workflow_config.get("question_agent", {})
+            .get("clarification_questions", {})
+            .get("topic", "Please provide the presentation topic.")
+        )
+        context["executed_agents"].append("question")
+        trace.append(
+            self._runtime_trace(
+                "question",
+                "topic missing" if context["needs_clarification"] else "presentation context is complete",
+                {
+                    "missing_fields": context["missing_fields"],
+                    "needs_clarification": context["needs_clarification"],
+                },
+            )
+        )
+        if context["needs_clarification"]:
+            return self._finalize(trace, context, answer=context["clarification_message"])
+
+        knowledge = self._load_runtime_data()
+        matched_topics = self._match_knowledge_topics(query, knowledge)
+        context["matched_topics"] = [topic["title"] for topic in matched_topics]
+        context["planning_goal"] = "Build a defensible presentation outline from local knowledge notes."
+        context["executed_agents"].append("topic_analysis")
+        trace.append(
+            self._runtime_trace(
+                "topic_analysis",
+                "matched topics: " + ", ".join(context["matched_topics"]),
+                {
+                    "matched_topic_ids": [topic["id"] for topic in matched_topics],
+                    "planning_goal": context["planning_goal"],
+                },
+            )
+        )
+
+        knowledge_points = []
+        slide_suggestions = []
+        for topic in matched_topics:
+            knowledge_points.extend(topic.get("points", [])[:2])
+            slide_suggestions.extend(topic.get("slide_suggestions", [])[:2])
+        context["knowledge_points"] = knowledge_points
+        context["slide_suggestions"] = slide_suggestions
+        context["executed_agents"].append("knowledge_lookup")
+        context["executed_tools"].append("presentation_knowledge")
+        trace.append(
+            self._runtime_trace(
+                "knowledge_lookup",
+                f"loaded {len(knowledge_points)} knowledge points from local notes",
+                {
+                    "knowledge_points": knowledge_points,
+                    "slide_suggestions": slide_suggestions,
+                    "source": self.workflow_config.get("data_file"),
+                },
+            )
+        )
+
+        outline_sections = self._build_presentation_outline(context)
+        context["outline_sections"] = outline_sections
+        context["speaker_focus"] = [
+            "Position the project as a workflow builder, not as a single recommendation feature.",
+            "Use multiple domains to prove template portability.",
+            "Show trace output as executable evidence.",
+        ]
+        context["executed_agents"].append("outline_generation")
+        trace.append(
+            self._runtime_trace(
+                "outline_generation",
+                f"generated {len(outline_sections)} outline sections",
+                {
+                    "outline_sections": outline_sections,
+                    "speaker_focus": context["speaker_focus"],
+                },
+            )
+        )
+
+        answer = self._render_presentation_answer(context)
+        context["summary_cards"] = [
+            {
+                "title": "Presentation Topic",
+                "rows": [
+                    {"label": "Duration", "value": f"{context['duration_minutes']} minutes"},
+                    {"label": "Matched Topics", "value": ", ".join(context["matched_topics"])},
+                ],
+            },
+            {
+                "title": "Knowledge Evidence",
+                "rows": [
+                    {"label": "Points", "value": str(len(context["knowledge_points"]))},
+                    {"label": "Trace", "value": "6 nodes executed"},
+                ],
+            },
+            {
+                "title": "Outline Result",
+                "rows": [
+                    {"label": str(i + 1), "value": section}
+                    for i, section in enumerate(context["outline_sections"][:4])
+                ],
+            },
+        ]
+        context["executed_agents"].append("compose")
+        trace.append(
+            self._runtime_trace(
+                "compose",
+                "final presentation outline rendered",
+                {"summary_cards": context["summary_cards"]},
+            )
+        )
+        return self._finalize(trace, context, answer=answer)
+
+    def _run_customer_support(self, query: str, user_id: str) -> WorkflowResult:
+        trace: list[TraceStep] = []
+        context: dict[str, Any] = {
+            "query": query,
+            "user_id": user_id,
+            "runtime_type": self.runtime_type,
+            "issue_text": query,
+            "executed_agents": [],
+            "executed_tools": [],
+        }
+
+        context["intent"] = self._detect_support_intent(query)
+        context["executed_agents"].append("request_parser")
+        trace.append(
+            self._runtime_trace(
+                "request_parser",
+                f"support intent={context['intent']}",
+                {"issue_text": context["issue_text"], "intent": context["intent"]},
+            )
+        )
+
+        context["missing_fields"] = [] if context["issue_text"] else ["issue_text"]
+        context["needs_clarification"] = bool(context["missing_fields"])
+        context["next_question_field"] = "issue_text" if context["needs_clarification"] else ""
+        context["clarification_message"] = (
+            self.workflow_config.get("question_agent", {})
+            .get("clarification_questions", {})
+            .get("issue_text", "Please describe the customer issue.")
+        )
+        context["executed_agents"].append("question")
+        trace.append(
+            self._runtime_trace(
+                "question",
+                "issue text missing" if context["needs_clarification"] else "ticket context is complete",
+                {
+                    "missing_fields": context["missing_fields"],
+                    "needs_clarification": context["needs_clarification"],
+                },
+            )
+        )
+        if context["needs_clarification"]:
+            return self._finalize(trace, context, answer=context["clarification_message"])
+
+        policy_data = self._load_runtime_data()
+        category, matched_keywords = self._classify_support_ticket(query, policy_data)
+        context["ticket_category"] = category["label"]
+        context["ticket_category_id"] = category["id"]
+        context["matched_keywords"] = matched_keywords
+        context["priority_candidate"] = category["priority"]
+        context["executed_agents"].append("ticket_classification")
+        trace.append(
+            self._runtime_trace(
+                "ticket_classification",
+                f"category={context['ticket_category']}, matched={', '.join(matched_keywords) or 'default'}",
+                {
+                    "category": context["ticket_category"],
+                    "priority_candidate": context["priority_candidate"],
+                    "matched_keywords": matched_keywords,
+                },
+            )
+        )
+
+        context["policy"] = category["policy"]
+        context["sla"] = category["sla"]
+        context["owner_team"] = category["owner_team"]
+        context["executed_agents"].append("policy_lookup")
+        context["executed_tools"].append("support_policy")
+        trace.append(
+            self._runtime_trace(
+                "policy_lookup",
+                f"loaded policy for {context['ticket_category']}",
+                {
+                    "owner_team": context["owner_team"],
+                    "sla": context["sla"],
+                    "policy": context["policy"],
+                    "source": self.workflow_config.get("data_file"),
+                },
+            )
+        )
+
+        context["priority"] = category["priority"]
+        context["next_actions"] = category["next_actions"]
+        context["executed_agents"].append("routing_decision")
+        trace.append(
+            self._runtime_trace(
+                "routing_decision",
+                f"route to {context['owner_team']} with priority {context['priority']}",
+                {
+                    "owner_team": context["owner_team"],
+                    "priority": context["priority"],
+                    "next_actions": context["next_actions"],
+                },
+            )
+        )
+
+        answer = self._render_support_answer(context)
+        context["summary_cards"] = [
+            {
+                "title": "Ticket Classification",
+                "rows": [
+                    {"label": "Category", "value": context["ticket_category"]},
+                    {"label": "Intent", "value": context["intent"]},
+                ],
+            },
+            {
+                "title": "Routing Decision",
+                "rows": [
+                    {"label": "Owner", "value": context["owner_team"]},
+                    {"label": "Priority", "value": context["priority"]},
+                    {"label": "SLA", "value": context["sla"]},
+                ],
+            },
+            {
+                "title": "Next Actions",
+                "rows": [
+                    {"label": str(i + 1), "value": action}
+                    for i, action in enumerate(context["next_actions"])
+                ],
+            },
+        ]
+        context["executed_agents"].append("compose")
+        trace.append(
+            self._runtime_trace(
+                "compose",
+                "support ticket response rendered",
+                {"summary_cards": context["summary_cards"]},
+            )
+        )
         return self._finalize(trace, context, answer=answer)
 
     def _finalize(
@@ -298,6 +586,130 @@ class MultiAgentWorkflowEngine:
                 "workflow_id": self.workflow_config.get("workflow_id"),
             },
         )
+
+    def _runtime_trace(self, node_id: str, detail: str, data: dict[str, Any]) -> TraceStep:
+        return TraceStep(name=self._node_name(node_id), detail=detail, data=data)
+
+    def _node_name(self, node_id: str) -> str:
+        for agent in self.workflow_config.get("agents", []):
+            if agent.get("id") == node_id:
+                return agent.get("name", node_id)
+        return node_id
+
+    def _load_runtime_data(self) -> dict[str, Any]:
+        data_file = self.workflow_config.get("data_file")
+        if not data_file:
+            raise ValueError(f"{self.runtime_type} workflow requires data_file")
+        return self._load_json(self.data_dir / data_file)
+
+    def _extract_duration_minutes(self, query: str, default: int) -> int:
+        for token in query.replace("-", " ").split():
+            cleaned = "".join(ch for ch in token if ch.isdigit())
+            if cleaned:
+                value = int(cleaned)
+                if 1 <= value <= 180:
+                    return value
+        return default
+
+    def _match_knowledge_topics(
+        self,
+        query: str,
+        knowledge: dict[str, Any],
+    ) -> list[dict[str, Any]]:
+        lower = query.lower()
+        scored = []
+        for topic in knowledge.get("topics", []):
+            keywords = topic.get("keywords", [])
+            score = sum(1 for keyword in keywords if keyword.lower() in lower)
+            if score:
+                scored.append((score, topic))
+        if scored:
+            return [topic for _, topic in sorted(scored, key=lambda item: item[0], reverse=True)[:3]]
+
+        default_ids = set(knowledge.get("default_topic_ids", []))
+        defaults = [topic for topic in knowledge.get("topics", []) if topic.get("id") in default_ids]
+        return defaults or list(knowledge.get("topics", []))[:2]
+
+    def _build_presentation_outline(self, context: dict[str, Any]) -> list[str]:
+        matched = ", ".join(context.get("matched_topics", []))
+        return [
+            f"Opening: define the presentation topic and why {matched} matters.",
+            "Problem: explain why a single-domain MVP is not enough to prove a builder.",
+            "Architecture: show Template -> Workflow JSON -> Multi-Agent Engine -> Trace.",
+            "Multi-domain evidence: compare recommendation, presentation planning and support ticket workflows.",
+            "Conclusion: position the current semester as the executable foundation for next semester.",
+        ]
+
+    def _render_presentation_answer(self, context: dict[str, Any]) -> str:
+        lines = [
+            "[Presentation Planning Workflow]",
+            f"Topic: {context['topic']}",
+            f"Duration: {context['duration_minutes']} minutes",
+            "Matched knowledge: " + ", ".join(context.get("matched_topics", [])),
+            "",
+            "Outline",
+        ]
+        lines.extend(f"{index}. {section}" for index, section in enumerate(context["outline_sections"], start=1))
+        lines.append("")
+        lines.append("Key evidence")
+        lines.extend(f"- {point}" for point in context.get("knowledge_points", [])[:5])
+        lines.append("")
+        lines.append("Trace proof: this outline was produced by a 6-node generated workflow.")
+        return "\n".join(lines)
+
+    def _detect_support_intent(self, query: str) -> str:
+        lower = query.lower()
+        if any(word in lower for word in ("refund", "return", "cancel", "money back")):
+            return "refund_or_return"
+        if any(word in lower for word in ("late", "delivery", "shipping", "tracking")):
+            return "delivery_status"
+        if any(word in lower for word in ("login", "password", "account", "locked")):
+            return "account_access"
+        return "technical_help"
+
+    def _classify_support_ticket(
+        self,
+        query: str,
+        policy_data: dict[str, Any],
+    ) -> tuple[dict[str, Any], list[str]]:
+        lower = query.lower()
+        best_category: dict[str, Any] | None = None
+        best_keywords: list[str] = []
+        for category in policy_data.get("categories", []):
+            matched = [keyword for keyword in category.get("keywords", []) if keyword.lower() in lower]
+            if len(matched) > len(best_keywords):
+                best_category = category
+                best_keywords = matched
+
+        if best_category is not None:
+            return best_category, best_keywords
+
+        default_id = policy_data.get("default_category")
+        for category in policy_data.get("categories", []):
+            if category.get("id") == default_id:
+                return category, []
+        return policy_data["categories"][0], []
+
+    def _render_support_answer(self, context: dict[str, Any]) -> str:
+        lines = [
+            "[Customer Support Ticket Workflow]",
+            f"Category: {context['ticket_category']}",
+            f"Intent: {context['intent']}",
+            f"Owner team: {context['owner_team']}",
+            f"Priority: {context['priority']} / SLA: {context['sla']}",
+            "",
+            "Policy basis:",
+            context["policy"],
+            "",
+            "Next actions",
+        ]
+        lines.extend(f"{index}. {action}" for index, action in enumerate(context["next_actions"], start=1))
+        lines.append("")
+        lines.append(
+            "Response draft: We have classified the issue and routed it to "
+            f"{context['owner_team']} for follow-up."
+        )
+        return "\n".join(lines)
 
     def _load_json(self, path: Path) -> Any:
         with path.open("r", encoding="utf-8") as file:

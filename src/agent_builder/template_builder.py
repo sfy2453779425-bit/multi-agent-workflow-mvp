@@ -68,8 +68,8 @@ class TemplateWorkflowBuilder:
         if not validation.ok:
             raise ValueError("; ".join(validation.errors))
 
-        base_agent_config = self.template["base_agent_config"]
-        if absolute_base_config:
+        base_agent_config = self.template.get("base_agent_config")
+        if base_agent_config and absolute_base_config:
             base_agent_config = str((self.template_path.parent / base_agent_config).resolve())
 
         agents = [
@@ -86,7 +86,12 @@ class TemplateWorkflowBuilder:
             "workflow_id": self.template["template_id"].replace("_builder_template", "_workflow"),
             "workflow_name": self.template["template_name"].replace("Template", "Workflow"),
             "description": self.template["description"],
+            "runtime_type": self.template.get("runtime_type", "outfit_recommendation"),
             "base_agent_config": base_agent_config,
+            "data_file": self.template.get("data_file"),
+            "data_dir": str((self.template_path.parent.parent.parent / "data").resolve())
+            if absolute_base_config and self.template.get("data_file")
+            else None,
             "default_query": self.template["default_query"],
             "default_user_id": self.template.get("default_user_id", "user_a"),
             "agents": agents,

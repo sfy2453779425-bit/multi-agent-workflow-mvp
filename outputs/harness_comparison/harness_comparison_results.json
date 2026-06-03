@@ -1,0 +1,88 @@
+{
+  "experiment": "Generic Harness Engineering vs Builder Workspace",
+  "method": "Both approaches use the same local execution engine. The comparison isolates how the workflow is constructed: manual Harness specification vs Builder Workspace generated JSON.",
+  "cases": [
+    {
+      "case_id": "presentation_planning",
+      "case_title_zh": "发表规划任务",
+      "case_title_kr": "발표 기획 업무",
+      "query": "Prepare a 15-minute presentation outline about Harness Engineering and Multi-Agent Workflow Builder MVP.",
+      "generic_harness": {
+        "construction": "manual_harness_spec",
+        "generated_by": "GenericHarnessManualSpec",
+        "manual_agent_definitions": 6,
+        "manual_harness_component_sections": 7,
+        "construction_touch_points": 17,
+        "workflow_json_bytes": 2468,
+        "trace_count": 6,
+        "needs_clarification": false,
+        "builder_standardized_json": false,
+        "domain_switch": "Copy and rewrite Agent roles, tool binding, rules and execution order for the next domain."
+      },
+      "builder_workspace": {
+        "construction": "builder_workspace_generated_workflow",
+        "generated_by": "BuilderWorkspace",
+        "source_template": "presentation_planning_template.json",
+        "manual_agent_definitions": 0,
+        "manual_harness_component_sections": 0,
+        "construction_touch_points": 3,
+        "workflow_json_bytes": 2477,
+        "trace_count": 6,
+        "needs_clarification": false,
+        "builder_standardized_json": true,
+        "domain_switch": "Select another Builder preset and generate a new executable Workflow JSON."
+      },
+      "delta": {
+        "manual_agent_definitions_reduced": 6,
+        "manual_component_sections_reduced": 7,
+        "touch_points_reduced": 14,
+        "trace_count_equal": true
+      }
+    },
+    {
+      "case_id": "customer_support",
+      "case_title_zh": "客服工单分流任务",
+      "case_title_kr": "고객 문의 분류 업무",
+      "query": "Customer says the delivery is late and asks whether the order can be refunded.",
+      "generic_harness": {
+        "construction": "manual_harness_spec",
+        "generated_by": "GenericHarnessManualSpec",
+        "manual_agent_definitions": 6,
+        "manual_harness_component_sections": 7,
+        "construction_touch_points": 17,
+        "workflow_json_bytes": 2359,
+        "trace_count": 6,
+        "needs_clarification": false,
+        "builder_standardized_json": false,
+        "domain_switch": "Copy and rewrite Agent roles, tool binding, rules and execution order for the next domain."
+      },
+      "builder_workspace": {
+        "construction": "builder_workspace_generated_workflow",
+        "generated_by": "BuilderWorkspace",
+        "source_template": "customer_support_ticket_template.json",
+        "manual_agent_definitions": 0,
+        "manual_harness_component_sections": 0,
+        "construction_touch_points": 3,
+        "workflow_json_bytes": 2373,
+        "trace_count": 6,
+        "needs_clarification": false,
+        "builder_standardized_json": true,
+        "domain_switch": "Select another Builder preset and generate a new executable Workflow JSON."
+      },
+      "delta": {
+        "manual_agent_definitions_reduced": 6,
+        "manual_component_sections_reduced": 7,
+        "touch_points_reduced": 14,
+        "trace_count_equal": true
+      }
+    }
+  ],
+  "summary": {
+    "case_count": 2,
+    "builder_presets_available": 4,
+    "all_cases_trace_count_equal": true,
+    "average_manual_touch_points": 17.0,
+    "average_builder_touch_points": 3.0,
+    "average_touch_points_reduced": 14.0
+  }
+}

@@ -263,5 +263,126 @@ class AgentBuilderEngineTest(unittest.TestCase):
         self.assertIn("추천", result.answer)
 
 
+    def test_builder_lists_four_templates_across_domains(self):
+        template_dir = ROOT / "configs" / "builder_templates"
+        template_names = {path.name for path in template_dir.glob("*_template.json")}
+
+        self.assertIn("outfit_recommendation_template.json", template_names)
+        self.assertIn("commute_outfit_template.json", template_names)
+        self.assertIn("presentation_planning_template.json", template_names)
+        self.assertIn("customer_support_ticket_template.json", template_names)
+
+    def test_cross_domain_templates_generate_runtime_workflow_configs(self):
+        presentation = TemplateWorkflowBuilder(
+            ROOT / "configs" / "builder_templates" / "presentation_planning_template.json"
+        ).build_workflow_config(absolute_base_config=True)
+        support = TemplateWorkflowBuilder(
+            ROOT / "configs" / "builder_templates" / "customer_support_ticket_template.json"
+        ).build_workflow_config(absolute_base_config=True)
+
+        self.assertEqual("presentation_planning", presentation["runtime_type"])
+        self.assertEqual("presentation_knowledge.json", presentation["data_file"])
+        self.assertIn("outline_generation", presentation["execution"]["order"])
+        self.assertEqual("customer_support", support["runtime_type"])
+        self.assertEqual("support_policy.json", support["data_file"])
+        self.assertIn("routing_decision", support["execution"]["order"])
+
+    def test_generated_presentation_template_workflow_runs(self):
+        import json
+        import tempfile
+
+        builder = TemplateWorkflowBuilder(
+            ROOT / "configs" / "builder_templates" / "presentation_planning_template.json"
+        )
+        generated = builder.build_workflow_config(absolute_base_config=True)
+
+        with tempfile.TemporaryDirectory(prefix="workflow_builder_presentation_test_") as temp_dir:
+            generated_path = Path(temp_dir) / "generated_presentation_workflow.json"
+            generated_path.write_text(
+                json.dumps(generated, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            engine = MultiAgentWorkflowEngine(generated_path)
+            result = engine.run()
+
+        self.assertFalse(result.context["needs_clarification"])
+        self.assertEqual(6, len(result.trace))
+        self.assertIn("Presentation Planning Workflow", result.answer)
+        self.assertIn("summary_cards", result.context)
+
+    def test_generated_customer_support_template_workflow_runs(self):
+        import json
+        import tempfile
+
+        builder = TemplateWorkflowBuilder(
+            ROOT / "configs" / "builder_templates" / "customer_support_ticket_template.json"
+        )
+        generated = builder.build_workflow_config(absolute_base_config=True)
+
+        with tempfile.TemporaryDirectory(prefix="workflow_builder_support_test_") as temp_dir:
+            generated_path = Path(temp_dir) / "generated_support_workflow.json"
+            generated_path.write_text(
+                json.dumps(generated, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            engine = MultiAgentWorkflowEngine(generated_path)
+            result = engine.run()
+
+        self.assertFalse(result.context["needs_clarification"])
+        self.assertEqual(6, len(result.trace))
+        self.assertIn("Customer Support Ticket Workflow", result.answer)
+        self.assertEqual("Logistics Support", result.context["owner_team"])
+
+    def test_web_builder_workspace_composes_custom_workflow(self):
+        import web_app
+
+        detail = web_app.api_builder_compose(
+            {
+                "preset": "presentation_planning",
+                "workflow_name": "Team Final Presentation Workflow",
+            }
+        )
+
+        self.assertEqual("custom_workspace", detail["builder_mode"])
+        self.assertEqual("Team Final Presentation Workflow", detail["generated_config"]["workflow_name"])
+        self.assertEqual("BuilderWorkspace", detail["generated_config"]["execution"]["generated_by"])
+        self.assertEqual("presentation_planning_template.json", detail["generated_config"]["execution"]["source_template"])
+        self.assertEqual(6, len(detail["nodes"]))
+
+    def test_web_builder_workspace_runs_custom_workflow(self):
+        import web_app
+
+        result = web_app.api_builder_run(
+            {
+                "preset": "customer_support",
+                "workflow_name": "Support Routing Built In Workspace",
+                "query": "The delivery is late and the customer asks for refund support.",
+                "user": "user_a",
+            }
+        )
+
+        self.assertEqual("custom_workspace", result["builder_mode"])
+        self.assertEqual("Support Routing Built In Workspace", result["workflow_name"])
+        self.assertEqual(6, len(result["trace"]))
+        self.assertTrue(result["summary"]["summary_cards"])
+        self.assertEqual("BuilderWorkspace", result["generated_config"]["execution"]["generated_by"])
+
+    def test_harness_comparison_experiment_produces_builder_delta(self):
+        from experiments.harness_comparison import run_experiment
+
+        result = run_experiment(write_outputs=False)
+
+        self.assertEqual(2, result["summary"]["case_count"])
+        self.assertEqual(4, result["summary"]["builder_presets_available"])
+        self.assertEqual(17.0, result["summary"]["average_manual_touch_points"])
+        self.assertEqual(3.0, result["summary"]["average_builder_touch_points"])
+        for case in result["cases"]:
+            self.assertEqual("GenericHarnessManualSpec", case["generic_harness"]["generated_by"])
+            self.assertEqual("BuilderWorkspace", case["builder_workspace"]["generated_by"])
+            self.assertEqual(6, case["generic_harness"]["trace_count"])
+            self.assertEqual(6, case["builder_workspace"]["trace_count"])
+            self.assertEqual(14, case["delta"]["touch_points_reduced"])
+
+
 if __name__ == "__main__":
     unittest.main()

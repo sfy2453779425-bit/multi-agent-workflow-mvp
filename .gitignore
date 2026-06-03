@@ -16,6 +16,9 @@ Thumbs.db
 .DS_Store
 *.lnk
 *.pptx
+gpu_llm_experiment.zip
+gpu_llm_results/
+Next_Presentation_*.md
 docs/
 docs/ppt_previews/
 team_research_package/
@@ -27,6 +30,11 @@ external_tools/flowise_poc/npm-debug.log*
 USAGE.md
 experiments/
 scripts/
+outputs/ppt_teacher_revision/
+outputs/web_server_*.log
+outputs/design_doc_check/
+outputs/ppt_read_analysis/
+outputs/pythonw_test.txt
 scripts/generate_ppt.js
 scripts/render_ppt_previews.mjs
 scripts/generate_final_workflow_ppt.js
@@ -42,4 +50,8 @@ run_baseline.cmd
 run_baseline.ps1
 run_demo.cmd
 run_demo.ps1
+run_builder_demo.cmd
+run_web.ps1
+configs/commute_agent.json
+configs/travel_pack_agent.json
 双击打开Demo.cmd

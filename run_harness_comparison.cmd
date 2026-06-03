@@ -6,13 +6,10 @@ set "PYTHON_EXE=%USERPROFILE%\.cache\codex-runtimes\codex-primary-runtime\depend
 if not exist "%PYTHON_EXE%" if exist "%LOCALAPPDATA%\Programs\Python\Python313\python.exe" set "PYTHON_EXE=%LOCALAPPDATA%\Programs\Python\Python313\python.exe"
 if not exist "%PYTHON_EXE%" set "PYTHON_EXE=python"
 
-echo Starting visual Builder frontend...
-echo URL: http://127.0.0.1:8000
-echo Keep this window open. Close this window to stop the server.
-
-start "" powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Sleep -Seconds 2; Start-Process 'http://127.0.0.1:8000'"
-"%PYTHON_EXE%" "%~dp0web_launcher.py" 8000
+"%PYTHON_EXE%" "%~dp0experiments\harness_comparison.py"
 
 echo.
-echo Server stopped.
+echo Report:
+echo outputs\harness_comparison\harness_comparison_report_zh.md
+echo outputs\harness_comparison\harness_comparison_report_kr.md
 pause

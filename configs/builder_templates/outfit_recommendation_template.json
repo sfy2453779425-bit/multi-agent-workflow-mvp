@@ -2,6 +2,7 @@
   "template_id": "outfit_recommendation_builder_template_v1",
   "template_name": "Personalized Outfit Recommendation Template",
   "target_domain": "personalized_recommendation",
+  "runtime_type": "outfit_recommendation",
   "description": "A builder template for assembling the outfit recommendation sample workflow from reusable nodes.",
   "base_agent_config": "../outfit_agent.json",
   "default_query": "다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘",

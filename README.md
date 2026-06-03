@@ -1,14 +1,15 @@
-# Personalized Outfit Recommendation Builder MVP
+# Multi-Agent Workflow Builder MVP
 
-This project is no longer just an outfit recommendation demo. It is now a
-**Sample Workflow + Template-based Builder Prototype** for personalized
-recommendation workflows.
+This project is a **template-based Multi-Agent Workflow Builder MVP**. The
+outfit recommendation workflow is now one executable domain example, alongside
+presentation planning and customer support ticket routing examples.
 
 The current semester scope is intentionally limited:
 
-- Build a working recommendation Sample Workflow.
+- Build working workflows across multiple domains.
 - Define reusable Workflow Templates.
-- Generate executable Workflow JSON from templates.
+- Compose custom workflows in the Builder Workspace.
+- Generate executable Workflow JSON from templates or workspace inputs.
 - Show how the same idea maps to Flowise / Dify / Langflow style builders.
 
 ## Project Position
@@ -16,7 +17,7 @@ The current semester scope is intentionally limited:
 Existing tools such as Flowise, Dify, and Langflow already provide general
 workflow builders. This project does not try to replace them.
 
-Our contribution is the recommendation-domain workflow structure:
+Our contribution is the domain-template workflow structure:
 
 ```text
 User Input
@@ -68,16 +69,19 @@ The Builder Prototype supports:
 
 - reusable node palette
 - template selection
+- Builder Workspace composition
 - required-node validation
 - Workflow JSON generation
 - generated Workflow execution
-- multiple recommendation templates
+- multiple domain workflow templates
 
 Current templates:
 
 ```text
 configs/builder_templates/outfit_recommendation_template.json
 configs/builder_templates/commute_outfit_template.json
+configs/builder_templates/presentation_planning_template.json
+configs/builder_templates/customer_support_ticket_template.json
 ```
 
 ## Visual Web Verification
@@ -97,10 +101,34 @@ http://127.0.0.1:8000
 The page shows:
 
 - selected Workflow Template
+- Builder Workspace for composing a custom workflow name and business domain
 - Node Palette and sequential Workflow structure
 - Builder mapping table
 - generated Workflow JSON
 - visual run result and execution trace
+
+## Harness Engineering Comparison
+
+Run the comparison experiment:
+
+```bat
+run_harness_comparison.cmd
+```
+
+The experiment compares two construction paths for the same tasks:
+
+- Generic Harness Engineering: manually define Agent roles, tools, context,
+  constraints, verification, and execution order.
+- Builder Workspace: select a business preset, name the Workflow, generate
+  executable Workflow JSON, and run the same 6-step trace.
+
+Outputs:
+
+```text
+outputs/harness_comparison/harness_comparison_results.json
+outputs/harness_comparison/harness_comparison_report_zh.md
+outputs/harness_comparison/harness_comparison_report_kr.md
+```
 
 ## Static Builder Preview
 
@@ -137,6 +165,18 @@ Generate and run the commute/work template:
 
 ```powershell
 python builder_demo.py --run-generated --builder-template configs\builder_templates\commute_outfit_template.json "서울 내일 출근 포멀 옷 추천해줘" --user user_b
+```
+
+Generate and run the presentation planning template:
+
+```powershell
+python builder_demo.py --run-generated --builder-template configs\builder_templates\presentation_planning_template.json
+```
+
+Generate and run the customer support ticket template:
+
+```powershell
+python builder_demo.py --run-generated --builder-template configs\builder_templates\customer_support_ticket_template.json
 ```
 
 Run project verification:
@@ -191,7 +231,7 @@ run_tests.cmd
 Expected result:
 
 ```text
-16 tests OK
+20 tests OK
 ```
 
 ## Project Structure
@@ -204,10 +244,14 @@ Expected result:
 |   |-- flowise_poc_mapping.json
 |   `-- builder_templates/
 |       |-- outfit_recommendation_template.json
-|       `-- commute_outfit_template.json
+|       |-- commute_outfit_template.json
+|       |-- presentation_planning_template.json
+|       `-- customer_support_ticket_template.json
 |-- data/
 |   |-- shopping_history.json
-|   `-- user_profiles.json
+|   |-- user_profiles.json
+|   |-- presentation_knowledge.json
+|   `-- support_policy.json
 |-- deliverables/
 |   |-- builder_tool_comparison_kr.md
 |   |-- competitor_positioning_kr.md
@@ -249,9 +293,9 @@ Expected result:
 - Weather API integration
 - simulated shopping history analysis
 - ranked recommendation output
-- local desktop Sample Workflow demo
+- local desktop workflow run
 - local template-based Builder Prototype
-- two recommendation templates using the same Builder mechanism
+- four templates across recommendation, presentation planning, and support
 - generated Workflow JSON execution
 - Flowise / Dify / Langflow comparison and PoC entry points
 - presentation and Q&A deliverables
