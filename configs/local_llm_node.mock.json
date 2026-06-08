@@ -1,0 +1,8 @@
+{
+  "enabled": true,
+  "provider": "mock",
+  "model": "Qwen2.5-1.5B-Instruct",
+  "role": "compose",
+  "fallback_to_mock": true,
+  "max_prompt_chars": 4000
+}

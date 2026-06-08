@@ -112,7 +112,7 @@ The page shows:
 Run the comparison experiment:
 
 ```bat
-run_harness_comparison.cmd
+tools\dev\run_harness_comparison.cmd
 ```
 
 The experiment compares two construction paths for the same tasks:
@@ -185,6 +185,25 @@ Run project verification:
 run_verify.cmd
 ```
 
+## GPU Baseline Evidence
+
+If the allocated GPU server is still available, run one final stable baseline
+benchmark for the Local LLM Node evidence:
+
+```bat
+tools\gpu\run_final_base_benchmark.cmd
+tools\gpu\download_final_base_benchmark.cmd
+```
+
+The downloaded files are stored locally under:
+
+```text
+_local_artifacts\gpu_results\final_base_benchmark
+```
+
+This benchmark is evidence collection only. It is not required for normal demo
+execution; the stable demo remains `tools\gpu\run_gpu_replay_demo.cmd`.
+
 ## External Builder Tool PoC
 
 These folders document external builder validation paths:
@@ -225,13 +244,13 @@ Current verified external-tool facts:
 Run:
 
 ```bat
-run_tests.cmd
+tools\dev\run_tests.cmd
 ```
 
 Expected result:
 
 ```text
-20 tests OK
+28 tests OK
 ```
 
 ## Project Structure
@@ -261,7 +280,15 @@ Expected result:
 |   |-- mentor_requirement_alignment_zh.md
 |   |-- next_presentation_outline_kr.md
 |   |-- ppt_4_slides_builder_addon_kr.md
-|   `-- professor_answer_drill_kr.md
+|   |-- professor_answer_drill_kr.md
+|   `-- forms/
+|       `-- *.txt
+|-- experiments/
+|   |-- harness_comparison.py
+|   `-- gpu_llm/
+|       |-- local_llm_api_server.py
+|       |-- run_local_llm_api_server.sh
+|       `-- smoke_local_llm_api.py
 |-- external_tools/
 |   |-- flowise_poc/
 |   |-- dify_poc/
@@ -274,6 +301,18 @@ Expected result:
 |   |   `-- shopping.py
 |   `-- weather_agent/
 |-- tests/
+|-- tools/
+|   |-- dev/
+|   |   |-- run_tests.cmd
+|   |   `-- run_harness_comparison.cmd
+|   `-- gpu/
+|       |-- upload_gpu_api_update.cmd
+|       |-- start_gpu_local_llm_api.cmd
+|       |-- open_gpu_local_llm_tunnel.cmd
+|       |-- verify_gpu_remote_node.cmd
+|       |-- run_local_llm_remote_demo.cmd
+|       `-- run_gpu_replay_demo.cmd
+|-- _local_artifacts/       # ignored local packages, GPU outputs, temporary PPTs
 |-- desktop_app.py
 |-- builder_app.py
 |-- web_app.py
@@ -283,7 +322,7 @@ Expected result:
 |-- run_desktop.cmd
 |-- run_builder_app.cmd
 |-- run_verify.cmd
-`-- run_tests.cmd
+`-- run_web.cmd
 ```
 
 ## Current Features
@@ -293,12 +332,27 @@ Expected result:
 - Weather API integration
 - simulated shopping history analysis
 - ranked recommendation output
+- optional Local LLM Node with mock, replay, and remote providers
 - local desktop workflow run
 - local template-based Builder Prototype
 - four templates across recommendation, presentation planning, and support
 - generated Workflow JSON execution
 - Flowise / Dify / Langflow comparison and PoC entry points
 - presentation and Q&A deliverables
+
+## Stable GPU Evidence Mode
+
+Use replay mode for the stable GPU-related demo:
+
+```bat
+tools\gpu\run_gpu_replay_demo.cmd
+```
+
+Replay mode reads a previously downloaded Qwen result JSON and appends it as a
+`Local LLM Node` in the workflow trace. It does not require SSH, an open tunnel,
+or a live GPU API process. The live remote API scripts remain available under
+`tools/gpu/`, but they are experimental because they depend on remote process,
+CUDA, tunnel, and port state.
 
 ## Out of Scope
 

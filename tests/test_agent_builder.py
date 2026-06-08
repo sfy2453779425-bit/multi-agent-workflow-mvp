@@ -6,6 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from agent_builder import AgentBuilderEngine, MultiAgentWorkflowEngine, TemplateWorkflowBuilder  # noqa: E402
+from agent_builder.local_llm import LocalLLMNode, LocalLLMNodeConfig  # noqa: E402
 from desktop_app import merge_followup_query  # noqa: E402
 from weather_agent import WeatherReport  # noqa: E402
 
@@ -27,6 +28,51 @@ class FakeWeatherTool:
 
 
 class AgentBuilderEngineTest(unittest.TestCase):
+    def test_local_llm_node_mock_provider_returns_structured_result(self):
+        node = LocalLLMNode(
+            LocalLLMNodeConfig(
+                enabled=True,
+                provider="mock",
+                model="Qwen2.5-1.5B-Instruct",
+                role="compose",
+            )
+        )
+
+        result = node.run(
+            {
+                "workflow_name": "Outfit Recommendation Workflow",
+                "query": "서울 내일 출근 옷 추천해줘",
+                "ranked_items": ["1. 흰 셔츠", "2. 검정 슬랙스"],
+                "weather_summary": {"condition": "흐림", "temp_min": 10, "temp_max": 21},
+            }
+        )
+
+        self.assertEqual("mock", result.provider)
+        self.assertEqual("Qwen2.5-1.5B-Instruct", result.model)
+        self.assertIn("Local LLM Node", result.text)
+        self.assertIn("Outfit Recommendation Workflow", result.text)
+        self.assertIn("1. 흰 셔츠", result.text)
+        self.assertIn("tokens_per_second", result.metrics)
+
+    def test_workflow_can_append_optional_local_llm_node_trace(self):
+        engine = MultiAgentWorkflowEngine(
+            ROOT / "configs" / "outfit_workflow.json",
+            weather_tool=FakeWeatherTool(),
+            local_llm_config={
+                "enabled": True,
+                "provider": "mock",
+                "model": "Qwen2.5-1.5B-Instruct",
+                "role": "compose",
+            },
+        )
+
+        result = engine.run("서울 내일 출근할 때 옷 추천해줘", user_id="user_a")
+
+        self.assertEqual("Local LLM Node", result.trace[-1].name)
+        self.assertIn("Qwen2.5-1.5B-Instruct", result.trace[-1].detail)
+        self.assertEqual("mock", result.context["local_llm"]["provider"])
+        self.assertIn("[Local LLM Node]", result.answer)
+
     def test_same_engine_runs_outfit_config(self):
         engine = AgentBuilderEngine(
             ROOT / "configs" / "outfit_agent.json",

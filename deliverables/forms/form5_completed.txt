@@ -1,0 +1,787 @@
+捤獥汤捯湰灧
+
+Capstone Design Project Report
+
+Project Title : 桤灧Personalized Outfit Recommendation Workflow MVP
+
+氠瑢
+
+Lecture
+
+Class 
+
+Capstone Design 1-04 (2026  Spring)
+
+Term
+
+2026.03.02. ~ 2026.06.21
+
+Supervisor
+
+Class Advisor
+
+Industry Mentor
+
+Industry 
+
+Mentor
+
+Team Member Students
+
+Student ID No.
+
+Name
+
+E-mail
+
+2022113683
+
+스팡위
+
+shifangyu152444@126.com
+
+2022112017
+
+장효명
+
+499926517@qq.com
+
+2022113685
+
+호일범
+
+huyifan010824@163.com
+
+2022113684
+
+리홍장
+
+lhj1042302892@163.com
+
+2022113686
+
+유옥명
+
+19979723358@163.com
+
+慤桥
+
+[양식5] 결과보고서 Capstone Design Project Report
+
+<Summary in English> 氠瑢
+
+Project Goal and Objectives
+
+ The goal of this project is to implement a personalized outfit recommendation MVP for travel and daily scenarios. The system accepts a natural-language request, identifies missing context, retrieves weather data, analyzes shopping history, and generates ranked outfit recommendations through a JSON-defined 6-Node Workflow.
+
+Project Contents 
+
+ The project consists of configuration-driven workflow execution, request parsing, clarification question generation, Open-Meteo weather integration, local shopping-history analysis, temperature-rule matching, recommendation ranking, desktop UI, web UI, and workflow trace visualization. The default pipeline is Request Parser, Question, Weather Tool, Shopping History Analysis, Recommendation, and Compose.
+
+Anticipated Results and Impacts on Industry
+
+ The result is a working MVP that proves how reusable workflow nodes can combine external context and user-owned item data. It can be extended to travel platforms, fashion commerce services, and personal shopping assistants by connecting real shopping APIs, larger recommendation rules, and a visual workflow builder.
+
+Keywords
+
+Personalized Recommendation
+
+Outfit Recommendation
+
+Workflow Node
+
+Weather API
+
+Shopping History
+
+JSON Configuration
+
+<Summary in English> : Example 
+
+氠瑢
+
+Purpose
+
+(500자내외)
+
+ This project develops a personalized outfit recommendation Workflow MVP for travel and daily use. The system receives a natural-language request, checks whether city, date, purpose, or style information is missing, asks follow-up questions when needed, and then combines weather data and shopping history to generate ranked outfit recommendations. The main objective is to prove that a user request can be handled through six small JSON-defined Workflow Nodes rather than one monolithic recommendation function
+
+Contents
+
+(1000자내외)
+
+This project consists of the following sub tasks.
+
+【1st task】Design and implementation of a JSON-based 6-Node Workflow
+(1) Define outfit_workflow.json to describe Request Parser, Question, Weather Tool, Shopping History Analysis, Recommendation, and Compose Nodes.
+(2) Implement MultiAgentWorkflowEngine to execute the configured Nodes sequentially and keep execution context and trace data.
+
+【2nd task】Development of context-aware outfit recommendation logic
+(1) Parse natural-language input to extract city, date, user, and intent keywords.
+(2) Call Open-Meteo Geocoding and Forecast APIs to normalize weather condition, temperature, and precipitation probability.
+(3) Analyze local shopping history to identify preferred styles, colors, categories, and owned items.
+(4) Apply temperature rules and conditional extras such as umbrella or thin outerwear to produce ranked recommendations.
+
+【3rd task】Implementation of demo interfaces and validation
+(1) Provide a desktop demo that runs without browser or localhost.
+(2) Provide a web demo that shows user input, workflow output, 6-Node trace, loaded config, and shopping-history analysis.
+(3) Prepare tests for single-Config and Workflow behavior, including clarification short-circuit cases.
+
+Expected
+
+Contribution
+
+(500자내외)
+
+(응용분야 및 
+
+활용범위 포함)
+
+The project produces a working MVP that demonstrates how reusable Workflow Nodes can combine external weather context and user-owned fashion data. The result can be applied to fashion commerce, travel planning, and personal assistant services where outfit decisions depend on weather, schedule, and user preference. The transparent trace also helps developers and evaluators inspect why each recommendation was produced. Future extensions include real shopping-platform API integration, a visual Builder UI, and larger rule sets.
+
+Keywords
+
+Personalized Recommendation
+
+Outfit Recommendation
+
+Workflow Node
+
+Weather API
+
+Shopping History
+
+JSON Configuration
+
+<국문 요약>
+
+氠瑢
+
+과제의 목적과  목표 
+
+ 
+
+  본 과제의 목적은 여행 및 일상 상황에서 사용할 수 있는 개인화 의류 추천 MVP를 구현하는 것이다. 사용자의 자연어 요청을 분석하고, 정보가 부족하면 추가 질문을 수행하며, 날씨 데이터와 쇼핑 이력을 결합하여 추천 결과를 제공한다.
+
+과제의
+
+내용
+
+JSON 설정으로 정의된 6개 Workflow Node를 순차 실행한다. 주요 구성은 Request Parser Node, Question Node, Weather Tool Node, Shopping History Analysis Node, Recommendation Node, Compose Node이며, 데스크톱 UI와 웹 UI에서 입력, 출력, 실행 Trace를 확인할 수 있다.
+
+예상되는 결과와 파급효과 
+
+ 본 결과물은 외부 환경 정보와 사용자 보유 아이템 데이터를 결합한 추천 서비스의 확장 가능성을 검증한다. 향후 실제 쇼핑몰 API, 여행 일정 서비스, 시각적 Builder UI와 연동하여 패션 커머스 및 개인 비서형 서비스로 확장할 수 있다.
+
+중요단어 
+
+개인화 추천
+
+의류 추천 
+
+Workflow Node
+
+날씨 API
+
+쇼핑 이력
+
+쇼핑 이력
+
+<국문 요약> : 예시
+
+氠瑢
+
+ 
+
+연구목표
+
+(500자내외)
+
+  본 과제에서는 여행 및 일상 상황에서 활용할 수 있는 개인화 의류 추천 Workflow MVP를 개발한다. 사용자의 자연어 요청을 분석하여 도시, 날짜, 목적, 스타일 정보의 누락 여부를 판단하고, 필요한 경우 추가 질문을 수행한다. 이후 날씨 데이터와 쇼핑 이력을 결합하여 사용자에게 적합한 착장 추천을 제공하는 것을 목표로 한다. 
+
+연구내용
+
+(1000자내외)
+
+ 본 과제는 다음과 같은 세부 과제로 구성된다.
+
+【1세부과제】JSON 기반 6-Node Workflow 설계 및 구현
+(1) outfit_workflow.json에 Request Parser, Question, Weather Tool, Shopping History Analysis, Recommendation, Compose Node를 정의한다.
+(2) MultiAgentWorkflowEngine을 구현하여 Node를 순차 실행하고 context와 trace를 관리한다.
+
+【2세부과제】맥락 기반 의류 추천 로직 구현
+(1) 자연어 입력에서 도시, 날짜, 사용자, 의도 키워드를 추출한다.
+(2) Open-Meteo API를 호출하여 날씨 상태, 최저/최고기온, 강수확률을 표준화한다.
+(3) shopping_history.json을 분석하여 선호 스타일, 색상, 카테고리, 보유 아이템을 도출한다.
+(4) 온도 구간 규칙과 강수/일교차 조건을 적용하여 추천 순위를 생성한다.
+
+【3세부과제】데모 UI 구현 및 검증
+(1) 브라우저 없이 실행 가능한 데스크톱 Demo를 제공한다.
+(2) 웹 Demo에서 입력, 출력, 6-Node Trace, Loaded Config, Shopping History Analysis를 표시한다.
+(3) 단일 Config 및 Workflow 동작, 추가 질문 Short-circuit 동작을 테스트한다.
+
+기대효과
+
+(500자내외)
+
+(응용분야 및 
+
+활용범위 포함)
+
+  본 과제의 결과물은 외부 날씨 정보와 사용자 보유 의류 데이터를 결합한 개인화 추천 서비스의 가능성을 검증한다. 패션 커머스, 여행 계획, 개인 비서형 서비스에서 사용자의 상황에 맞는 착장 추천을 제공하는 기반으로 활용될 수 있다. 또한 실행 Trace를 제공하므로 추천 과정의 투명성을 높이고, 향후 실제 쇼핑몰 API, 시각적 Builder UI, 확장된 추천 규칙과 연동할 수 있다.
+
+중심어
+
+개인화 추천
+
+의류 추천 
+
+Workflow Node 
+
+날씨 API
+
+쇼핑 이력
+
+쇼핑 이력
+
+湯湷1. Project Goals and Objectives 湯湷(과제의 목표와 목적)
+
+1.1 Project Goal (과제의 목적)
+
+Project Goal (과제의 목적)본
+
+프로젝트는 사용자의 자연어 의류 추천 요청을 실제 실행 가능한 Workflow로 처리하는 개인화 추천
+
+MVP를 구현하는 것을 목적으로 한다. 단순 키워드 추천이 아니라 도시, 날짜, 목적/스타일, 날씨, 보유
+
+아이템 정보를 결합하여 상황에 맞는 착장 추천을 제공한다.
+
+1.2 Project Objectives (과제의 목표)
+
+Project Objectives (과제의목표)JSON 기반 Workflow 정의를 사용하여 6개 Node를 순차 실행한다.정보가 부족한 요청에
+
+대해 도시, 날짜, 목적/스타일 순서로 추가 질문을 생성한다.Open-Meteo API를 사용하여 도시별
+
+일별 날씨 데이터를 조회한다.사용자별 shopping_history.json을 분석하여 선호 스타일, 색상,
+
+카테고리를 도출한다.온도 구간 및 강수/일교차 조건을 반영한 추천 순위를 생성한다.데스크톱
+
+UI와 웹 UI에서 추천 결과와 실행 Trace를 확인할 수 있도록 구현한다.
+
+2. Background of the Project (과제의 필요성)
+
+2.1 Motivations (필요성)
+
+필요성)2.1 Motivations (필요성)의류 추천 서비스는 사용자의 취향뿐 아니라
+
+날씨, 여행지, 일정 목적과 같은 실시간 맥락을 함께 고려해야 한다. 기존 단순 추천은 사용자가 실제 보유한 아이템과 외부 환경을 동시에 반영하기 어렵다. 본 프로젝트는 작은 Workflow Node들을 조립하여 이러한 맥락 결합 문제를 MVP 수준에서 검증한다.
+
+2.2 Significances (중요성)
+
+Significances (중요성)시장 측면: 여행, 패션 커머스, 개인 비서형 서비스에 적용 가능한 추천 흐름을 제공한다.기술 측면: JSON 설정 기반 Workflow 구조를 통해 추천 로직을 재사용 및 확장할 수 있다.사용자 측면: 날씨와 보유 아이템을 고려하므로 실제 착용 가능성이 높은 추천을 제공한다.
+
+3. Related Works (관련연구)
+
+3.1 Related Techniques
+
+氠瑢
+
+관련 기술
+
+장점
+
+한계
+
+본 프로젝트와의 차이
+
+일반 패션 추천
+
+상품 기반 추천이 용이함
+
+날씨/일정 맥락 반영이 제한적임
+
+날씨와 사용자 보유
+
+아이템을 함께 반영
+
+날씨 기반 착장 추천
+
+실시간 환경 반영 가능
+
+개인 취향과 구매 이력 반영이 부족함
+
+쇼핑 이력 분석으로
+
+개인화 강화
+
+챗봇형 추천
+
+자연어 입력이 편리함
+
+실행 과정이 불투명할 수 있음
+
+6-Node Trace로 처리 과정을 표시
+
+Workflow Builder
+
+구성요소 재사용 가능
+
+초기 구현 비용이 높음
+
+MVP에서는 JSON
+
+Workflow로 핵심 구조 검증
+
+4. Requirement Analysis (요구 분석)
+
+4.1 Objective Tree (목적나무)
+
+(목적나무)최종 목표: 개인화 의류 추천 Workflow MVP 구현
+
+-입력 이해: 자연어 요청에서 도시, 날짜, 의도 키워드 추출
+
+-대화 보완:누락 정보에 대한 순차 추가 질문
+
+-외부 정보 연동: Open-Meteo 날씨 조회
+
+-사용자 데이터 분석: 쇼핑이력 기반 취향 분석
+
+-추천 생성: 온도/강수/일교차/보유 아이템 기반 추천
+
+-검증 가능성: UI에서실행 Trace 표시
+
+4.2 Functional Requirement Analysis (요구 분석)
+
+4.2.1 Function-Related Requirement (기능 관련 요구사항)
+
+Function-Related
+
+사용자는 자연어로 의류 추천 요청을 입력할 수 있어야 한다.
+
+시스템은 요청에 도시, 날짜, 목적/스타일 정보가 부족한지 판단해야 한다.
+
+시스템은 Open-Meteo API로 날씨 데이터를 가져와 추천에 반영해야 한다.
+
+시스템은 사용자 쇼핑 이력을 분석하여 선호 스타일과 색상을 도출해야 한다.
+
+시스템은 추천 결과와 실행 Trace를 UI에 표시해야 한다.
+
+4.2.2 Data-Related Requirement (자료 관련 요구사항)
+
+氠瑢
+
+Data
+
+Type
+
+Source
+
+Usage
+
+user query
+
+string
+
+UI input
+
+도시, 날짜, 목적, 스타일 추출
+
+weather report
+
+object
+
+Open-Meteo API
+
+평균기온, 강수확률, 날씨 상태 계산
+
+shopping history
+
+JSON
+
+data/shopping_history.json
+
+보유 아이템 및 선호도 분석
+
+workflow config
+
+JSON
+
+configs/outfit_workflow.json 
+
+Node 목록과 실행 순서 정의
+
+agent config
+
+JSON
+
+configs/outfit_agent.json
+
+추천 규칙과 출력 템플릿 정의
+
+4.2.3 Interface-Related Requirement (인터페이스 관련 요구사항)
+
+Interface-Related Requirement (인터페이스 관련 요구사항)Desktop UI는
+
+브라우저와 포트 설정 없이 실행되어야 한다.Web UI는 한국어/중국어 표시, 예시 입력, 사용자
+
+선택, 결과/Trace 표시를 제공해야 한다.외부 API 연동은 WeatherTool 내부에서 수행하고, UI는
+
+실행 결과만 표시해야 한다.
+
+4.2.4 User-Related Requirement (사용자 관련 요구사항)
+
+일반 사용자는 전문 지식 없이 자연어 요청만으로 추천을 받을 수 있어야 한다.검토자는 Workflow
+
+Trace와 Technical Details를 통해 처리 과정을 확인할 수 있어야 한다.
+
+4.3 Realistic Constrains (현실적 제한조건)
+
+4.3.1 Constraints for Available Resources (가용 자원에 대한 제한조건)
+
+MVP는 Python 표준 라이브러리 중심으로 구현하며, 데이터는 로컬 JSON 파일을 사용한다.
+
+실제 쇼핑몰 API와 OAuth 연동은 범위에서 제외한다.
+
+4.3.2 Constraints for Minium Performance (최소 성능에 대한 제한조건)
+
+일반 데모 입력에 대해 수 초 내에 결과를 반환해야 하며, 정보 부족 시
+
+불필요한 외부 API 호출을 수행하지 않아야 한다.
+
+4.3.3 Constraints for Security (보안에 대한 제한조건)
+
+개인정보 보호를 위해 실사용자 계정 대신 user_a, user_b의 샘플 쇼핑 이력을 사용한다.
+
+4.3.4 Constraints for Compatibility (호환성에 대한 제한조건)
+
+(호환성에 대한 제한조건)Windows 실행을 고려하여
+
+run_desktop.cmd, run_web.cmd, tools/dev/run_tests.cmd를 제공한다. 웹 데모는 127.0.0.1 기반으로
+
+실행된다.
+
+4.3.5 Constraints for Ethics (윤리성에 대한 제한조건)
+
+추천 결과는 사용자의 선택을 보조하는 정보로 제공하며, 외부 API와 오픈소스 사용 범위를 명확히 문서화한다.
+
+(과제 내용)5.1
+
+5. Project Contents (과제 내용)
+
+5.1 Design in Detail (상세 설계)
+
+5.1.1 System Structure (시스템 구조)
+
+[Figure 1] Overall System StructureUser Input → Request Parser Node → Question Node →
+
+Weather Tool Node → Shopping History Analysis Node → Recommendation Node → Compose Node→ UI Output / Trace
+
+전체 구조는 JSON 설정 파일을 기준으로 실행된다. MultiAgentWorkflowEngine은 workflow 설정을 읽고 AgentBuilderEngine을 통해 날씨 조회, 쇼핑 이력 분석, 추천 규칙 적용, 결과 렌더링을 수행한다.
+
+5.1.2 Module Specification (모듈 설계)
+
+氠瑢
+
+Module
+
+File
+
+Main Data / Method
+
+Description
+
+MultiAgentWorkflowEngine
+
+src/agent_builder/workflow.py
+
+run(),
+
+_run_question_agent()
+
+6개 Node의 순차 실행 및 Trace 생성
+
+AgentBuilderEngine
+
+src/agent_builder/engine.py
+
+_plan(), _act(),
+
+_analyze(), _decide(),
+
+_render()
+
+단일 Agent 실행, 추천 규칙 적용
+
+Shopping Analysis
+
+src/agent_builder/shopping.py
+
+analyze_shopping_histor
+
+y(),select_owned_items()
+
+쇼핑 이력 집계 및 보유 아이템 선택
+
+WeatherTool
+
+src/weather_agent/tools.py
+
+geocode(),
+
+get_daily_weather()
+
+Open-Meteo API 호출 및 날씨 데이터 표준화
+
+Desktop UI
+
+desktop_app.py
+
+DesktopWorkflowApp
+
+입력, 보충 답변, 출력,Trace 표시
+
+Web UI
+
+web_app.py
+
+DemoHandler,
+
+render_page()
+
+웹 기반 데모, 다국어UI,Technical Details 표시
+
+5.2 Implementation (구현)
+
+5.2.1 Implementation Result (구현 결과)
+
+데스크톱 앱은 사용자 입력/보충 답변 박스, 사용자 선택, Workflow 출력, 6-Node Trace, Follow-up context 상태를 표시한다.
+
+웹 앱은 Workflow 6 Node와 단일 Config 데모 탭, 예시 입력 칩, 결과 카드, Node Pipeline,Technical Details를 제공한다.
+
+입력 예시 ‘다음 주에 칭다오 여행 가는데 옷 추천해줘’는 전체 Workflow를 실행하여 날씨와 쇼핑 이력 기반 추천을 생성한다.
+
+입력 예시 ‘옷 추천해줘’는 도시 정보가 부족하므로 추가 질문을 먼저 반환한다.
+
+5.2.2 Implementation Tools (구현 도구)
+
+氠瑢
+
+Tool
+
+Purpose
+
+Reason
+
+Python
+
+Workflow engine and UI
+
+implementation
+
+표준 라이브러리와 JSON 처리에 적합
+
+Tkinter
+
+Desktop UI
+
+별도 브라우저/서버 없이 데모 가능
+
+ThreadingHTTPServer
+
+Web demo server
+
+간단한 로컬 웹 UI 구현 가능
+
+Open-Meteo API
+
+Weather geocoding and forecast
+
+무료 공개 API이며 도시/일별 예보 제공
+
+JSON
+
+Config and local data
+
+MVP 단계에서 수정과 검증이 쉬움
+
+5.3 Tasks and Task Assignments (과업 및 과업 분담)
+
+5.3.1 Work Breakdown Structure (과업 분해)
+
+-Planning: 문제 정의, 요구사항 정리, MVP 범위 확정
+
+-Design: 6-Node Workflow, JSON config, UI 흐름 설계
+
+-Coding: workflow.py, engine.py, shopping.py, tools.py, desktop_app.py, web_app.py 구현
+
+-Test: 단일 Config, Workflow 실행, 추가 질문 Short-circuit 검증
+
+-Documentation: README, UI/UX 설계서, 상세설계서, 결과보고서 작성5.3.2
+
+5.3.2 Task Assignment and Project Timeline (과업 분담 및 과제 진행)
+
+氠瑢
+
+Task
+
+Detail
+
+Description
+
+Weight
+
+Member A
+
+Member B
+
+Member C
+
+Member D
+
+Total
+
+WorkflowEngine
+
+6-Node execution
+
+and context
+
+management
+
+3
+
+40
+
+30
+
+20
+
+10
+
+100
+
+Weather/Shopping Logic
+
+Open-Meteo
+
+integration and
+
+shopping history
+
+analysis
+
+3
+
+25
+
+35
+
+25
+
+15
+
+100
+
+UI
+
+Implementation
+
+Desktop UI
+
+and Web UI
+
+2
+
+20
+
+20
+
+40
+
+20
+
+100
+
+Testing/Documentation
+
+Tests, README,
+
+finaldocuments
+
+2
+
+15
+
+15
+
+15
+
+55
+
+100
+
+6. Anticipated Results and Contributions (예상 결과 및 기대 효과)
+
+JSON Workflow 기반 추천 MVP 실행 파일과 데모 UI를 산출한다.
+
+6-Node Trace를 통해 추천 과정의 투명성과 검토 가능성을 확보한다.
+
+향후 쇼핑몰 API, 여행 일정 API, 추천 규칙 확장, 
+
+Visual Builder UI로 발전 가능하다.
+
+패션 커머스와 여행 서비스에서 개인화 추천 경험을 개선할 수 있다.
+
+7. References (참고 서적)
+
+-Project Repository: 汫╨https://github.com/CSID-DGU/2026-1-CECD1-04-Nene-04汫h
+
+-Open-Meteo Geocoding API and Forecast API documentation
+
+-Python official documentation: json, urllib, http.server,tkinter
+
+-Repository files: README.md, configs/outfit_workflow.json, configs/outfit_agent.json, src/agent_builder/workflow.py, src/agent_builder/engine.py
+
+8. Budget (예산)
+
+氠瑢
+
+Item
+
+Description
+
+Cost
+
+Note
+
+Development Tool
+
+Python / standard library
+
+0 KRW
+
+Open-source / built-in
+
+Weather API
+
+Open-Meteo API
+
+0 KRW
+
+Free public API
+
+Server
+
+Local desktop/web demo
+
+0 KRW
+
+No cloud server required for MVP
+
+External Shopping API
+
+Not used in MVP
+
+0 KRW
+
+Future extension

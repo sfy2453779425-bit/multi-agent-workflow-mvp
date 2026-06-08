@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from agent_builder.engine import AgentBuilderEngine, TraceStep
+from agent_builder.local_llm import LocalLLMNode, LocalLLMNodeConfig
 from agent_builder.shopping import analyze_shopping_history
 from weather_agent.tools import CITY_ALIASES, WeatherTool
 
@@ -54,6 +55,7 @@ class MultiAgentWorkflowEngine:
         workflow_config_path: str | Path,
         data_dir: str | Path | None = None,
         weather_tool: WeatherTool | None = None,
+        local_llm_config: dict[str, Any] | LocalLLMNodeConfig | None = None,
     ):
         self.workflow_config_path = Path(workflow_config_path)
         self.workflow_config = self._load_json(self.workflow_config_path)
@@ -78,6 +80,8 @@ class MultiAgentWorkflowEngine:
                 self.data_dir = Path(data_dir)
             else:
                 self.data_dir = self.workflow_config_path.parent.parent / "data"
+        configured_llm = local_llm_config or self.workflow_config.get("local_llm_node", {})
+        self.local_llm_node = LocalLLMNode(configured_llm)
 
     def run(self, user_message: str | None = None, user_id: str | None = None) -> WorkflowResult:
         query = (user_message or self.workflow_config.get("default_query") or "").strip()
@@ -118,6 +122,7 @@ class MultiAgentWorkflowEngine:
         answer = self.base_engine._render(context)
         context["executed_agents"].append("compose")
         trace.append(self._trace_compose(context))
+        answer = self._maybe_run_local_llm_node(trace, context, answer)
 
         return self._finalize(trace, context, answer=answer)
 
@@ -257,6 +262,7 @@ class MultiAgentWorkflowEngine:
                 {"summary_cards": context["summary_cards"]},
             )
         )
+        answer = self._maybe_run_local_llm_node(trace, context, answer)
         return self._finalize(trace, context, answer=answer)
 
     def _run_customer_support(self, query: str, user_id: str) -> WorkflowResult:
@@ -387,6 +393,7 @@ class MultiAgentWorkflowEngine:
                 {"summary_cards": context["summary_cards"]},
             )
         )
+        answer = self._maybe_run_local_llm_node(trace, context, answer)
         return self._finalize(trace, context, answer=answer)
 
     def _finalize(
@@ -589,6 +596,33 @@ class MultiAgentWorkflowEngine:
 
     def _runtime_trace(self, node_id: str, detail: str, data: dict[str, Any]) -> TraceStep:
         return TraceStep(name=self._node_name(node_id), detail=detail, data=data)
+
+    def _maybe_run_local_llm_node(
+        self,
+        trace: list[TraceStep],
+        context: dict[str, Any],
+        answer: str,
+    ) -> str:
+        if not self.local_llm_node.enabled:
+            return answer
+
+        context["workflow_name"] = self.workflow_config["workflow_name"]
+        result = self.local_llm_node.run(context)
+        context["local_llm"] = {
+            "provider": result.provider,
+            "model": result.model,
+            "metrics": result.metrics,
+        }
+        context["local_llm_prompt"] = result.prompt
+        context["executed_agents"].append("local_llm")
+        trace.append(
+            TraceStep(
+                name="Local LLM Node",
+                detail=f"{result.provider} provider executed with model={result.model}",
+                data=context["local_llm"],
+            )
+        )
+        return answer + "\n\n" + result.text
 
     def _node_name(self, node_id: str) -> str:
         for agent in self.workflow_config.get("agents", []):

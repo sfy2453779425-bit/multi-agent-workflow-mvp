@@ -1,0 +1,58 @@
+[
+  {
+    "id": "workflow_node_decomposition_outfit",
+    "category": "workflow_generation",
+    "language": "ko",
+    "prompt": "사용자 입력: '다음 주 칭다오 여행 가는데 내 쇼핑 기록을 참고해서 옷을 추천해줘.' 이 요청을 Template-based Multi-Agent Workflow Builder에서 실행할 수 있도록 Question, Weather, Shopping History, Style Analysis, Recommendation, Compose 노드로 분해해 주세요. 각 노드의 입력과 출력을 간단히 작성해 주세요.",
+    "expected_keywords": ["Question", "Weather", "Shopping", "Style", "Recommendation", "Compose"]
+  },
+  {
+    "id": "missing_information_question_node",
+    "category": "question_node",
+    "language": "ko",
+    "prompt": "사용자 입력: '내일 옷 추천해줘.' 정보가 부족합니다. Workflow의 Question Node가 어떤 정보를 어떤 순서로 물어봐야 하는지 작성해 주세요. 최종 답변이 아니라 질문 목록을 우선순위와 함께 작성해 주세요.",
+    "expected_keywords": ["도시", "목적", "스타일", "날씨", "우선순위"]
+  },
+  {
+    "id": "ranked_outfit_recommendation",
+    "category": "recommendation",
+    "language": "ko",
+    "prompt": "날씨: 서울, 내일 18도, 흐림. 쇼핑 기록: 검정 슬랙스, 흰 셔츠, 네이비 재킷, 회색 후드티, 운동화. 사용자 선호: 깔끔한 캐주얼. 이 정보를 바탕으로 추천 이유와 함께 1순위, 2순위, 3순위 옷 조합을 작성해 주세요.",
+    "expected_keywords": ["1순위", "2순위", "3순위", "추천 이유", "날씨", "쇼핑 기록"]
+  },
+  {
+    "id": "builder_vs_chatbot_explanation",
+    "category": "project_explanation",
+    "language": "ko",
+    "prompt": "Template-based Multi-Agent Workflow Builder MVP가 단순 챗봇과 다른 점을 발표용으로 설명해 주세요. 반드시 Template, Workflow, Node, Trace, Reuse라는 단어를 포함하고, 5개 bullet로 작성해 주세요.",
+    "expected_keywords": ["Template", "Workflow", "Node", "Trace", "Reuse"]
+  },
+  {
+    "id": "harness_limitation_answer",
+    "category": "professor_answer",
+    "language": "ko",
+    "prompt": "교수님 질문: 'Harness Engineering을 쓰면 에이전트를 쉽게 만들 수 있는데, 왜 여러분 프로젝트가 필요합니까?' 이 질문에 대한 답변을 한국어 발표체로 작성해 주세요. 핵심은 Generic Harness와 Domain-specific Workflow Template의 차이를 설명하는 것입니다.",
+    "expected_keywords": ["Harness", "Template", "도메인", "Workflow", "검증"]
+  },
+  {
+    "id": "customer_support_workflow",
+    "category": "multi_domain",
+    "language": "ko",
+    "prompt": "사용자 요청: '배송은 완료됐다고 나오는데 상품을 못 받았어요. 환불 가능한가요?' 이 요청을 고객지원 Workflow로 분해해 주세요. Intent Detection, Policy Lookup, Priority Routing, Response Compose 노드를 포함해 주세요.",
+    "expected_keywords": ["Intent", "Policy", "Priority", "Routing", "Compose"]
+  },
+  {
+    "id": "presentation_planning_workflow",
+    "category": "multi_domain",
+    "language": "ko",
+    "prompt": "사용자 요청: '다음 발표에서 우리 프로젝트 방향과 기존 Builder와의 차이를 설명해야 해.' 이 요청을 Presentation Planning Workflow로 분해하고, 필요한 자료와 출력물을 정리해 주세요.",
+    "expected_keywords": ["발표", "Builder", "차이", "Workflow", "자료"]
+  },
+  {
+    "id": "local_llm_node_design",
+    "category": "local_llm_node",
+    "language": "zh",
+    "prompt": "请设计一个 Local LLM Node，用于 Template-based Multi-Agent Workflow Builder。说明它的输入、输出、适合接入的位置、失败时的 fallback，以及为什么可以提高系统技术性。",
+    "expected_keywords": ["输入", "输出", "fallback", "Workflow", "Local LLM"]
+  }
+]

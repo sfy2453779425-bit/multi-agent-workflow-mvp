@@ -1,0 +1,32 @@
+WITHUS 결과발표회 포스터 시안 내용 원고
+
+프로젝트명: Template 기반 Lightweight Agent Builder MVP
+팀명: 네네
+팀원: 스팡위, 유옥명, 호일범, 장효명, 리훙장
+소속: 컴퓨터공학전공
+지도교수: 이종섭 교수
+산업체멘토: 박창우 멘토(솔트웨어㈜)
+
+핵심 정의:
+본 프로젝트는 단일 추천 App이 아니라, 반복 업무 Agent Workflow를 Template 기반으로 생성하고 실행 Trace로 검증하는 Lightweight Builder MVP이다.
+
+시스템 구조:
+User Input → Builder Workspace → Workflow JSON → Multi-Agent Engine → Execution Trace → Final Answer
+
+구현 결과:
+- 4개 Workflow Template 구현
+- Web Builder Workspace 구현
+- Multi-Agent Workflow Engine 구현
+- Node별 실행 Trace 및 최종 응답 시각화
+- Local LLM Node / GPU 실험 자료 확보
+
+검증 결과:
+- Unit Test 30개 통과
+- Project Verification 통과
+- Harness 비교 실험 수행
+- Qwen2.5 GPU 실험 수행
+
+AI 도구 및 참고자료 활용:
+- AI assisted coding을 활용하여 MVP UI 및 Workflow Engine 구현 속도 향상
+- Flowise / Dify / Langflow 등 기존 Builder 도구 조사
+- Qwen2.5 기반 Local LLM Node 실험으로 향후 확장 가능성 확인

@@ -1,0 +1,10 @@
+{
+  "enabled": true,
+  "provider": "remote",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "role": "compose",
+  "endpoint": "http://127.0.0.1:9100/generate",
+  "timeout_seconds": 30,
+  "fallback_to_mock": true,
+  "max_prompt_chars": 4000
+}

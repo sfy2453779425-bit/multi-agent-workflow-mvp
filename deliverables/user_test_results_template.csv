@@ -1,0 +1,5 @@
+participant_id,date,round,task,template,success,time_seconds,confusion_count,understanding_score,trace_helpfulness_score,output_usefulness_score,builder_value_score,main_confusion,positive_feedback,improvement_request
+P01,2026-09-01,Pilot,Task A,outfit_recommendation,yes,120,1,4,4,4,4,,,
+P01,2026-09-01,Pilot,Task B,commute_outfit,yes,110,1,4,4,4,4,,,
+P01,2026-09-01,Pilot,Task C,presentation_planning,yes,130,2,3,4,3,4,,,
+

@@ -1,0 +1,4 @@
+model,load_seconds,avg_latency_seconds,avg_token_per_second,avg_peak_mb,avg_keyword_score,recommended_use
+Qwen2.5-1.5B Base,1.705,2.160,100.298,2964.4,0.667,Fast stable demo
+Qwen2.5-1.5B Old LoRA,2.192,2.933,48.995,3040.8,0.658,First feasibility baseline
+Qwen2.5-1.5B New LoRA v2,2.097,2.547,48.952,3040.8,0.733,Technical evidence for domain adaptation

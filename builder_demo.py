@@ -38,15 +38,21 @@ def run_one(config_path: Path, query: str | None, user_id: str) -> None:
     print()
 
 
-def run_workflow(config_path: Path, query: str | None, user_id: str) -> None:
-    engine = MultiAgentWorkflowEngine(config_path)
+def load_local_llm_config(config_path: Path | None) -> dict | None:
+    if config_path is None:
+        return None
+    return json.loads(config_path.read_text(encoding="utf-8"))
+
+
+def run_workflow(config_path: Path, query: str | None, user_id: str, local_llm_config: dict | None = None) -> None:
+    engine = MultiAgentWorkflowEngine(config_path, local_llm_config=local_llm_config)
     result = engine.run(query, user_id=user_id)
 
     print("=" * 64)
     print(f"Workflow Config: {config_path.name}")
     print(f"Workflow: {result.workflow_name}")
     print()
-    print("Workflow Trace (6 Nodes)")
+    print(f"Workflow Trace ({len(result.trace)} Nodes)")
     for index, step in enumerate(result.trace, start=1):
         print(f"{index}. {step.name}: {step.detail}")
     print()
@@ -75,7 +81,12 @@ def show_builder_template(template_path: Path) -> None:
     print()
 
 
-def run_generated_workflow(template_path: Path, query: str | None, user_id: str) -> None:
+def run_generated_workflow(
+    template_path: Path,
+    query: str | None,
+    user_id: str,
+    local_llm_config: dict | None = None,
+) -> None:
     builder = TemplateWorkflowBuilder(template_path)
     generated = builder.build_workflow_config(absolute_base_config=True)
 
@@ -85,7 +96,7 @@ def run_generated_workflow(template_path: Path, query: str | None, user_id: str)
             json.dumps(generated, ensure_ascii=False, indent=2),
             encoding="utf-8",
         )
-        run_workflow(generated_path, query, user_id)
+        run_workflow(generated_path, query, user_id, local_llm_config=local_llm_config)
 
 
 def list_builder_templates() -> None:
@@ -109,6 +120,7 @@ def main() -> None:
     parser.add_argument("--config", default=None, help="Path to one agent config JSON.")
     parser.add_argument("--workflow-config", default=None, help="Path to one workflow config JSON.")
     parser.add_argument("--builder-template", default=None, help="Path to one builder template JSON.")
+    parser.add_argument("--local-llm-config", default=None, help="Optional Local LLM Node config JSON.")
     parser.add_argument("--user", default="user_a", help="user_a or user_b")
     parser.add_argument(
         "--show-builder",
@@ -141,6 +153,11 @@ def main() -> None:
     if not builder_template.is_absolute():
         builder_template = ROOT / builder_template
 
+    local_llm_config_path = Path(args.local_llm_config) if args.local_llm_config else None
+    if local_llm_config_path and not local_llm_config_path.is_absolute():
+        local_llm_config_path = ROOT / local_llm_config_path
+    local_llm_config = load_local_llm_config(local_llm_config_path)
+
     if args.list_templates:
         list_builder_templates()
         return
@@ -150,14 +167,14 @@ def main() -> None:
         return
 
     if args.run_generated:
-        run_generated_workflow(builder_template, args.query, args.user)
+        run_generated_workflow(builder_template, args.query, args.user, local_llm_config=local_llm_config)
         return
 
     if args.workflow:
         workflow_config = Path(args.workflow_config) if args.workflow_config else DEFAULT_WORKFLOW_CONFIG
         if not workflow_config.is_absolute():
             workflow_config = ROOT / workflow_config
-        run_workflow(workflow_config, args.query, args.user)
+        run_workflow(workflow_config, args.query, args.user, local_llm_config=local_llm_config)
         return
 
     if args.all:

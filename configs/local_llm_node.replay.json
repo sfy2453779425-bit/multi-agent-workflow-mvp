@@ -1,0 +1,9 @@
+{
+  "enabled": true,
+  "provider": "replay",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "role": "compose",
+  "replay_path": "_local_artifacts/gpu_results/gpu_llm_results/single_Qwen_Qwen2.5-1.5B-Instruct_20260603_185728.json",
+  "fallback_to_mock": true,
+  "max_prompt_chars": 4000
+}

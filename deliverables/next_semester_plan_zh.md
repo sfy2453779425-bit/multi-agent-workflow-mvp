@@ -93,7 +93,7 @@ http://127.0.0.1:8000
 
 ```text
 run_verify.cmd
-run_harness_comparison.cmd
+tools/dev/run_harness_comparison.cmd
 ```
 
 ## 最小可交付版本
@@ -105,4 +105,3 @@ run_harness_comparison.cmd
 运行时至少一个节点调用本地 Qwen 模型，
 最终输出 Trace 和模型回答。
 ```
-

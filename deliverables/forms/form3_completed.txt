@@ -1,0 +1,146 @@
+--- SLIDE 1 ---
+개정 이력
+| 2 |
+버전
+작성일
+변경 내용
+작성자
+비고
+0.1
+2026-05-29
+GitHub 프로젝트 기반 UI/UX 설계서 최초 작성
+네네팀
+최종 제출용 초안
+문서 범위
+데스크톱 Demo와 웹 Demo의 주요 화면, 사용자 흐름, 권한/사용자 정책, 입력/출력/Trace 표시 방식을 정의한다.
+참조 산출물
+README.md, desktop_app.py, web_app.py, configs/outfit_workflow.json, configs/outfit_agent.json, data/shopping_history.json
+네네팀
+ · Personalized Outfit Recommendation Workflow MVP
+--- SLIDE 2 ---
+메뉴 구성도 (Menu Tree)
+| 3 |
+NODE 01
+Demo 진입
+Desktop App
+Web Demo
+NODE 02
+Config 선택
+Workflow 6 Node
+Single Config
+NODE 03
+사용자 선택
+user_a
+user_b
+NODE 04
+입력
+자연어 요청
+예시 입력
+NODE 05
+실행
+Run Workflow
+보충 답변
+NODE 06
+결과
+Output
+Trace
+Details
+일반 사용자 흐름
+사용자 선택 → 자연어 입력 → 추천 결과 확인 → 필요 시 추가 질문에 답변
+개발/검토자 흐름
+Workflow Trace → Loaded Config → Shopping Analysis → Raw Trace JSON 확인
+지원 언어
+웹 UI는 한국어/중국어 토글을 제공하고 데모 설명 및 버튼 문구를 언어별로 표시
+네네팀
+ · Personalized Outfit Recommendation Workflow MVP
+--- SLIDE 3 ---
+User 관리 정책
+| 4 |
+구분
+정의
+권한
+비고
+일반 사용자
+쇼핑 이력 기준 개인화 추천 대상
+user_a 또는 user_b 선택, 요청 입력, 추천 결과 확인
+실제 로그인은 MVP 범위 밖
+검토자/관리자
+데모 및 기술 검토 대상
+Config, Trace, Shopping Analysis, Raw Trace 확인
+웹 UI Technical Details 영역 활용
+user_a
+캐주얼 / 블랙 / 후드티 선호
+구매 이력: 블랙 후드티, 네이비 조거 팬츠, 바람막이, 패딩 등 6개
+user_b
+미니멀 / 화이트 / 셔츠 선호
+구매 이력: 옥스포드 셔츠, 베이지 슬랙스, 트렌치코트 등 6개
+보안/범위
+개인정보와 실계정 연동 없이 로컬 JSON 데이터로 MVP를 검증한다. OAuth와 실제 쇼핑몰 API는 향후 과제.
+네네팀
+· Personalized Outfit Recommendation Workflow MVP
+--- SLIDE 4 ---
+기본화면 레이아웃 (Web Demo)
+| 5 |
+① Header: 서비스명, 설명, 한국어/중국어 토글
+② Demo Config 탭: Workflow 6 Node / 단일 Config
+③ 입력 카드: 힌트 배너, 예시 입력 칩, 자연어 textarea, 쇼핑 기록 사용자 선택, 실행 버튼
+④ Workflow Output: 추천 결과 또는 추가 질문 메시지
+⑤ Workflow Trace: Node별 실행 결과 카드 6개
+⑥ Technical Details: Loaded Config / Shopping History Analysis / Raw Trace JSON
+네네팀
+· Personalized Outfit Recommendation Workflow MVP
+--- SLIDE 5 ---
+입력 및 추가 질문 화면
+| 6 |
+Description
+1. 최소 입력: “옷 추천해줘”
+2. 시스템은 도시 → 날짜 → 목적/스타일 순서로 누락 정보를 확인
+3. 기존 입력은 conversation_context에 저장
+4. 사용자의 보충 답변을 이전 입력과 병합
+5. 정보가 충분해질 때 전체 Workflow 실행
+개인화 의류 추천 Workflow Demo
+힌트: 정보가 부족한 입력을 보내면 시스템이 도시 → 시간 → 목적 순으로 추가 질문합니다.
+예시 입력: 최소 입력 / 부분 입력 / 전체 한 문장
+사용자 입력
+옷 추천해줘
+User A
+▶ Run Selected Workflow
+Workflow Output: 어느 도시나 여행지를 기준으로 추천할까요?
+네네팀
+ · Personalized Outfit Recommendation Workflow MVP
+--- SLIDE 6 ---
+결과 및 Trace 화면
+| 7 |
+Description
+1. 입력: 다음 주에 칭다오 여행 가는데 옷 추천해줘
+2. Open-Meteo 날씨 조회
+3. 쇼핑 이력에서 선호 스타일/색상 분석
+4. 온도별 추천 규칙과 조건부 추가 아이템 적용
+5. 추천 순위와 Node Trace 표시
+Workflow Output
+칭다오의 다음 주 날씨와 user_a의 쇼핑 기록을 기반으로 캐주얼/스트릿 스타일의 레이어드 착장을 추천합니다.
+추천 순위: 보유 아이템 우선 + 날씨 조건별 추가 아이템
+NODE 01
+Request Parser
+city=칭다오, date=다음 주
+NODE 02
+Question
+정보 충분
+NODE 03
+Weather Tool
+날씨 데이터 로드
+NODE 04
+Shopping Analysis
+스타일/색상 집계
+NODE 05
+Recommendation
+mild/cold/warm 규칙
+NODE 06
+Compose
+템플릿 렌더링
+Technical Details
+Loaded Config: workflow_config, agents, tools
+Shopping History Analysis: total_items, top_styles, top_colors, favorite_items
+Raw Trace JSON
+네네팀
+ · Personalized Outfit Recommendation Workflow MVP

@@ -1,0 +1,5 @@
+model,lora,load_seconds,avg_latency_seconds,avg_token_per_second,avg_peak_mb,avg_keyword_score,recommended_use
+Qwen2.5-1.5B-Instruct,No,1.533,2.232,99.018,2964.4,0.667,Stable local demo and fast compose node
+Qwen2.5-1.5B-Instruct,Yes,1.905,2.968,48.437,3040.8,0.658,LoRA feasibility test only
+Qwen2.5-7B-Instruct,No,3.167,3.963,65.642,14557.2,0.638,Higher-quality local LLM candidate
+Qwen2.5-7B-Instruct,Yes,3.455,4.564,46.654,14787.8,0.596,LoRA feasibility test only
