@@ -36,6 +36,7 @@ CONSISTENCY_VALIDATOR_V1_1 = "consistency-validator-v1.1"
 CONSISTENCY_VALIDATOR_V1_2 = "consistency-validator-v1.2"
 RUNTIME_V1_2_VERSION = "authoritative-contract-v1.2"
 ECHO_SIMILARITY_THRESHOLD = 0.85
+V12_NEGATION_MAX_WORD_GAP = 6
 
 
 class WorkflowValidationError(ValueError):
@@ -212,33 +213,79 @@ _NUMBER_WORDS = {
     "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18,
     "nineteen": 19, "twenty": 20, "thirty": 30, "forty": 40,
     "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80,
-    "ninety": 90, "a": 1, "an": 1,
+    "ninety": 90, "hundred": 100, "thousand": 1000, "a": 1, "an": 1,
 }
+_NUMBER_WORD_TOKEN = (
+    r"zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|"
+    r"thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|"
+    r"thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand"
+)
 _DURATION_RE = re.compile(
-    r"(?<!\w)(?P<number>\d+(?:\.\d+)?|(?:zero|one|two|three|four|five|six|seven|"
-    r"eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|"
-    r"eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|a|an)"
-    r"(?:[- ](?:one|two|three|four|five|six|seven|eight|nine))?)"
+    rf"(?<!\w)(?P<number>\d[\d,]*(?:\.\d+)?|(?:a|an|{_NUMBER_WORD_TOKEN})"
+    rf"(?:[- ]+(?:and[- ]+)?(?:{_NUMBER_WORD_TOKEN}))*)"
     r"[- ]+(?:(?P<business>business)[- ]+)?(?P<unit>minutes?|mins?|hours?|hrs?|days?)\b",
     re.IGNORECASE,
 )
 _QUOTED_RE = re.compile(r"“[^”]*”|‘[^’]*’|\"[^\"]*\"|(?<!\w)'[^']*'(?!\w)")
 _CLAUSE_BREAK_RE = re.compile(
-    r"[,;]|\b(?:but|however|although|whereas)\b|\band\s+(?=(?:we|i|our|it|the|this)\b)",
+    r"[,;:]|[—–]|\b(?:but|however|although|whereas|so|because|then)\b|"
+    r"\band\s+(?=(?:we|i|our|it|the|this|that)\b)",
+    re.IGNORECASE,
+)
+_MAJOR_CLAUSE_BREAK_RE = re.compile(
+    r"[;:]|[—–]|\b(?:but|however|although|whereas|so|because|then)\b|"
+    r"\band\s+(?=(?:we|i|our|it|the|this|that)\b)",
     re.IGNORECASE,
 )
 _ATTRIBUTION_RE = re.compile(
-    r"\b(?:you\s+(?:asked|requested|mentioned|said|wanted)|your\s+request\s+for|"
-    r"you(?:'d|\s+would)\s+like|(?:was|were|has\s+been)\s+requested)\b",
+    r"\b(?:you|your(?:\s+(?:message|note|email|comment))?|"
+    r"(?:the\s+)?customer(?:['’]s)?(?:\s+(?:message|note|email|comment))?|"
+    r"(?:the\s+)?client(?:['’]s)?(?:\s+(?:message|note|email|comment))?|"
+    r"(?:the\s+)?user(?:['’]s)?(?:\s+(?:message|note|email|comment))?)\s+"
+    r"(?:ask(?:ed|s)?|request(?:ed|s|ing)|mention(?:ed|s)?|said|says|want(?:ed|s)?|"
+    r"would\s+like|(?:['’]d|would)\s+like)\b|"
+    r"\b(?:your|the\s+customer's|the\s+customer’s|the\s+client's|the\s+client’s)\s+request\s+for\b",
     re.IGNORECASE,
 )
 _NEGATION_RE = re.compile(
-    r"\b(?:cannot|can't|can’t|unable\s+to|won't|won’t|will\s+not|would\s+not|"
-    r"do\s+not|don't|don’t|does\s+not|doesn't|doesn’t|not|never)\b",
+    r"\b(?:cannot|can\s+not|can't|can’t|unable\s+to|not\s+able\s+to|"
+    r"won't|won’t|will\s+not|wouldn't|wouldn’t|would\s+not|shouldn't|shouldn’t|"
+    r"should\s+not|couldn't|couldn’t|could\s+not|mustn't|mustn’t|must\s+not|"
+    r"isn't|isn’t|aren't|aren’t|wasn't|wasn’t|weren't|weren’t|hasn't|hasn’t|"
+    r"haven't|haven’t|hadn't|hadn’t|don't|don’t|doesn't|doesn’t|didn't|didn’t|"
+    r"will\s+not|do\s+not|does\s+not|did\s+not|not(?!\s+only)|never)\b",
     re.IGNORECASE,
 )
-_CONTRAST_RE = re.compile(
-    r"\b(?:rather\s+than|instead\s+of|unlike|other\s+than|sooner\s+than|faster\s+than)\b",
+_NEGATION_AFTER_RE = re.compile(
+    r"^\s*(?:(?:is|are|was|were|has|have|had|will|would|should|could|can|do|does|did)\s+)?"
+    r"(?:not(?!\s+only)|never|isn't|isn’t|aren't|aren’t|wasn't|wasn’t|weren't|weren’t|"
+    r"hasn't|hasn’t|haven't|haven’t|hadn't|hadn’t|won't|won’t|wouldn't|wouldn’t|"
+    r"shouldn't|shouldn’t|couldn't|couldn’t|can't|can’t|don't|don’t|doesn't|doesn’t|"
+    r"didn't|didn’t)\b",
+    re.IGNORECASE,
+)
+_AGREEMENT_RE = re.compile(
+    r"\b(?:approved|approval|granted|accepted|acceptance|authorized|authorised|"
+    r"confirmed|done|implemented|as\s+requested|as\s+you\s+asked|per\s+your\s+request)\b",
+    re.IGNORECASE,
+)
+_TEAM_ASSIGNMENT_RE = re.compile(
+    r"\b(?:assign(?:ed|s|ing)?|rout(?:e|ed|es|ing)|forward(?:ed|s|ing)?|"
+    r"transfer(?:red|s|ring)?|move(?:d|s|ing)?|escalat(?:e|ed|es|ing)|"
+    r"pass(?:ed|es|ing)?|send(?:s|ing)?|sent|direct(?:ed|s|ing)?|refer(?:red|s|ring)?|"
+    r"hand(?:ed|s|ing)?\s+over)\b",
+    re.IGNORECASE,
+)
+_SLA_NONCOMMITMENT_RE = re.compile(
+    r"\b(?:ago|since|for\s+the\s+past|over\s+the\s+last|during\s+the\s+last|"
+    r"delivery|deliveries|delivered|arrival|arrivals|arrived|transit|parcels?|packages?|"
+    r"shipments?|shipping|carriers?|settlement|settled|deposits?|credited|credits?|payments?)\b",
+    re.IGNORECASE,
+)
+_SLA_SERVICE_WORK_RE = re.compile(
+    r"\b(?:reply|respond|response|hear\s+from|get\s+back|follow\s*up|"
+    r"investigation|investigate|review|resolve|resolution|case|ticket|support|"
+    r"process|processing|complete|completion|handle|handling|work)\b",
     re.IGNORECASE,
 )
 
@@ -253,7 +300,8 @@ def _quoted_request_with_reply(text: str, user_input: str) -> bool:
     if not request:
         return False
     for match in _QUOTED_RE.finditer(text):
-        if _normalize_echo(match.group()) == request:
+        quoted = _normalize_echo(match.group())
+        if quoted and quoted in request:
             outside = _normalize_echo(text[: match.start()] + text[match.end() :])
             if len(outside) >= 20:
                 return True
@@ -271,8 +319,26 @@ def _echo_similarity(text: str, user_input: str) -> float | None:
         return None
     if min(len(response), len(request)) < 20:
         return None
+    if response in request:
+        return 1.0
     # ponytail: character similarity misses paraphrases; add deterministic token overlap only if validated.
     return SequenceMatcher(None, response, request, autojunk=False).ratio()
+
+
+def _quoted_claim_is_user_text(
+    sentence: str,
+    claim_start: int,
+    claim_end: int,
+    user_input: str,
+) -> bool:
+    request = _normalize_echo(user_input)
+    if not request:
+        return False
+    for match in _QUOTED_RE.finditer(sentence):
+        quoted = _normalize_echo(match.group())
+        if match.start() <= claim_start and claim_end <= match.end() and quoted in request:
+            return True
+    return False
 
 
 def _sentence_spans(text: str) -> list[tuple[int, int, str]]:
@@ -305,20 +371,119 @@ def _clause_for_offset(sentence: str, local_offset: int) -> tuple[str, int]:
     return clause, clause_start
 
 
+def _word_count(text: str) -> int:
+    return len(re.findall(r"[\w’'-]+", text, re.UNICODE))
+
+
+def _negation_precedes_value(clause: str, local_start: int) -> bool:
+    matches = list(_NEGATION_RE.finditer(clause[:local_start]))
+    if not matches:
+        return False
+    last = matches[-1]
+    return _word_count(clause[last.end() : local_start]) <= V12_NEGATION_MAX_WORD_GAP
+
+
+def _is_negated_list_member(
+    sentence: str,
+    claim_start: int,
+    claims_in_sentence: list[tuple[int, int]],
+) -> bool:
+    for anchor_start, anchor_end in claims_in_sentence:
+        if anchor_start >= claim_start:
+            break
+        between = sentence[anchor_end:claim_start]
+        if _MAJOR_CLAUSE_BREAK_RE.search(between):
+            continue
+        for inner_start, inner_end in reversed(claims_in_sentence):
+            if anchor_end <= inner_start < claim_start:
+                between = (
+                    between[: inner_start - anchor_end]
+                    + between[inner_end - anchor_end :]
+                )
+        if not re.fullmatch(r"[\s,]*(?:(?:and|or)[\s,]*)?", between, re.IGNORECASE):
+            continue
+        clause, clause_start = _clause_for_offset(sentence, anchor_start)
+        if _negation_precedes_value(clause, anchor_start - clause_start):
+            return True
+    return False
+
+
+def _negation_follows_value(sentence: str, claim_end: int) -> bool:
+    clause, clause_start = _clause_for_offset(sentence, claim_end)
+    tail_start = max(0, claim_end - clause_start)
+    return bool(_NEGATION_AFTER_RE.match(clause[tail_start:]))
+
+
+def _contrast_exempts_value(clause: str, local_start: int) -> bool:
+    before = clause[:local_start]
+    return bool(
+        re.search(
+            r"\b(?:rather\s+than|instead\s+of|unlike|other\s+than|sooner\s+than|"
+            r"faster\s+than)\s+(?:(?:the|a|an|this|that|these|those|one|single|other|"
+            r"another|any|each|either|same|different)\s+)?$",
+            before,
+            re.IGNORECASE,
+        )
+    )
+
+
+def _team_is_known(team: str, known_teams: list[str]) -> bool:
+    normalized = re.sub(r"\s+(?:support|team|department)$", "", team, flags=re.IGNORECASE).casefold()
+    return any(
+        normalized
+        == re.sub(r"\s+(?:support|team|department)$", "", known, flags=re.IGNORECASE).casefold()
+        for known in known_teams
+    )
+
+
+def _unknown_team_has_local_route(sentence: str, claim_start: int, claim_end: int) -> bool:
+    left = max(
+        (match.end() for match in _MAJOR_CLAUSE_BREAK_RE.finditer(sentence, 0, claim_start)),
+        default=0,
+    )
+    right_match = _MAJOR_CLAUSE_BREAK_RE.search(sentence, claim_end)
+    right = right_match.start() if right_match else len(sentence)
+    before_words = list(re.finditer(r"[\w’'-]+", sentence[left:claim_start], re.UNICODE))[-6:]
+    after_words = list(re.finditer(r"[\w’'-]+", sentence[claim_end:right], re.UNICODE))[:4]
+    start = left + before_words[0].start() if before_words else claim_start
+    end = claim_end + after_words[-1].end() if after_words else claim_end
+    return bool(_TEAM_ASSIGNMENT_RE.search(sentence[start:end]))
+
+
+def _duration_describes_other_process(sentence: str, claim_start: int) -> bool:
+    local, _local_start = _clause_for_offset(sentence, claim_start)
+    if re.search(r"\b(?:ago|since|for\s+the\s+past|over\s+the\s+last|during\s+the\s+last)\b", local, re.IGNORECASE):
+        return True
+    if not _SLA_NONCOMMITMENT_RE.search(local):
+        return False
+    return not bool(_SLA_SERVICE_WORK_RE.search(local))
+
+
 def _number_value(value: str) -> float | None:
     value = value.casefold().replace("-", " ").strip()
-    if re.fullmatch(r"\d+(?:\.\d+)?", value):
-        return float(value)
+    numeric = value.replace(",", "")
+    if re.fullmatch(r"\d+(?:\.\d+)?", numeric):
+        return float(numeric)
     words = value.split()
     if not words:
         return None
-    total = 0
+    if words[0] in {"a", "an"} and len(words) > 1:
+        words = words[1:]
+    total = current = 0
     for word in words:
+        if word == "and":
+            continue
         number = _NUMBER_WORDS.get(word)
         if number is None:
             return None
-        total += number
-    return float(total)
+        if number >= 100:
+            current = max(current, 1) * number
+            if number >= 1000:
+                total += current
+                current = 0
+        else:
+            current += number
+    return float(total + current)
 
 
 def _normalize_duration(value: str) -> str:
@@ -401,67 +566,36 @@ def _is_asserted_value(
     claim_start: int,
     claim_end: int,
     field: str,
+    *,
+    known_teams: list[str],
+    user_input: str,
+    claims_in_sentence: list[tuple[int, int]],
 ) -> bool:
-    for quoted in _QUOTED_RE.finditer(sentence):
-        if quoted.start() <= claim_start and claim_end <= quoted.end():
-            return False
+    if _quoted_claim_is_user_text(sentence, claim_start, claim_end, user_input):
+        return False
     clause, clause_start = _clause_for_offset(sentence, claim_start)
     local_start = claim_start - clause_start
     local_end = claim_end - clause_start
     before, after = clause[:local_start], clause[local_end:]
-    if _ATTRIBUTION_RE.search(before) or re.search(
-        r"\b(?:was|were|has\s+been)\s+requested\b", after[:60], re.IGNORECASE
+    if _ATTRIBUTION_RE.search(before) and not _AGREEMENT_RE.search(clause):
+        return False
+    if (
+        _negation_precedes_value(clause, local_start)
+        or _negation_follows_value(sentence, claim_end)
+        or _is_negated_list_member(sentence, claim_start, claims_in_sentence)
     ):
         return False
-    if _NEGATION_RE.search(before[-90:]) or re.match(
-        r"\s*(?:is|was|has been|will be)?\s*(?:not|never|unavailable|incorrect)\b",
-        after,
-        re.IGNORECASE,
-    ):
+    if _contrast_exempts_value(clause, local_start):
         return False
-    contrast = _CONTRAST_RE.search(clause)
-    if contrast and claim_start - clause_start >= contrast.end():
+    if field == "sla" and _duration_describes_other_process(sentence, claim_start):
         return False
-    if re.match(r"\s*(?:if|when|unless|provided that)\b", clause, re.IGNORECASE):
-        return False
-    if re.match(
-        r"\s*(?:please\s+)?(?:route|forward|refer|send|contact|check|confirm|open|ask|collect|verify)\b",
-        clause,
-        re.IGNORECASE,
-    ):
-        return False
-
-    context = clause[max(0, local_start - 90) : min(len(clause), local_end + 55)]
-    if field == "priority":
-        return bool(
-            re.search(
-                r"\b(?:priority|classified|classify|marked|mark|set|changed|change|updated|update|"
-                r"raised|lowered|escalated)\b",
-                context,
-                re.IGNORECASE,
-            )
-        )
-    if field == "sla":
-        return bool(
-            re.search(
-                r"\b(?:response|reply|respond|hear\s+from|get\s+back|turnaround|SLA|target|"
-                r"promise|promised|expect|commit|committed)\b",
-                context,
-                re.IGNORECASE,
-            )
-        )
     if field == "owner_team":
-        return bool(
-            _CONTRAST_RE.search(after[:55])
-            or re.search(
-                r"\b(?:assign(?:ed|ment)?|rout(?:e|ed|ing)|forward(?:ed)?|transfer(?:red)?|"
-                r"send|sent|manage[ds]?|handle[ds]?|own(?:s|er|ership)?|responsible|"
-                r"queue|team|department|stay(?:s|ed)?|remain(?:s|ed)?)\b",
-                context,
-                re.IGNORECASE,
-            )
-        )
-    return False
+        surface = sentence[claim_start:claim_end]
+        if not _team_is_known(surface, known_teams) and not _unknown_team_has_local_route(
+            sentence, claim_start, claim_end
+        ):
+            return False
+    return True
 
 
 def _v12_field_consistency(
@@ -469,21 +603,34 @@ def _v12_field_consistency(
     field: str,
     expected: Any,
     claims: list[tuple[int, int, str, str]],
+    known_teams: list[str],
+    user_input: str,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     expected_normalized = (
         _normalize_duration(str(expected)) if field == "sla" else str(expected).casefold()
     )
     asserted: list[tuple[str, str, str]] = []
+    mentioned: list[str] = []
     for start, end, surface, normalized in claims:
         for sentence_start, sentence_end, sentence in _sentence_spans(text):
             if sentence_start <= start and end <= sentence_end:
+                sentence_claims = [
+                    (claim_start - sentence_start, claim_end - sentence_start)
+                    for claim_start, claim_end, _surface, _normalized in claims
+                    if sentence_start <= claim_start and claim_end <= sentence_end
+                ]
                 if _is_asserted_value(
                     sentence,
                     start - sentence_start,
                     end - sentence_start,
                     field,
+                    known_teams=known_teams,
+                    user_input=user_input,
+                    claims_in_sentence=sentence_claims,
                 ):
                     asserted.append((surface, normalized, sentence))
+                elif surface.casefold() not in [item.casefold() for item in mentioned]:
+                    mentioned.append(surface)
                 break
     unique: list[tuple[str, str, str]] = []
     for item in asserted:
@@ -501,8 +648,7 @@ def _v12_field_consistency(
         }
         for surface, _normalized, sentence in conflicts
     ]
-    return (
-        _consistency_result(
+    field_result = _consistency_result(
             field,
             status,
             [surface for surface, _normalized, _sentence in unique],
@@ -512,9 +658,9 @@ def _v12_field_consistency(
             else "asserted values match authoritative value"
             if unique
             else "no asserted value found",
-        ),
-        reasons,
-    )
+        )
+    field_result["mentioned_values"] = mentioned
+    return field_result, reasons
 
 
 def _v12_consistency(
@@ -537,6 +683,7 @@ def _v12_consistency(
         )
     similarity = _echo_similarity(text, user_input)
     if similarity is not None and (similarity == 1.0 or similarity >= ECHO_SIMILARITY_THRESHOLD):
+        overlap_chars = len(_normalize_echo(text)) if _normalize_echo(text) in _normalize_echo(user_input) else None
         reason = {
             "field": "customer_message",
             "claimed_value": None,
@@ -545,6 +692,8 @@ def _v12_consistency(
             "rule_type": "non_reply_echo",
             "similarity": round(similarity, 6),
         }
+        if overlap_chars is not None:
+            reason["overlap_chars"] = overlap_chars
         return (
             {
                 "overall": "CONFLICT",
@@ -552,6 +701,7 @@ def _v12_consistency(
                     "status": "CONFLICT",
                     "rule_type": "non_reply_echo",
                     "similarity": round(similarity, 6),
+                    **({"overlap_chars": overlap_chars} if overlap_chars is not None else {}),
                 },
             },
             [reason],
@@ -570,7 +720,14 @@ def _v12_consistency(
         ("sla", sla_claims),
         ("owner_team", owner_claims),
     ):
-        result, codes = _v12_field_consistency(text, field, expected.get(field), claims)
+        result, codes = _v12_field_consistency(
+            text,
+            field,
+            expected.get(field),
+            claims,
+            known_teams,
+            user_input,
+        )
         results[field] = result
         reasons.extend(codes)
     consistency = _aggregate_consistency(results)
@@ -608,7 +765,9 @@ def _deterministic_fallback(
     )
     actions = [str(action).strip() for action in (next_actions or []) if str(action).strip()]
     if actions:
-        fallback += "\nNext steps:\n" + "\n".join(f"- {action}" for action in actions)
+        fallback += "\nNext steps our team will take:\n" + "\n".join(
+            f"- {action}" for action in actions
+        )
     return fallback
 
 
@@ -623,6 +782,62 @@ def _category_next_actions(context: Mapping[str, Any]) -> list[str]:
             if isinstance(actions, list):
                 return [str(action) for action in actions if isinstance(action, str) and action.strip()]
     return []
+
+
+def _v12_fallback(
+    snapshot: AuthoritativeSnapshot,
+    context: Mapping[str, Any],
+    user_input: str,
+) -> tuple[str, dict[str, Any]]:
+    known_teams = _policy_owner_teams(context.get("support_policy"))
+    actions = _category_next_actions(context)
+    safe_actions: list[str] = []
+    filtered_actions: list[dict[str, Any]] = []
+    for action in actions:
+        result, reasons = _v12_consistency(
+            action,
+            snapshot.fields,
+            known_teams,
+            user_input="",
+        )
+        if result.get("overall") == "CONFLICT":
+            filtered_actions.append({"action": action, "reject_reason_codes": reasons})
+        else:
+            safe_actions.append(action)
+
+    fallback = _deterministic_fallback(snapshot, safe_actions)
+    candidate_check, candidate_reasons = _v12_consistency(
+        fallback,
+        snapshot.fields,
+        known_teams,
+        user_input,
+    )
+    candidate_passed = all(
+        candidate_check.get(field, {}).get("status") == "PASS"
+        for field in ("priority", "sla", "owner_team")
+    )
+    used_minimal = not candidate_passed
+    if used_minimal:
+        fallback = _deterministic_fallback(snapshot)
+    final_check, final_reasons = _v12_consistency(
+        fallback,
+        snapshot.fields,
+        known_teams,
+        user_input,
+    )
+    self_check = {
+        "passed": all(
+            final_check.get(field, {}).get("status") == "PASS"
+            for field in ("priority", "sla", "owner_team")
+        ),
+        "used_minimal_fallback": used_minimal,
+        "filtered_actions": filtered_actions,
+        "candidate_consistency": candidate_check,
+        "candidate_reject_reason_codes": candidate_reasons,
+        "final_consistency": final_check,
+        "final_reject_reason_codes": final_reasons,
+    }
+    return fallback, self_check
 
 
 class _UnavailableNodeHandler:
@@ -774,6 +989,10 @@ class WorkflowRuntime:
         context = dict(initial_context)
         context.setdefault("executed_agents", [])
         context.setdefault("executed_tools", [])
+        if self.validator_version == CONSISTENCY_VALIDATOR_V1_2:
+            context["runtime_version"] = self.runtime_version
+            context["validator_version"] = self.validator_version
+            context.setdefault("fallback_self_check", None)
         if self._is_v2:
             context.setdefault("field_evidence", [])
             context.setdefault("raw_candidates", {})
@@ -810,8 +1029,13 @@ class WorkflowRuntime:
                 trace_data = result.data or result.outputs
                 if self.validator_version == CONSISTENCY_VALIDATOR_V1_2 and node.mode == "generative":
                     trace_data = dict(trace_data) if isinstance(trace_data, Mapping) else {"result": trace_data}
+                    trace_data["runtime_version"] = self.runtime_version
+                    trace_data["validator_version"] = self.validator_version
                     trace_data["reject_reason_codes"] = _safe_value(
                         context.get("reject_reason_codes", [])
+                    )
+                    trace_data["fallback_self_check"] = _safe_value(
+                        context.get("fallback_self_check")
                     )
                 trace.append(
                     self._trace(
@@ -835,6 +1059,14 @@ class WorkflowRuntime:
             except Exception as exc:
                 finished_at = _timestamp()
                 error = str(exc)
+                error_data = {}
+                if self.validator_version == CONSISTENCY_VALIDATOR_V1_2 and node.mode == "generative":
+                    error_data = {
+                        "runtime_version": self.runtime_version,
+                        "validator_version": self.validator_version,
+                        "reject_reason_codes": _safe_value(context.get("reject_reason_codes", [])),
+                        "fallback_self_check": _safe_value(context.get("fallback_self_check")),
+                    }
                 trace.append(
                     self._trace(
                         node,
@@ -845,7 +1077,7 @@ class WorkflowRuntime:
                         inputs=_trace_inputs(node, inputs, context),
                         outputs={},
                         detail=f"{node.node_type} failed",
-                        data={},
+                        data=error_data,
                         error=error,
                     )
                 )
@@ -1218,14 +1450,18 @@ class WorkflowRuntime:
             snapshot = context.get("authoritative_snapshot")
             if not isinstance(snapshot, AuthoritativeSnapshot):
                 raise WorkflowValidationError("fallback requires an authoritative snapshot")
+            if self.validator_version == CONSISTENCY_VALIDATOR_V1_2:
+                fallback_text, fallback_self_check = _v12_fallback(
+                    snapshot,
+                    context,
+                    str(context.get("user_input") or ""),
+                )
+                context["fallback_self_check"] = fallback_self_check
+            else:
+                fallback_text = _deterministic_fallback(snapshot)
             write_binding(
                 contract.fields["customer_message"].binding,
-                _deterministic_fallback(
-                    snapshot,
-                    _category_next_actions(context)
-                    if self.validator_version == CONSISTENCY_VALIDATOR_V1_2
-                    else None,
-                ),
+                fallback_text,
                 context,
             )
             context["fallback_used"] = True

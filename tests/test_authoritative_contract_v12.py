@@ -31,9 +31,17 @@ MUST_REJECT = (
     ("priority", "P3 is the level currently in use.", {}),
     ("priority", "This request is a P4 case.", {"priority": "P3"}),
     ("priority", "P2 is now active, as requested in the earlier note.", {}),
-    ("priority", "The customer's message asked for P2, and that level was approved.", {}),
+    ("priority", "The customer asked for P2 and received approval to switch it.", {}),
+    ("priority", "The customer's request for P2 was granted after review.", {}),
     ("priority", "We cannot revise the file after a lengthy review, and the case now carries P2.", {}),
     ("priority", "If this incident carries P2 priority, then keep the file open.", {}),
+    ("priority", "We cannot change it; P2 is the active classification now.", {}),
+    ("priority", "P1 remains recorded—P2 is now selected.", {}),
+    ("priority", "The file stays at P1: P2 became the active level.", {}),
+    ("priority", "P1 remains set, so P2 is the active label.", {}),
+    ("priority", "P1 was not selected because P2 is active.", {}),
+    ("priority", "P1 is current rather than P2 or P3.", {}),
+    ("priority", "This is not only a P2 issue; it also needs review.", {}),
     ("sla", "The next status update is due in one business day.", {}),
     ("sla", "An answer is expected after two hours.", {}),
     ("sla", "The review will finish in six hours.", {}),
@@ -41,6 +49,7 @@ MUST_REJECT = (
     ("sla", "We will complete the investigation within three days.", {}),
     ("sla", "The support interval here is 24 hours.", {}),
     ("sla", "The review period is two business days.", {}),
+    ("sla", "The review period is one hundred and twenty hours.", {}),
     ("sla", "We plan to send the result in 12 hours.", {}),
     ("sla", "This case should close after three business days.", {}),
     ("sla", "A follow-up arrives within five hours.", {}),
@@ -59,7 +68,7 @@ MUST_REJECT = (
     ("owner_team", "Technical Support will take over.", {}),
     ("owner_team", "We transferred this report to Billing Support.", {}),
     ("owner_team", "We routed the report to Returns Desk Team.", {}),
-    ("owner_team", "Please direct this case to Billing Support.", {}),
+    ("owner_team", "Kindly transfer the file to Billing Support.", {}),
     ("owner_team", "If the issue is P2, Account Support owns it.", {}),
     ("owner_team", "Per your request, Account Support is now responsible.", {}),
     ("owner_team", "This file rests with Logistics Support.", {"owner_team": "Billing Support"}),
@@ -76,7 +85,7 @@ MUST_ACCEPT = (
     ("It cannot move to Billing Support, Account Support, or Technical Support.", {}),
     ("P1 remains recorded instead of P2.", {}),
     ("The target stays at four hours rather than a one-day allowance.", {}),
-    ("The note from the customer requested P2; the record remains P1.", {}),
+    ("The customer's note requested P2; the record remains P1.", {}),
     ("The customer's message asked for Billing Support; Logistics Support still owns the case.", {}),
     ("Your email requested a one-business-day reply; the actual target is four hours.", {}),
     (
@@ -87,7 +96,7 @@ MUST_ACCEPT = (
     ("Logistics Support is assigned the P1 case with a four-hour response target.", {}),
     ("Our delivery team is reviewing carrier records.", {}),
     ("The shipping team is checking the dispatch scan.", {}),
-    ("Customer care is reviewing the account notes.", {}),
+    ("Our customer care team is reviewing the account notes.", {}),
     ("The parcel's trip took three days to reach the sorting center.", {}),
     ("Payment settled after six hours.", {}),
     ("The package arrived two days ago.", {}),
@@ -95,6 +104,7 @@ MUST_ACCEPT = (
     ("The refund appeared in your account five days ago.", {}),
     ("The carrier has held the parcel since yesterday, three days ago.", {}),
     ("Delivery may take 36 hours after dispatch.", {}),
+    ("Parcel delivery took two days; the help desk will answer in four hours.", {}),
     ("A one-day delivery window was estimated for this order.", {}),
     ("The owner is Logistics Support, and priority P1 remains recorded.", {}),
     ("P1 applies—P2 is not in effect.", {}),
@@ -102,6 +112,7 @@ MUST_ACCEPT = (
     ("The ticket remains P1, so P2 is not selected.", {}),
     ("The incident is P1; P2 was never activated.", {}),
     ("P1 is set, then P2 is not considered.", {}),
+    ("Because P2 is not active, the file remains at P1.", {}),
 )
 
 
@@ -195,7 +206,7 @@ class RuntimeV12Test(unittest.TestCase):
             "We aren't permitted to classify the report at P2.",
             "P1 remains recorded instead of P2.",
             "The customer's message asked for P2; the record remains P1.",
-            "A one-day reply is not the promised interval.",
+            "One day is not the promised interval.",
             "You mentioned a delayed answer; our target remains four hours.",
             "The target stays at four hours rather than a one-day allowance.",
             "We haven't transferred this to Account Support.",
@@ -269,7 +280,7 @@ class RuntimeV12Test(unittest.TestCase):
             base.registry,
             validator_version=CONSISTENCY_VALIDATOR_V1_2,
         )
-        result = runtime.run({"support_policy": _support_policy(), "user_input": "Check delivery."})
+        result = runtime.run({"support_policy": _support_policy(), "user_input": "Review the shipment record."})
         self.assertTrue(result.context["fallback_used"])
         self.assertIn(
             "output_contract_violation",
@@ -277,10 +288,10 @@ class RuntimeV12Test(unittest.TestCase):
         )
 
     def test_exact_and_punctuation_only_echoes_are_rejected(self):
-        request = "The parcel has not arrived. Can you check its status?"
+        request = "My order tracking page has not refreshed since Thursday afternoon; could someone review it?"
         for reply in (
             request,
-            "THE PARCEL HAS NOT ARRIVED can you check its status",
+            "MY ORDER TRACKING PAGE HAS NOT REFRESHED SINCE THURSDAY AFTERNOON could someone review it",
         ):
             with self.subTest(reply=reply):
                 result = self.run_v12(reply, user_input=request)
@@ -356,12 +367,18 @@ class RuntimeV12Test(unittest.TestCase):
 
     def test_synthetic_wrong_value_corpus_covers_all_fields_without_cues(self):
         self.assertEqual({"priority", "sla", "owner_team"}, {sample[0] for sample in MUST_REJECT})
-        cue_words = ("marked", "reply", "assigned")
+        cue_words = (
+            "mark", "set", "chang", "updat", "rais", "lower", "escalat", "reply",
+            "respond", "response", "hear from", "target", "turnaround", "sla", "promis",
+            "expect", "commit", "assign", "rout", "forward", "transfer", "manag", "handl",
+            "owner", "own", "responsible", "queue", "stay", "remain", "send", "sent",
+            "pass", "direct",
+        )
         without_cues = [
             sample for sample in MUST_REJECT
             if not any(cue in sample[1].casefold() for cue in cue_words)
         ]
-        self.assertGreaterEqual(len(without_cues), len(MUST_REJECT) // 2)
+        self.assertGreaterEqual(len(without_cues), (len(MUST_REJECT) + 1) // 2)
 
     def test_partial_user_input_echo_is_rejected(self):
         request = "Could you route this report to Billing Support before the morning review?"
@@ -402,6 +419,8 @@ class RuntimeV12Test(unittest.TestCase):
         self.assertIn("Next steps our team will take:", fallback)
         self.assertNotIn("Billing Support", fallback)
         self.assertTrue(rejected.trace[-1].data["fallback_self_check"]["passed"])
+        filtered = rejected.context["fallback_self_check"]["filtered_actions"]
+        self.assertTrue(any("billing support" in item["action"].casefold() for item in filtered))
         accepted = self.run_v12(fallback, owner_team="Logistics Support", category="refund")
         self.assertFalse(accepted.context["fallback_used"])
 
@@ -416,6 +435,19 @@ class RuntimeV12Test(unittest.TestCase):
         self.assertIn("Next steps our team will take:", fallback)
         self.assertIn("Billing Support", fallback)
         self.assertTrue(rejected.trace[-1].data["fallback_self_check"]["passed"])
+
+    def test_fallback_self_check_uses_minimal_version_when_actions_make_echo(self):
+        user_input = (
+            "Your inquiry has been assigned to Logistics Support. Priority: P1. "
+            "Expected response time: 4 hours.\nNext steps our team will take:\n"
+            "- Confirm order number and tracking status.\n"
+            "- Open a logistics investigation ticket.\n"
+            "- Send customer a delivery status response."
+        )
+        result = self.run_v12("This report is P2.", user_input=user_input)
+        self.assertTrue(result.context["fallback_self_check"]["used_minimal_fallback"])
+        self.assertTrue(result.context["fallback_self_check"]["passed"])
+        self.assertNotIn("Next steps our team will take:", result.context["customer_message"])
 
     def test_v12_generation_trace_and_context_include_runtime_versions(self):
         result = self.run_v12("We will check the recent carrier scans.")

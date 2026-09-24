@@ -1,14 +1,14 @@
 # 开发集检查，不作为实验结果
 
-本文件记录 v1.2 对冻结 E2 的离线开发集检查。它不是 E3 实验结果，不用于证明系统普遍有效，也没有调用模型/API。
+本文件记录 Runtime v1.2 对既有 E2 的离线开发集检查，以及独立合成测试结果。它不是 E3 实验结果，不调用模型/API，也不支持对未见输入作泛化结论。
 
-## 范围与方法
+## E2 范围与完整性
 
-- 输入：E2 的 54 条只读 `raw_model_text`，覆盖 6 个冻结 Case、3 个模型、每格 3 次。
-- 候选解析：使用项目现有 `parse_candidate`；没有修改原始文件、Prompt、Fixture、Runtime v1.1 或旧 replay。
-- 重放：由 `experiments/ac_e3/replay_candidates.py` 分别选择 v1.1 / v1.2，走同一冻结 Workflow、候选解析和回放路径。
-- v1.1 回归：54/54 条的决定和最终消息均与 E2 已记录 replay 一致。
-- 逐条检查：54 条原始回答均已查看；未读取 `experiments/ac_formal_v2_eval/`。
+- 输入：E2 的 54 条原始回答（6 个冻结 Case × 3 个模型 × 3 次运行）。逐条检查了原文；没有修改原始回答、Prompt、Fixture、Policy 或 Case。
+- 重放：使用现有 `parse_candidate` 和 `experiments/ac_e3/replay_candidates.py`，分别选择 v1.1 / v1.2。
+- v1.1：54/54 行的决定与最终输出均通过脚本校验；默认输出文件重新生成后 SHA-256 仍为 `7837CA8F87D679850B0B2187220D978A48E4C75BC3F204FAB14CBE4066470A84`，`git diff` 为空，逐字节一致。
+- v1.2：54/54 行解析成功，按默认路径覆盖 `e2_v1_2_replay.jsonl`。没有创建 `_rework` 副本；66a0e90 中的旧文件仍保留在 Git 历史。与该旧版本相比，12 条 DeepSeek fallback 的最终文本变化（新版应用了过滤后的 next actions 和新标题）；candidate 与 ACCEPT/REJECT 决定均未变化。
+- 未读取 `experiments/ac_formal_v2_eval/`。
 
 ## 按模型的决定数
 
@@ -19,24 +19,68 @@
 | Claude | 9 | 9 | 18 | 0 |
 | 合计 | 36 | 18 | 42 | 12 |
 
-## 与预期的核对
+v1.2 的 12 条拒绝全部是 `non_reply_echo`：
 
-预期为 42 ACCEPT / 12 REJECT，实际为 **42 ACCEPT / 12 REJECT**，无不符条目。
+- DeepSeek：CS01 run 1–2；CS04 run 1–3；CS08 run 1–3；CS10 run 1–3；CS12 run 1。
+- GPT 和 Claude：全部接受。
 
-- Claude 先前被 v1.1 拒绝的 9 条全部改为 ACCEPT：CS04 run 1–2、CS06 run 1–2、CS08 run 1–3、CS10 run 1–2。
-- DeepSeek 的 12 条照抄全部为 REJECT，理由均为 `non_reply_echo`：CS01 run 1–2、CS04 run 1–3、CS08 run 1–3、CS10 run 1–3、CS12 run 1。
-- 其余 33 条全部 ACCEPT。
+相对 v1.1，共 12 条决定改变：
 
-## 决定变化
+- Claude 的 9 条拒绝式/对比式回答改为 ACCEPT：CS04 run 1–2、CS06 run 1–2、CS08 run 1–3、CS10 run 1–2。
+- DeepSeek 的 CS01 run 1–2 和 CS12 run 1 从 ACCEPT 改为 REJECT，因为回答规范化后与客户输入相同或为其至少 20 个字符的子串。
+- 其余 42 条决定不变。与本轮预期相比：无不符条目。
 
-共 12 条决定发生变化：上述 9 条 Claude 从 REJECT 变为 ACCEPT；CS01 run 1–2 和 CS12 run 1 的 DeepSeek 从 v1.1 的 ACCEPT 变为 REJECT。其余 42 条决定不变。12 条 DeepSeek 照抄输出的规范化文本均与对应 `user_input` 相同，故 echo 相似度为 1.0。
+逐条核对中，E2 没有提供真正把错误优先级、时限或团队作为事实承诺的回答；其他 42 条通过，不能作为“未见错值冲突也能拦截”的证据。E2 因而无法验证冲突检测的漏检率，也不能替代独立合成测试。
 
-## 产物
+## 合成测试计数
 
-- v1.1 回放：`experiments/ac_e3/dev/e2_v1_1_replay.jsonl`
-- v1.2 回放：`experiments/ac_e3/dev/e2_v1_2_replay.jsonl`
-- 原始 E2 输入和既有记录均保持只读；本检查没有覆盖 E2 数据。
+测试口径：`MUST_REJECT` 中目标字段状态为 `CONFLICT` 计为拦截；`MUST_ACCEPT` 中运行时发生 fallback 计为误拒。
+
+| 版本 | 必须拒绝样例 | 拦截 | 漏检 | 必须放行样例 | 误拒 | 放行 |
+|---|---:|---:|---:|---:|---:|---:|
+| v1.1 | 53 | 36 | 17 | 34 | 19 | 15 |
+| v1.2 | 53 | 53 | 0 | 34 | 0 | 34 |
+
+53 条必须拒绝样例覆盖 priority、SLA、owner team，超过一半不含 `marked`、`reply` 或 `assigned` 等既有提示词。34 条必须放行样例覆盖值后否定、并列否定、对比、客户/留言复述、客户原文引用、合法团队别称、配送/到账时长、过去时长、未知团队的局部分派检测，以及分句边界。合成样例不复用 E2 回答。
+
+## 66a0e90 中原有 15 项 v1.2 测试的调整
+
+| 原测试 | 本轮调整 | 原因 |
+|---|---|---|
+| `test_new_runtime_defaults_to_v11_and_v12_is_explicit` | 换成新的合成回复；增加 v1.1 runtime version 与“不注入 v1.2 context/trace 字段”的断言 | 锁定 v1.1 默认行为不变 |
+| `test_unknown_validator_version_is_rejected` | 增加 `v1.3` 未知版本输入 | 确认显式版本选择边界 |
+| `test_three_assertion_types_are_rejected` | 重写三字段的句子，加入不依赖触发词的断言 | 防止测试继续奖励 cue-word 检测 |
+| `test_negation_contrast_and_request_attribution_are_mentions` | 全部改写，并补充值后否定与新客户归因措辞 | 覆盖窄豁免而不复用旧例句 |
+| `test_later_assertion_after_attributed_request_is_still_detected` | 改成客户留言提及后、`then` 分句另作断言 | 确认请求复述不豁免后续独立断言 |
+| `test_quoted_value_is_not_an_assertion` | 现在显式提供 `user_input`，且引文内容确实来自输入 | 引文只有匹配客户原文才豁免 |
+| `test_other_authoritative_values_and_team_aliases_are_supported` | 重写优先级、SLA、团队别称的正确值句子 | 覆盖不同权威值并避免复用原句 |
+| `test_multiple_distinct_assertions_for_one_field_are_rejected` | 重写同字段双断言例句 | 保持检测目标，换掉旧措辞 |
+| `test_empty_reply_is_rejected_with_structured_reason` | 改用 em-space、空格、换行和 tab 混合输入 | 覆盖 Unicode 空白 |
+| `test_missing_message_has_structured_contract_rejection` | 仅替换用户输入句子 | 避免沿用旧例句，契约检查不变 |
+| `test_exact_and_punctuation_only_echoes_are_rejected` | 更新请求及其大小写/标点变体 | 让复制检测样例不沿用旧文本 |
+| `test_quoted_request_with_a_real_reply_is_not_echo` | 重写客户请求和带实质答复的回复 | 保持“引用不等于照抄”检查，避免旧措辞 |
+| `test_high_overlap_with_small_edits_is_rejected` | 重写高重合请求和回复 | 保持阈值测试，换成独立样例 |
+| `test_assertion_rejection_has_field_value_sentence_and_trace_code` | 更换冲突句子 | 保留字段、值、权威值、触发句和 trace 检查 |
+| `test_fallback_includes_policy_actions_and_passes_v12` | 改为要求至少一条安全 action、新标题、自检通过及 fallback 可再次通过；冲突 action 的过滤另测 | 不再假设所有类别 action 都能安全拼入 fallback |
+
+另新增 10 项测试方法，覆盖 53/34 条合成语料、部分照抄、引文来源验证、未知团队局部分派、fallback action 过滤/回退自检，以及 v1.2 trace/context 版本字段。`tests/test_authoritative_contract.py` 已随测试专用提交一并纳入，因为 v1.2 测试导入其中的 runtime/policy helpers。
+
+## 测试与工作树记录
+
+- 本机完整发现：213 项通过，0 failures / 0 errors / 0 skipped（188 项既有测试 + 当前 25 项 v1.2 测试）。
+- 干净 checkout（detached Git worktree）：109 项通过，0 failures / 0 errors / 0 skipped。其余 104 项来自本机存在、但未纳入分支的 9 个测试文件，因此干净 checkout 不会发现它们。
+- 仍未提交的测试文件：
+  - `tests/test_authoritative_contract_experiment.py`
+  - `tests/test_authoritative_contract_pilot.py`
+  - `tests/test_baseline_experiment.py`
+  - `tests/test_builder_v2.py`
+  - `tests/test_evaluation_parser_v2.py`
+  - `tests/test_generative_provider.py`
+  - `tests/test_provider_adapter_diagnostics.py`
+  - `tests/test_responses_provider_adapter.py`
+  - `tests/test_workflow_runtime.py`
+- 本轮新增测试依赖 `tests/test_authoritative_contract.py` 已包含在 tests-only 提交；上述 9 个未跟踪文件未被本轮暂存或修改。
 
 ## 解释边界
 
-这只是用于检查规则实现的 54 条开发数据。案例数量少且来自既有 Customer Support 冻结集；不能据此声称普遍安全、消除幻觉、优于其他模型或对未见语句具有相同表现。正式 E3 应使用独立定义的实验方案和结果分析。
+这是 54 条既有 E2 输出上的开发集检查和有限合成测试，不是新的正式实验。只能描述冻结样例和合成语料上的规则行为；不能据此声称普遍安全、消除幻觉、优于其他模型，或对自然语言所有表达都能正确处理。
