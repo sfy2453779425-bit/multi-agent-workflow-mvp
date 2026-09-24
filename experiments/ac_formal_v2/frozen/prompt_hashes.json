@@ -1,0 +1,81 @@
+{
+  "experiment_id": "ac_formal_3model_6case_20260924_v2",
+  "prompt_version": "customer-message-prompt-v2",
+  "items": [
+    {
+      "case_id": "CS01",
+      "case_hash": "b7d71fb3a2bdbfdb83a752752cfc50fdfdf080a49bab791f6a7c6588ddf1e716",
+      "fixture_hash": "636d3f29d9699b2a06bd9bf803fb84665512fb68498a8be4036a88c1cf8a5ed0",
+      "prompt_text_hash": "887e8fe7ce259a566fcf5d2bda0e72be1ee52fa0ab8b922ef6e461130829b820",
+      "provider_request_prompt_hash": "887e8fe7ce259a566fcf5d2bda0e72be1ee52fa0ab8b922ef6e461130829b820",
+      "pilot_v4_prompt_hash_match": true,
+      "equality_pilot_hash_status": "PASS",
+      "equality_pilot_prompt_hashes": {
+        "generation_input_hash_equal": "True",
+        "prompt_text_hash_equal": "True",
+        "c_prompt_text_hash": "887e8fe7ce259a566fcf5d2bda0e72be1ee52fa0ab8b922ef6e461130829b820",
+        "d_prompt_text_hash": "887e8fe7ce259a566fcf5d2bda0e72be1ee52fa0ab8b922ef6e461130829b820"
+      }
+    },
+    {
+      "case_id": "CS04",
+      "case_hash": "58c98c59b5dc9d70c1a39d3da3c078222a990e7dd767c59272c38b6893cfd3c0",
+      "fixture_hash": "2a1f5b649d45e280eb997b655f4b7b4630951b589046631929ec3b0f6c43e7d8",
+      "prompt_text_hash": "496106832b2ac4edc7417a57583503807e2837d98963b8806a7598d2e4802032",
+      "provider_request_prompt_hash": "496106832b2ac4edc7417a57583503807e2837d98963b8806a7598d2e4802032",
+      "pilot_v4_prompt_hash_match": true,
+      "equality_pilot_hash_status": "NOT_RECORDED",
+      "equality_pilot_prompt_hashes": null
+    },
+    {
+      "case_id": "CS06",
+      "case_hash": "be2ee27d21a3bae4fb69eaaaec60211c3feb9b6a6d03b708ef1b6232d6fb5a08",
+      "fixture_hash": "569fa778c82a1ac47aa01aa3b0c34ebaed93abae25f05758cd334c85cb9fd3dd",
+      "prompt_text_hash": "3e819265c05aa8edb4e35682b3a6f901060cf361e67c7cc99934b1a437018882",
+      "provider_request_prompt_hash": "3e819265c05aa8edb4e35682b3a6f901060cf361e67c7cc99934b1a437018882",
+      "pilot_v4_prompt_hash_match": true,
+      "equality_pilot_hash_status": "NOT_RECORDED",
+      "equality_pilot_prompt_hashes": null
+    },
+    {
+      "case_id": "CS08",
+      "case_hash": "22d0c721cfdfb6468399ca90817e3c51b61fb0f79042ccb3dc28dc497a824954",
+      "fixture_hash": "0ea5e7d2c3c9036d12849f27271209921b19717dd6423d628a701cfcd92ece76",
+      "prompt_text_hash": "17872ca531843634331485e8aeaa351d594899b9fe0762406264deeb4f588687",
+      "provider_request_prompt_hash": "17872ca531843634331485e8aeaa351d594899b9fe0762406264deeb4f588687",
+      "pilot_v4_prompt_hash_match": true,
+      "equality_pilot_hash_status": "NOT_RECORDED",
+      "equality_pilot_prompt_hashes": null
+    },
+    {
+      "case_id": "CS10",
+      "case_hash": "b470b3efb7bb152d128d2adf2583c0f86e0a98b914f345e49f156079d508cc80",
+      "fixture_hash": "1ce0a9b95c85a1d822445ceef8ea13c8f2e48c819dbcf2b4f6ae6cbe23a99b98",
+      "prompt_text_hash": "7b9d9d2356834f2c93a30268010bcdb768b3f22f390a9d70fc14b4cfda123c66",
+      "provider_request_prompt_hash": "7b9d9d2356834f2c93a30268010bcdb768b3f22f390a9d70fc14b4cfda123c66",
+      "pilot_v4_prompt_hash_match": true,
+      "equality_pilot_hash_status": "PASS",
+      "equality_pilot_prompt_hashes": {
+        "generation_input_hash_equal": "True",
+        "prompt_text_hash_equal": "True",
+        "c_prompt_text_hash": "7b9d9d2356834f2c93a30268010bcdb768b3f22f390a9d70fc14b4cfda123c66",
+        "d_prompt_text_hash": "7b9d9d2356834f2c93a30268010bcdb768b3f22f390a9d70fc14b4cfda123c66"
+      }
+    },
+    {
+      "case_id": "CS12",
+      "case_hash": "c2ae46f66cf62a8d210abc68ef6805fad8414ad71277de9da31e74969fb80e7e",
+      "fixture_hash": "7b87f428717f01c227a5237f660450b2c17636b3c3f16c3d7e183bb85f2957c7",
+      "prompt_text_hash": "906dcec5356d5d6807588b64ebd2aa138dd3a620c5294cab26bb90ef7df78123",
+      "provider_request_prompt_hash": "906dcec5356d5d6807588b64ebd2aa138dd3a620c5294cab26bb90ef7df78123",
+      "pilot_v4_prompt_hash_match": true,
+      "equality_pilot_hash_status": "PASS",
+      "equality_pilot_prompt_hashes": {
+        "generation_input_hash_equal": "True",
+        "prompt_text_hash_equal": "True",
+        "c_prompt_text_hash": "906dcec5356d5d6807588b64ebd2aa138dd3a620c5294cab26bb90ef7df78123",
+        "d_prompt_text_hash": "906dcec5356d5d6807588b64ebd2aa138dd3a620c5294cab26bb90ef7df78123"
+      }
+    }
+  ]
+}

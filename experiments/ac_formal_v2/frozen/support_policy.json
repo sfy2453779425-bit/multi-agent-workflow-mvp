@@ -1,0 +1,91 @@
+{
+  "default_category": "technical",
+  "categories": [
+    {
+      "id": "delivery",
+      "label": "Delivery / Shipping",
+      "keywords": [
+        "delivery",
+        "shipping",
+        "late",
+        "delay",
+        "parcel",
+        "tracking",
+        "arrived"
+      ],
+      "owner_team": "Logistics Support",
+      "priority": "P2",
+      "sla": "1 business day",
+      "policy": "Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.",
+      "next_actions": [
+        "Confirm order number and tracking status.",
+        "Open a logistics investigation ticket.",
+        "Send customer a delivery status response."
+      ]
+    },
+    {
+      "id": "refund",
+      "label": "Refund / Return",
+      "keywords": [
+        "refund",
+        "return",
+        "cancel",
+        "chargeback",
+        "money back",
+        "payment"
+      ],
+      "owner_team": "Billing Support",
+      "priority": "P2",
+      "sla": "1 business day",
+      "policy": "Check order eligibility and payment status. If eligible, route to billing support for refund processing.",
+      "next_actions": [
+        "Check refund eligibility.",
+        "Verify payment transaction status.",
+        "Route to billing support if refund criteria are met."
+      ]
+    },
+    {
+      "id": "account",
+      "label": "Account / Login",
+      "keywords": [
+        "account",
+        "login",
+        "password",
+        "email",
+        "verification",
+        "locked"
+      ],
+      "owner_team": "Account Support",
+      "priority": "P3",
+      "sla": "2 business days",
+      "policy": "Verify customer identity before changing account information or unlocking access.",
+      "next_actions": [
+        "Ask for identity verification.",
+        "Check account lock status.",
+        "Provide password reset or unlock instructions."
+      ]
+    },
+    {
+      "id": "technical",
+      "label": "Technical Issue",
+      "keywords": [
+        "error",
+        "bug",
+        "app",
+        "website",
+        "crash",
+        "not working",
+        "api"
+      ],
+      "owner_team": "Technical Support",
+      "priority": "P2",
+      "sla": "1 business day",
+      "policy": "Collect reproduction steps and device information, then route to technical support for diagnosis.",
+      "next_actions": [
+        "Collect reproduction steps.",
+        "Ask for device, browser or app version.",
+        "Route to technical support with logs if available."
+      ]
+    }
+  ]
+}

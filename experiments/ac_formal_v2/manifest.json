@@ -1,0 +1,61 @@
+{
+  "experiment_id": "ac_formal_3model_6case_20260924_v2",
+  "status": "PREPARED_SMOKE_PENDING",
+  "created_from_commit": "487a761b76147c5158215529b3c3d5ba18fd81d7",
+  "worktree_dirty": true,
+  "case_count": 6,
+  "model_count": 3,
+  "runs_per_case_model": 3,
+  "planned_calls": 54,
+  "schedule_hash": "f4c4ceeea0922bb2b32e1582708f09a4289a5ecda052ac9e0b3e08bd7f8c4e50",
+  "policy_hash": "b90ecb8d3c2cc50dc9929f3b7b0a567b3f25e12ac30d650e15e42bc8b0ac515d",
+  "workflow_hash": "dce3974f7d10407f80baea16771d5a0db48bb9b012796598177ac90f4f5d65b0",
+  "source_hashes": {
+    "workflow_runtime": "40c80dddc949f997db8e95349919b2a4135b8d4d54b61c894b3f039ad18ceb34",
+    "validator_parser": "03df1735e168839dcc547826d6e984b9aaa56839cd38a2d071deeed62ad30d12",
+    "provider_adapter": "44515cbadd9b7ea8c3d1579c16e08b42ac36ca6b74e7418f67c5ef098a648ccd",
+    "node_registry": "0b9be8f03ec68103b44d4c4b71a2c87d9feb35f302d443c482c58bc1bebca229",
+    "workflow_schema": "eee8feb3e9d5f4ca659eb32392c17893323fd7d00f7236229e43fa6b493de660",
+    "workflow_engine": "5dbef1a41003ab51c9a26ad3849cd8d1588a91d23ad7296a032d5934904fde9e",
+    "prompt_and_runtime_helper": "cf88cd894ad3da360812f4873edae3fba55890b2decb19fc88454a96df2ad90e"
+  },
+  "tool_hashes": {
+    "experiments/ac_formal_v2/common.py": "4291ec44ae5b95979bb3a8b6c833d6900538b6d1b6c3715bfba9b310c87152bd",
+    "experiments/ac_formal_v2/collect.py": "e9ae5459c8c874b6413de0277cadc5438f5ac6347573453d29a0df891b76d201",
+    "experiments/ac_formal_v2/replay.py": "4be687e13864397c22beca5dbf582a19eefc0c088c7e5a2bc43d1467a37c3325",
+    "experiments/ac_formal_v2/tests/test_tools.py": "1754088294780121a611c872db32df537b88f25303593135032d5883f1e34bde",
+    "experiments/ac_formal_v2/README.md": "21e6b9fdd4e7a7a0015cf682c91162c7ec1bf38f853b2d6b60bc7085569af319",
+    "experiments/ac_formal_v2/DEVIATIONS.md": "a433a7827576b5b3d79be363e7a3e45868810bd1968d9f57cefdc3bb03a4faa9"
+  },
+  "input_hashes": {
+    "cases": "c121feb04118968b0755ac67aa21defb29eeb419bd3ba65bb62a455be102e07d",
+    "fixture_hashes": "5ed43575b8372c002ccf81fda4949fac9b6b8028f1dac158c464aadb4e5a1754",
+    "pilot_prompt_hashes": "7c38a2d17053bb138882518e5aa6f090f93fe0947d38a1dd16099a871eaad5a2",
+    "equality_prompt_hashes": "fcc444e1b4008fe6f29310b495eb6072d40e666a964da1015739bcf4d2b0c4bd",
+    "policy": "3af8fec18df7121497982365e3d899433b9c4e91832381c08a239a39cbf59660",
+    "workflow": "dce3974f7d10407f80baea16771d5a0db48bb9b012796598177ac90f4f5d65b0"
+  },
+  "frozen_artifact_hashes": {
+    "experiments/ac_formal_v2/frozen/equality_pilot_prompt_hashes.json": "23d3b1e51daea2e035ef3255135b7488646ad1c20e7184f3958f226edfc022f3",
+    "experiments/ac_formal_v2/frozen/prompt_hashes.json": "ad14f9f94ce3e1910c0ef5a92c03f751d25cb291cdd01fe407a470758ed20c3e",
+    "experiments/ac_formal_v2/frozen/prompts/CS01.json": "6779d11f97330df05df94d68e53074849c8bebf0d28e90859807332e1c7bfa38",
+    "experiments/ac_formal_v2/frozen/prompts/CS04.json": "bc13f260f5877131635c43865db22856e83d3d18408801ef36261279c0c707e9",
+    "experiments/ac_formal_v2/frozen/prompts/CS06.json": "b7c8e93a5f3453ada457531c2e25900584e8e5b5f1c7067e888a4671c7ee2549",
+    "experiments/ac_formal_v2/frozen/prompts/CS08.json": "c654958fd20fb3392a39f27d386b54027658700d16a8b31504af320ebc534e85",
+    "experiments/ac_formal_v2/frozen/prompts/CS10.json": "294ed333b16b370470925c33bd100e74b9881156bee178593d58791ad480bddb",
+    "experiments/ac_formal_v2/frozen/prompts/CS12.json": "5d8606c60a017c0fb872f4ad72fe2c1426506c0a10dc8ebc2153acb39a4893ab",
+    "experiments/ac_formal_v2/frozen/support_policy.json": "3af8fec18df7121497982365e3d899433b9c4e91832381c08a239a39cbf59660",
+    "experiments/ac_formal_v2/frozen/workflow_v1.json": "dce3974f7d10407f80baea16771d5a0db48bb9b012796598177ac90f4f5d65b0",
+    "experiments/ac_formal_v2/config/freeze_config.json": "37703f8d5f1316ac912c48ea68b567801bb69a8d2184067f76bbc75a30938280",
+    "experiments/ac_formal_v2/config/schedule.json": "b2090f114039c00af8b0c36cc3c84b5b412758d19f786d7a23419f8a133a2585"
+  },
+  "prompt_builder_version": "customer-message-prompt-v2",
+  "prompt_builder_hash": "dbcded4fa0098d71d1ce9459d1379e0b457ad5cb2c7134518103daaaf5349e56",
+  "prompt_hashes_verified": true,
+  "equality_pilot_case_hashes_verified": [
+    "CS01",
+    "CS10",
+    "CS12"
+  ],
+  "fixture_hashes_verified": true
+}

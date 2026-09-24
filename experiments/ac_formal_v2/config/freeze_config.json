@@ -1,0 +1,55 @@
+{
+  "experiment_id": "ac_formal_3model_6case_20260924_v2",
+  "phase": "formal_collection_preparation",
+  "case_ids": [
+    "CS01",
+    "CS04",
+    "CS06",
+    "CS08",
+    "CS10",
+    "CS12"
+  ],
+  "runs_per_case_model": 3,
+  "planned_calls": 54,
+  "schedule_seed": 20260924,
+  "models": {
+    "deepseek": "deepseek-v4-pro",
+    "gpt": "gpt-5.6",
+    "claude": "claude-opus-5-5"
+  },
+  "provider": {
+    "deepseek": {
+      "api_format": "responses",
+      "adapter_version": "deepseek-responses-adapter-v1",
+      "config_version": "deepseek-v4-pro-responses-nonthinking-v1",
+      "model": "deepseek-v4-pro",
+      "reasoning_effort": "none",
+      "max_output_tokens": 1024,
+      "sampling_parameters": "not_set_provider_default"
+    },
+    "gpt": {
+      "api_format": "responses",
+      "model": "gpt-5.6",
+      "reasoning_effort": "none",
+      "max_output_tokens": 1024,
+      "sampling_parameters": "not_set_provider_default",
+      "credential_env": "OPENAI_API_KEY"
+    },
+    "claude": {
+      "api_format": "messages",
+      "model": "claude-opus-5-5",
+      "max_tokens": 1024,
+      "extended_thinking": "not_enabled",
+      "sampling_parameters": "not_set_provider_default",
+      "credential_env": "ANTHROPIC_API_KEY"
+    }
+  },
+  "runtime_version": "authoritative-contract-v1.1",
+  "validator_version": "consistency-validator-v1.1",
+  "sampling_parameters": "not_set_provider_default",
+  "temperature": null,
+  "top_p": null,
+  "seed": null,
+  "exact_backend_revision": null,
+  "raw_artifacts_immutable": true
+}

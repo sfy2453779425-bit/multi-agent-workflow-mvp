@@ -1,0 +1,101 @@
+{
+  "schema_version": 2,
+  "runtime_type": "customer_support",
+  "workflow_mode": "authoritative_contract",
+  "workflow_id": "authoritative_contract_pilot_v1",
+  "workflow_name": "Authoritative Contract E1 Pilot",
+  "nodes": [
+    {
+      "id": "classification",
+      "type": "classification",
+      "mode": "deterministic",
+      "inputs": {
+        "support_policy": "context.support_policy"
+      },
+      "outputs": {
+        "ticket_category": "context.ticket_category",
+        "policy": "context.policy"
+      }
+    },
+    {
+      "id": "routing_decision",
+      "type": "routing_decision",
+      "mode": "deterministic",
+      "inputs": {
+        "category": "context.ticket_category",
+        "policy": "context.policy"
+      },
+      "outputs": {
+        "owner_team": "context.owner_team",
+        "priority": "context.priority",
+        "sla": "context.sla"
+      }
+    },
+    {
+      "id": "response_generation",
+      "type": "response_generation",
+      "mode": "generative",
+      "inputs": {
+        "grounding": "context.authoritative_snapshot",
+        "user_input": "context.user_input",
+        "support_policy": "context.support_policy",
+        "ticket_category": "context.ticket_category"
+      },
+      "outputs": {
+        "customer_message": "context.customer_message"
+      }
+    }
+  ],
+  "execution": {
+    "type": "sequential",
+    "order": [
+      "classification",
+      "routing_decision",
+      "response_generation"
+    ]
+  },
+  "output_contract": {
+    "fields": {
+      "ticket_category": {
+        "binding": "context.ticket_category",
+        "type": "string",
+        "required": true,
+        "authority": "authoritative",
+        "producer": "classification"
+      },
+      "owner_team": {
+        "binding": "context.owner_team",
+        "type": "string",
+        "required": true,
+        "authority": "authoritative",
+        "producer": "routing_decision"
+      },
+      "priority": {
+        "binding": "context.priority",
+        "type": "string",
+        "required": true,
+        "authority": "authoritative",
+        "producer": "routing_decision"
+      },
+      "sla": {
+        "binding": "context.sla",
+        "type": "string",
+        "required": true,
+        "authority": "authoritative",
+        "producer": "routing_decision"
+      },
+      "customer_message": {
+        "binding": "context.customer_message",
+        "type": "string",
+        "required": true,
+        "authority": "generative",
+        "producer": "response_generation",
+        "grounded_on": [
+          "priority",
+          "sla",
+          "owner_team"
+        ]
+      }
+    }
+  }
+}

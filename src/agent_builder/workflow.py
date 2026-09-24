@@ -1,11 +1,16 @@
 import json
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
+from time import perf_counter
 from typing import Any
 
 from agent_builder.engine import AgentBuilderEngine, TraceStep
 from agent_builder.local_llm import LocalLLMNode, LocalLLMNodeConfig
+from agent_builder.node_registry import NodeExecutionResult, NodeRegistry
 from agent_builder.shopping import analyze_shopping_history
+from agent_builder.workflow_runtime import WorkflowRuntime
+from agent_builder.workflow_schema import upgrade_workflow_config
 from weather_agent.tools import CITY_ALIASES, WeatherTool
 
 
@@ -48,7 +53,7 @@ class WorkflowResult:
 
 
 class MultiAgentWorkflowEngine:
-    """Runs a configured sequential workflow made of small Agent steps."""
+    """Run Workflow JSON through a registry-backed sequential runtime."""
 
     def __init__(
         self,
@@ -56,10 +61,12 @@ class MultiAgentWorkflowEngine:
         data_dir: str | Path | None = None,
         weather_tool: WeatherTool | None = None,
         local_llm_config: dict[str, Any] | LocalLLMNodeConfig | None = None,
+        registry: NodeRegistry | None = None,
     ):
         self.workflow_config_path = Path(workflow_config_path)
-        self.workflow_config = self._load_json(self.workflow_config_path)
+        self.workflow_config = upgrade_workflow_config(self._load_json(self.workflow_config_path))
         self.runtime_type = self.workflow_config.get("runtime_type", "outfit_recommendation")
+
         base_config_value = self.workflow_config.get("base_agent_config")
         if base_config_value:
             base_config = Path(base_config_value)
@@ -71,6 +78,7 @@ class MultiAgentWorkflowEngine:
                 weather_tool=weather_tool,
             )
             self.data_dir = self.base_engine.data_dir
+            self.weather_tool = self.base_engine.weather_tool
         else:
             self.base_engine = None
             configured_data_dir = self.workflow_config.get("data_dir")
@@ -80,169 +88,401 @@ class MultiAgentWorkflowEngine:
                 self.data_dir = Path(data_dir)
             else:
                 self.data_dir = self.workflow_config_path.parent.parent / "data"
+            self.weather_tool = weather_tool or WeatherTool()
+
         configured_llm = local_llm_config or self.workflow_config.get("local_llm_node", {})
         self.local_llm_node = LocalLLMNode(configured_llm)
+        self.registry = registry or self._build_registry()
+        self.runtime = WorkflowRuntime(self.workflow_config, self.registry)
+
+    def _build_registry(self) -> NodeRegistry:
+        registry = NodeRegistry()
+        handlers = {
+            "request_parser": self._handle_outfit_request_parser,
+            "question": self._handle_outfit_question,
+            "weather": self._handle_outfit_weather,
+            "shopping_analysis": self._handle_outfit_shopping_analysis,
+            "recommendation": self._handle_outfit_recommendation,
+            "compose": self._handle_outfit_compose,
+            "presentation_request_parser": self._handle_presentation_request_parser,
+            "presentation_question": self._handle_presentation_question,
+            "topic_analysis": self._handle_topic_analysis,
+            "knowledge_lookup": self._handle_knowledge_lookup,
+            "outline_generation": self._handle_outline_generation,
+            "presentation_compose": self._handle_presentation_compose,
+            "support_request_parser": self._handle_support_request_parser,
+            "support_question": self._handle_support_question,
+            "ticket_classification": self._handle_ticket_classification,
+            "policy_lookup": self._handle_policy_lookup,
+            "routing_decision": self._handle_routing_decision,
+            "support_compose": self._handle_support_compose,
+        }
+        for node_type, handler in handlers.items():
+            registry.register(node_type, handler)
+        return registry
 
     def run(self, user_message: str | None = None, user_id: str | None = None) -> WorkflowResult:
         query = (user_message or self.workflow_config.get("default_query") or "").strip()
         selected_user = user_id or self.workflow_config.get("default_user_id", "user_a")
+        runtime_result = self.runtime.run(
+            {
+                "query": query,
+                "user_id": selected_user,
+                "runtime_type": self.runtime_type,
+                "workflow_name": self.workflow_config.get("workflow_name", ""),
+            }
+        )
+        context = runtime_result.context
+        trace = runtime_result.trace
+        if runtime_result.failed_node:
+            answer = f"Workflow failed at node '{runtime_result.failed_node}': {runtime_result.error}"
+        else:
+            answer = str(context.get("final_answer") or context.get("clarification_message") or "")
+            answer = self._maybe_run_local_llm_node(trace, context, answer)
+        return self._finalize(trace, context, answer)
 
-        if self.runtime_type == "presentation_planning":
-            return self._run_presentation_planning(query, selected_user)
-        if self.runtime_type == "customer_support":
-            return self._run_customer_support(query, selected_user)
-
-        if self.base_engine is None:
-            raise ValueError("outfit workflow requires base_agent_config")
-
-        trace: list[TraceStep] = []
-        context = self._run_request_parser(query, selected_user)
-        trace.append(self._trace_request_parser(context))
-
-        self._run_question_agent(context)
-        trace.append(self._trace_question(context))
-
-        if context.get("needs_clarification"):
-            return self._finalize(
-                trace,
-                context,
-                answer=context["clarification_message"],
-            )
-
-        self._run_weather_agent(context)
-        trace.append(self._trace_weather(context))
-
-        self._run_shopping_analysis_agent(context)
-        trace.append(self._trace_shopping(context))
-
-        self.base_engine._decide(context)
-        context["executed_agents"].append("recommendation")
-        trace.append(self._trace_recommendation(context))
-
-        answer = self.base_engine._render(context)
-        context["executed_agents"].append("compose")
-        trace.append(self._trace_compose(context))
-        answer = self._maybe_run_local_llm_node(trace, context, answer)
-
-        return self._finalize(trace, context, answer=answer)
-
-    def _run_presentation_planning(self, query: str, user_id: str) -> WorkflowResult:
-        trace: list[TraceStep] = []
-        context: dict[str, Any] = {
-            "query": query,
-            "user_id": user_id,
-            "runtime_type": self.runtime_type,
-            "executed_agents": [],
-            "executed_tools": [],
-        }
-
-        context["topic"] = query
-        context["duration_minutes"] = self._extract_duration_minutes(query, default=15)
-        context["output_type"] = "presentation_outline"
-        context["executed_agents"].append("request_parser")
-        trace.append(
-            self._runtime_trace(
-                "request_parser",
-                f"topic extracted, duration={context['duration_minutes']} minutes",
-                {
-                    "topic": context["topic"],
-                    "duration_minutes": context["duration_minutes"],
-                    "output_type": context["output_type"],
-                },
-            )
+    def _finalize(
+        self,
+        trace: list[TraceStep],
+        context: dict[str, Any],
+        answer: str,
+    ) -> WorkflowResult:
+        context["workflow_name"] = self.workflow_config["workflow_name"]
+        context["workflow_agents"] = self.workflow_config.get("agents", [])
+        context["workflow_nodes"] = self.workflow_config.get("nodes", [])
+        context["workflow_execution"] = self.workflow_config.get("execution", {})
+        return WorkflowResult(
+            workflow_name=self.workflow_config["workflow_name"],
+            answer=answer,
+            trace=trace,
+            context=context,
         )
 
-        context["missing_fields"] = [] if context["topic"] else ["topic"]
-        context["needs_clarification"] = bool(context["missing_fields"])
-        context["next_question_field"] = "topic" if context["needs_clarification"] else ""
-        context["clarification_message"] = (
+    # Outfit handlers -----------------------------------------------------
+
+    def _handle_outfit_request_parser(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        if self.base_engine is None:
+            raise ValueError("outfit workflow requires base_agent_config")
+        inputs = node_config["inputs"]
+        parsed = self.base_engine._plan(
+            str(inputs["user_message"]),
+            str(inputs["user_id"]),
+        )
+        return NodeExecutionResult(
+            outputs=parsed,
+            detail=(
+                f"city={parsed['city_display']}, date={parsed['date_label']}, "
+                f"user={parsed['user_id']}"
+            ),
+            data={
+                "workflow": str(self.workflow_config_path),
+                "base_config": str(self.base_engine.config_path),
+                "intent": self.base_engine.config.get("intent"),
+                "matched_keywords": parsed["matched_keywords"],
+            },
+        )
+
+    def _handle_outfit_question(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        question_config = self.workflow_config.get("question_agent", {})
+        purpose_keywords = list(DEFAULT_PURPOSE_KEYWORDS) + list(
+            question_config.get("purpose_keywords", [])
+        )
+        style_keywords = list(DEFAULT_STYLE_KEYWORDS) + list(
+            question_config.get("style_keywords", [])
+        )
+        query = str(node_config["inputs"].get("query", context["query"]))
+        lower = query.lower()
+        detected_purpose = [kw for kw in purpose_keywords if kw.lower() in lower]
+        detected_style = [kw for kw in style_keywords if kw.lower() in lower]
+        missing_fields = self._find_missing_context(lower, detected_purpose, detected_style)
+        next_question_field = missing_fields[0] if missing_fields else ""
+        clarification_questions = {
+            **DEFAULT_CLARIFICATION_QUESTIONS,
+            **question_config.get("clarification_questions", {}),
+        }
+        clarification_message = (
+            clarification_questions.get(next_question_field, question_config.get("clarification_message"))
+            if missing_fields
+            else ""
+        )
+        outputs = {
+            "detected_purpose": detected_purpose,
+            "detected_style": detected_style,
+            "missing_fields": missing_fields,
+            "next_question_field": next_question_field,
+            "needs_clarification": bool(missing_fields),
+            "clarification_message": clarification_message,
+        }
+        if missing_fields:
+            detail = f"missing={', '.join(missing_fields)} → {next_question_field} 질문"
+        else:
+            detail = (
+                f"purpose={', '.join(detected_purpose) or '(없음)'}, "
+                f"style={', '.join(detected_style) or '(없음)'} → 정보 충분"
+            )
+        return NodeExecutionResult(
+            outputs=outputs,
+            detail=detail,
+            data=outputs,
+            halt=bool(missing_fields),
+            halt_reason="clarification" if missing_fields else "",
+        )
+
+    def _handle_outfit_weather(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        inputs = node_config["inputs"]
+        weather = self.weather_tool.get_daily_weather(
+            str(inputs["city_query"]),
+            int(inputs["day_offset"]),
+        )
+        summary = {
+            "date": weather.date,
+            "condition": weather.condition,
+            "temp_min": weather.temp_min,
+            "temp_max": weather.temp_max,
+            "precipitation_probability": weather.precipitation_probability,
+        }
+        context["executed_tools"].append("weather")
+        return NodeExecutionResult(
+            outputs={"weather": weather, "weather_summary": summary},
+            detail=(
+                f"{context['city_display']} {context['date_label']} weather loaded: "
+                f"{weather.condition}"
+            ),
+            data=summary,
+        )
+
+    def _handle_outfit_shopping_analysis(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        if self.base_engine is None:
+            raise ValueError("shopping analysis requires base_agent_config")
+        tools = self.base_engine.config.get("tools", {})
+        filename = tools.get("shopping_history", {}).get("file", "shopping_history.json")
+        records = self._load_json(self.data_dir / filename)
+        user_id = str(node_config["inputs"]["user_id"])
+        shopping_items = records.get(user_id)
+        if shopping_items is None:
+            raise ValueError(f"unknown user_id: {user_id}")
+
+        analysis = analyze_shopping_history(shopping_items)
+        history_summary = {
+            "records": len(shopping_items),
+            "source": filename,
+            "sample_items": [item.get("item") for item in shopping_items[:3]],
+        }
+        analysis_summary = {
+            "total_items": analysis["total_items"],
+            "top_styles": analysis["top_styles"],
+            "top_colors": analysis["top_colors"],
+            "top_categories": analysis["top_categories"],
+            "favorite_items": analysis["favorite_items"],
+        }
+        context["executed_tools"].append("shopping_history")
+        return NodeExecutionResult(
+            outputs={
+                "shopping_history": shopping_items,
+                "shopping_history_summary": history_summary,
+                "shopping_analysis": analysis,
+                "shopping_item_count": analysis["total_items"],
+                "styles_text": ", ".join(analysis["top_styles"]),
+                "colors_text": ", ".join(analysis["top_colors"]),
+                "favorite_items_text": ", ".join(analysis["favorite_items"]),
+                "top_categories_text": ", ".join(analysis["top_categories"]),
+                "user_name": user_id,
+                "shopping_analysis_summary": analysis_summary,
+            },
+            detail=(
+                f"styles={', '.join(analysis['top_styles'])}, "
+                f"colors={', '.join(analysis['top_colors'])}, records={analysis['total_items']}"
+            ),
+            data=analysis_summary,
+        )
+
+    def _handle_outfit_recommendation(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        if self.base_engine is None:
+            raise ValueError("recommendation requires base_agent_config")
+        working = dict(context)
+        working["weather"] = node_config["inputs"]["weather"]
+        working["shopping_analysis"] = node_config["inputs"]["shopping_analysis"]
+        self.base_engine._decide(working)
+        output_names = (
+            "avg_temp", "temp_min", "temp_max", "weather_date", "weather_condition",
+            "precipitation_probability", "matched_rule_name", "recommendation",
+            "owned_recommended_items", "owned_recommended_items_text", "additional_items",
+            "additional_items_text", "recommended_items", "recommended_items_text",
+            "ranked_items", "ranked_items_text", "extras", "extras_text",
+        )
+        outputs = {name: working[name] for name in output_names}
+        return NodeExecutionResult(
+            outputs=outputs,
+            detail=f"rule={working['matched_rule_name']}, items={len(working['recommended_items'])}",
+            data={
+                "avg_temp": working["avg_temp"],
+                "recommended_items": working["recommended_items"],
+                "ranked_items": working.get("ranked_items", []),
+                "extras": working["extras"],
+            },
+        )
+
+    def _handle_outfit_compose(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        if self.base_engine is None:
+            raise ValueError("compose requires base_agent_config")
+        working = dict(context)
+        working["recommendation"] = node_config["inputs"].get(
+            "recommendation", working.get("recommendation")
+        )
+        working["ranked_items"] = node_config["inputs"].get(
+            "ranked_items", working.get("ranked_items")
+        )
+        return NodeExecutionResult(
+            outputs={"final_answer": self.base_engine._render(working)},
+            detail="final response rendered from output_template",
+            data={
+                "template_id": self.base_engine.config.get("agent_id"),
+                "workflow_id": self.workflow_config.get("workflow_id"),
+            },
+        )
+
+    # Presentation handlers ----------------------------------------------
+
+    def _handle_presentation_request_parser(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        topic = str(node_config["inputs"].get("user_message", context["query"]))
+        duration = self._extract_duration_minutes(topic, default=15)
+        outputs = {
+            "topic": topic,
+            "duration_minutes": duration,
+            "output_type": "presentation_outline",
+        }
+        return NodeExecutionResult(
+            outputs=outputs,
+            detail=f"topic extracted, duration={duration} minutes",
+            data=outputs,
+        )
+
+    def _handle_presentation_question(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        topic = node_config["inputs"].get("topic", context.get("topic"))
+        missing = ["topic"] if not topic else []
+        question = (
             self.workflow_config.get("question_agent", {})
             .get("clarification_questions", {})
             .get("topic", "Please provide the presentation topic.")
         )
-        context["executed_agents"].append("question")
-        trace.append(
-            self._runtime_trace(
-                "question",
-                "topic missing" if context["needs_clarification"] else "presentation context is complete",
-                {
-                    "missing_fields": context["missing_fields"],
-                    "needs_clarification": context["needs_clarification"],
-                },
-            )
+        outputs = {
+            "missing_fields": missing,
+            "needs_clarification": bool(missing),
+            "next_question_field": "topic" if missing else "",
+            "clarification_message": question if missing else "",
+        }
+        return NodeExecutionResult(
+            outputs=outputs,
+            detail="topic missing" if missing else "presentation context is complete",
+            data=outputs,
+            halt=bool(missing),
+            halt_reason="clarification" if missing else "",
         )
-        if context["needs_clarification"]:
-            return self._finalize(trace, context, answer=context["clarification_message"])
 
+    def _handle_topic_analysis(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
         knowledge = self._load_runtime_data()
-        matched_topics = self._match_knowledge_topics(query, knowledge)
-        context["matched_topics"] = [topic["title"] for topic in matched_topics]
-        context["planning_goal"] = "Build a defensible presentation outline from local knowledge notes."
-        context["executed_agents"].append("topic_analysis")
-        trace.append(
-            self._runtime_trace(
-                "topic_analysis",
-                "matched topics: " + ", ".join(context["matched_topics"]),
-                {
-                    "matched_topic_ids": [topic["id"] for topic in matched_topics],
-                    "planning_goal": context["planning_goal"],
-                },
-            )
+        topic = str(node_config["inputs"]["topic"])
+        matched_topics = self._match_knowledge_topics(topic, knowledge)
+        goal = "Build a defensible presentation outline from local knowledge notes."
+        return NodeExecutionResult(
+            outputs={"matched_topics": matched_topics, "planning_goal": goal},
+            detail="matched topics: " + ", ".join(self._topic_titles(matched_topics)),
+            data={
+                "matched_topic_ids": [topic["id"] for topic in matched_topics],
+                "planning_goal": goal,
+            },
         )
 
-        knowledge_points = []
-        slide_suggestions = []
+    def _handle_knowledge_lookup(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        knowledge_points: list[str] = []
+        slide_suggestions: list[str] = []
+        matched_topics = node_config["inputs"].get("matched_topics", [])
         for topic in matched_topics:
             knowledge_points.extend(topic.get("points", [])[:2])
             slide_suggestions.extend(topic.get("slide_suggestions", [])[:2])
-        context["knowledge_points"] = knowledge_points
-        context["slide_suggestions"] = slide_suggestions
-        context["executed_agents"].append("knowledge_lookup")
         context["executed_tools"].append("presentation_knowledge")
-        trace.append(
-            self._runtime_trace(
-                "knowledge_lookup",
-                f"loaded {len(knowledge_points)} knowledge points from local notes",
-                {
-                    "knowledge_points": knowledge_points,
-                    "slide_suggestions": slide_suggestions,
-                    "source": self.workflow_config.get("data_file"),
-                },
-            )
+        return NodeExecutionResult(
+            outputs={
+                "knowledge_points": knowledge_points,
+                "slide_suggestions": slide_suggestions,
+            },
+            detail=f"loaded {len(knowledge_points)} knowledge points from local notes",
+            data={
+                "knowledge_points": knowledge_points,
+                "slide_suggestions": slide_suggestions,
+                "source": self.workflow_config.get("data_file"),
+            },
         )
 
-        outline_sections = self._build_presentation_outline(context)
-        context["outline_sections"] = outline_sections
-        context["speaker_focus"] = [
+    def _handle_outline_generation(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        working = dict(context)
+        working["knowledge_points"] = node_config["inputs"].get("knowledge_points", [])
+        working["duration_minutes"] = node_config["inputs"].get(
+            "duration_minutes", working.get("duration_minutes", 15)
+        )
+        working["planning_goal"] = node_config["inputs"].get(
+            "planning_goal", working.get("planning_goal", "")
+        )
+        outline_sections = self._build_presentation_outline(working)
+        speaker_focus = [
             "Position the project as a workflow builder, not as a single recommendation feature.",
             "Use multiple domains to prove template portability.",
             "Show trace output as executable evidence.",
         ]
-        context["executed_agents"].append("outline_generation")
-        trace.append(
-            self._runtime_trace(
-                "outline_generation",
-                f"generated {len(outline_sections)} outline sections",
-                {
-                    "outline_sections": outline_sections,
-                    "speaker_focus": context["speaker_focus"],
-                },
-            )
+        return NodeExecutionResult(
+            outputs={"outline_sections": outline_sections, "speaker_focus": speaker_focus},
+            detail=f"generated {len(outline_sections)} outline sections",
+            data={"outline_sections": outline_sections, "speaker_focus": speaker_focus},
         )
 
-        answer = self._render_presentation_answer(context)
-        context["summary_cards"] = [
+    def _handle_presentation_compose(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        working = dict(context)
+        working["outline_sections"] = node_config["inputs"].get(
+            "outline_sections", working.get("outline_sections", [])
+        )
+        working["knowledge_points"] = node_config["inputs"].get(
+            "knowledge_points", working.get("knowledge_points", [])
+        )
+        working["speaker_focus"] = node_config["inputs"].get(
+            "speaker_focus", working.get("speaker_focus", [])
+        )
+        answer = self._render_presentation_answer(working)
+        summary_cards = [
             {
                 "title": "Presentation Topic",
                 "rows": [
-                    {"label": "Duration", "value": f"{context['duration_minutes']} minutes"},
-                    {"label": "Matched Topics", "value": ", ".join(context["matched_topics"])},
+                    {"label": "Duration", "value": f"{working['duration_minutes']} minutes"},
+                    {"label": "Matched Topics", "value": ", ".join(self._topic_titles(working.get("matched_topics", [])))},
                 ],
             },
             {
                 "title": "Knowledge Evidence",
                 "rows": [
-                    {"label": "Points", "value": str(len(context["knowledge_points"]))},
+                    {"label": "Points", "value": str(len(working["knowledge_points"]))},
                     {"label": "Trace", "value": "6 nodes executed"},
                 ],
             },
@@ -250,118 +490,117 @@ class MultiAgentWorkflowEngine:
                 "title": "Outline Result",
                 "rows": [
                     {"label": str(i + 1), "value": section}
-                    for i, section in enumerate(context["outline_sections"][:4])
+                    for i, section in enumerate(working["outline_sections"][:4])
                 ],
             },
         ]
-        context["executed_agents"].append("compose")
-        trace.append(
-            self._runtime_trace(
-                "compose",
-                "final presentation outline rendered",
-                {"summary_cards": context["summary_cards"]},
-            )
-        )
-        answer = self._maybe_run_local_llm_node(trace, context, answer)
-        return self._finalize(trace, context, answer=answer)
-
-    def _run_customer_support(self, query: str, user_id: str) -> WorkflowResult:
-        trace: list[TraceStep] = []
-        context: dict[str, Any] = {
-            "query": query,
-            "user_id": user_id,
-            "runtime_type": self.runtime_type,
-            "issue_text": query,
-            "executed_agents": [],
-            "executed_tools": [],
-        }
-
-        context["intent"] = self._detect_support_intent(query)
-        context["executed_agents"].append("request_parser")
-        trace.append(
-            self._runtime_trace(
-                "request_parser",
-                f"support intent={context['intent']}",
-                {"issue_text": context["issue_text"], "intent": context["intent"]},
-            )
+        return NodeExecutionResult(
+            outputs={"final_answer": answer, "summary_cards": summary_cards},
+            detail="final presentation outline rendered",
+            data={"summary_cards": summary_cards},
         )
 
-        context["missing_fields"] = [] if context["issue_text"] else ["issue_text"]
-        context["needs_clarification"] = bool(context["missing_fields"])
-        context["next_question_field"] = "issue_text" if context["needs_clarification"] else ""
-        context["clarification_message"] = (
+    # Customer support handlers ------------------------------------------
+
+    def _handle_support_request_parser(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        issue_text = str(node_config["inputs"].get("user_message", context["query"]))
+        intent = self._detect_support_intent(issue_text)
+        outputs = {"issue_text": issue_text, "intent": intent}
+        return NodeExecutionResult(
+            outputs=outputs,
+            detail=f"support intent={intent}",
+            data=outputs,
+        )
+
+    def _handle_support_question(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        issue_text = node_config["inputs"].get("issue_text", context.get("issue_text"))
+        missing = ["issue_text"] if not issue_text else []
+        question = (
             self.workflow_config.get("question_agent", {})
             .get("clarification_questions", {})
             .get("issue_text", "Please describe the customer issue.")
         )
-        context["executed_agents"].append("question")
-        trace.append(
-            self._runtime_trace(
-                "question",
-                "issue text missing" if context["needs_clarification"] else "ticket context is complete",
-                {
-                    "missing_fields": context["missing_fields"],
-                    "needs_clarification": context["needs_clarification"],
-                },
-            )
+        outputs = {
+            "missing_fields": missing,
+            "needs_clarification": bool(missing),
+            "next_question_field": "issue_text" if missing else "",
+            "clarification_message": question if missing else "",
+        }
+        return NodeExecutionResult(
+            outputs=outputs,
+            detail="issue text missing" if missing else "ticket context is complete",
+            data=outputs,
+            halt=bool(missing),
+            halt_reason="clarification" if missing else "",
         )
-        if context["needs_clarification"]:
-            return self._finalize(trace, context, answer=context["clarification_message"])
 
+    def _handle_ticket_classification(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
         policy_data = self._load_runtime_data()
-        category, matched_keywords = self._classify_support_ticket(query, policy_data)
-        context["ticket_category"] = category["label"]
-        context["ticket_category_id"] = category["id"]
-        context["matched_keywords"] = matched_keywords
-        context["priority_candidate"] = category["priority"]
-        context["executed_agents"].append("ticket_classification")
-        trace.append(
-            self._runtime_trace(
-                "ticket_classification",
-                f"category={context['ticket_category']}, matched={', '.join(matched_keywords) or 'default'}",
-                {
-                    "category": context["ticket_category"],
-                    "priority_candidate": context["priority_candidate"],
-                    "matched_keywords": matched_keywords,
-                },
-            )
+        issue_text = str(node_config["inputs"]["issue_text"])
+        category, matched_keywords = self._classify_support_ticket(issue_text, policy_data)
+        outputs = {
+            "ticket_category_record": category,
+            "ticket_category": category["label"],
+            "ticket_category_id": category["id"],
+            "matched_keywords": matched_keywords,
+            "priority_candidate": category["priority"],
+        }
+        return NodeExecutionResult(
+            outputs=outputs,
+            detail=f"category={category['label']}, matched={', '.join(matched_keywords) or 'default'}",
+            data={
+                "category": category["label"],
+                "priority_candidate": category["priority"],
+                "matched_keywords": matched_keywords,
+            },
         )
 
-        context["policy"] = category["policy"]
-        context["sla"] = category["sla"]
-        context["owner_team"] = category["owner_team"]
-        context["executed_agents"].append("policy_lookup")
+    def _handle_policy_lookup(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        category = node_config["inputs"].get("category", context["ticket_category_record"])
+        outputs = {
+            "policy": category["policy"],
+            "sla": category["sla"],
+            "owner_team": category["owner_team"],
+        }
         context["executed_tools"].append("support_policy")
-        trace.append(
-            self._runtime_trace(
-                "policy_lookup",
-                f"loaded policy for {context['ticket_category']}",
-                {
-                    "owner_team": context["owner_team"],
-                    "sla": context["sla"],
-                    "policy": context["policy"],
-                    "source": self.workflow_config.get("data_file"),
-                },
-            )
+        return NodeExecutionResult(
+            outputs=outputs,
+            detail=f"loaded policy for {category['label']}",
+            data={**outputs, "source": self.workflow_config.get("data_file")},
         )
 
-        context["priority"] = category["priority"]
-        context["next_actions"] = category["next_actions"]
-        context["executed_agents"].append("routing_decision")
-        trace.append(
-            self._runtime_trace(
-                "routing_decision",
-                f"route to {context['owner_team']} with priority {context['priority']}",
-                {
-                    "owner_team": context["owner_team"],
-                    "priority": context["priority"],
-                    "next_actions": context["next_actions"],
-                },
-            )
+    def _handle_routing_decision(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        category = node_config["inputs"].get("category", context["ticket_category_record"])
+        policy = node_config["inputs"].get("policy", context["policy"])
+        outputs = {
+            "priority": category["priority"],
+            "next_actions": category["next_actions"],
+        }
+        return NodeExecutionResult(
+            outputs=outputs,
+            detail=f"route to {context['owner_team']} with priority {outputs['priority']}",
+            data={"owner_team": context["owner_team"], "policy": policy, **outputs},
         )
 
-        answer = self._render_support_answer(context)
-        context["summary_cards"] = [
+    def _handle_support_compose(
+        self, context: dict[str, Any], node_config: dict[str, Any]
+    ) -> NodeExecutionResult:
+        working = dict(context)
+        for key in ("owner_team", "priority", "next_actions", "policy"):
+            if key in node_config["inputs"]:
+                working[key] = node_config["inputs"][key]
+        answer = self._render_support_answer(working)
+        summary_cards = [
             {
                 "title": "Ticket Classification",
                 "rows": [
@@ -385,70 +624,13 @@ class MultiAgentWorkflowEngine:
                 ],
             },
         ]
-        context["executed_agents"].append("compose")
-        trace.append(
-            self._runtime_trace(
-                "compose",
-                "support ticket response rendered",
-                {"summary_cards": context["summary_cards"]},
-            )
-        )
-        answer = self._maybe_run_local_llm_node(trace, context, answer)
-        return self._finalize(trace, context, answer=answer)
-
-    def _finalize(
-        self,
-        trace: list[TraceStep],
-        context: dict[str, Any],
-        answer: str,
-    ) -> WorkflowResult:
-        context["workflow_name"] = self.workflow_config["workflow_name"]
-        context["workflow_agents"] = self.workflow_config.get("agents", [])
-        context["workflow_execution"] = self.workflow_config.get("execution", {})
-        return WorkflowResult(
-            workflow_name=self.workflow_config["workflow_name"],
-            answer=answer,
-            trace=trace,
-            context=context,
+        return NodeExecutionResult(
+            outputs={"final_answer": answer, "summary_cards": summary_cards},
+            detail="support ticket response rendered",
+            data={"summary_cards": summary_cards},
         )
 
-    def _run_request_parser(self, query: str, user_id: str) -> dict[str, Any]:
-        context = self.base_engine._plan(query, user_id)
-        context["executed_agents"] = ["request_parser"]
-        context["executed_tools"] = []
-        return context
-
-    def _run_question_agent(self, context: dict[str, Any]) -> None:
-        question_config = self.workflow_config.get("question_agent", {})
-        purpose_keywords = list(DEFAULT_PURPOSE_KEYWORDS) + list(
-            question_config.get("purpose_keywords", [])
-        )
-        style_keywords = list(DEFAULT_STYLE_KEYWORDS) + list(
-            question_config.get("style_keywords", [])
-        )
-        clarification_message = question_config.get(
-            "clarification_message", DEFAULT_CLARIFICATION_MESSAGE
-        )
-
-        lower = context["query"].lower()
-        detected_purpose = [kw for kw in purpose_keywords if kw.lower() in lower]
-        detected_style = [kw for kw in style_keywords if kw.lower() in lower]
-        missing_fields = self._find_missing_context(lower, detected_purpose, detected_style)
-        needs_clarification = bool(missing_fields)
-        next_question_field = missing_fields[0] if missing_fields else ""
-        clarification_questions = {
-            **DEFAULT_CLARIFICATION_QUESTIONS,
-            **question_config.get("clarification_questions", {}),
-        }
-        next_question = clarification_questions.get(next_question_field, clarification_message)
-
-        context["detected_purpose"] = detected_purpose
-        context["detected_style"] = detected_style
-        context["missing_fields"] = missing_fields
-        context["next_question_field"] = next_question_field
-        context["needs_clarification"] = needs_clarification
-        context["clarification_message"] = next_question if needs_clarification else ""
-        context["executed_agents"].append("question")
+    # Shared helpers ------------------------------------------------------
 
     def _find_missing_context(
         self,
@@ -457,184 +639,13 @@ class MultiAgentWorkflowEngine:
         detected_style: list[str],
     ) -> list[str]:
         missing_fields = []
-        if not self._has_explicit_city(lower):
+        if not any(alias in lower for alias in CITY_ALIASES):
             missing_fields.append("city")
         if not any(keyword in lower for keyword in DATE_KEYWORDS):
             missing_fields.append("date")
         if not detected_purpose and not detected_style:
             missing_fields.append("purpose_or_style")
         return missing_fields
-
-    def _has_explicit_city(self, lower: str) -> bool:
-        return any(alias in lower for alias in CITY_ALIASES)
-
-    def _run_weather_agent(self, context: dict[str, Any]) -> None:
-        weather = self.base_engine.weather_tool.get_daily_weather(
-            context["city_query"],
-            context["day_offset"],
-        )
-        context["weather"] = weather
-        context["weather_summary"] = {
-            "date": weather.date,
-            "condition": weather.condition,
-            "temp_min": weather.temp_min,
-            "temp_max": weather.temp_max,
-            "precipitation_probability": weather.precipitation_probability,
-        }
-        context["executed_agents"].append("weather")
-        context["executed_tools"].append("weather")
-
-    def _run_shopping_analysis_agent(self, context: dict[str, Any]) -> None:
-        tools = self.base_engine.config.get("tools", {})
-        filename = tools.get("shopping_history", {}).get("file", "shopping_history.json")
-        records = self._load_json(self.data_dir / filename)
-        shopping_items = records.get(context["user_id"])
-        if shopping_items is None:
-            raise ValueError(f"unknown user_id: {context['user_id']}")
-
-        analysis = analyze_shopping_history(shopping_items)
-        context["shopping_history"] = shopping_items
-        context["shopping_history_summary"] = {
-            "records": len(shopping_items),
-            "source": filename,
-            "sample_items": [item.get("item") for item in shopping_items[:3]],
-        }
-        context["shopping_analysis"] = analysis
-        context["shopping_item_count"] = analysis["total_items"]
-        context["styles_text"] = ", ".join(analysis["top_styles"])
-        context["colors_text"] = ", ".join(analysis["top_colors"])
-        context["favorite_items_text"] = ", ".join(analysis["favorite_items"])
-        context["top_categories_text"] = ", ".join(analysis["top_categories"])
-        context["user_name"] = context["user_id"]
-        context["shopping_analysis_summary"] = {
-            "total_items": analysis["total_items"],
-            "top_styles": analysis["top_styles"],
-            "top_colors": analysis["top_colors"],
-            "top_categories": analysis["top_categories"],
-            "favorite_items": analysis["favorite_items"],
-        }
-        context["executed_agents"].append("shopping_analysis")
-        context["executed_tools"].append("shopping_history")
-
-    def _trace_request_parser(self, context: dict[str, Any]) -> TraceStep:
-        return TraceStep(
-            name="Request Parser Node",
-            detail=(
-                f"city={context['city_display']}, date={context['date_label']}, "
-                f"user={context['user_id']}"
-            ),
-            data={
-                "workflow": str(self.workflow_config_path),
-                "base_config": str(self.base_engine.config_path),
-                "intent": self.base_engine.config.get("intent"),
-                "matched_keywords": context["matched_keywords"],
-            },
-        )
-
-    def _trace_question(self, context: dict[str, Any]) -> TraceStep:
-        if context.get("needs_clarification"):
-            missing = ", ".join(context.get("missing_fields", []))
-            detail = f"missing={missing} → {context.get('next_question_field')} 질문"
-        else:
-            purpose = ", ".join(context.get("detected_purpose", [])) or "(없음)"
-            style = ", ".join(context.get("detected_style", [])) or "(없음)"
-            detail = f"purpose={purpose}, style={style} → 정보 충분"
-        return TraceStep(
-            name="Question Node",
-            detail=detail,
-            data={
-                "detected_purpose": context.get("detected_purpose", []),
-                "detected_style": context.get("detected_style", []),
-                "missing_fields": context.get("missing_fields", []),
-                "next_question_field": context.get("next_question_field", ""),
-                "needs_clarification": context.get("needs_clarification", False),
-                "clarification_message": context.get("clarification_message", ""),
-            },
-        )
-
-    def _trace_weather(self, context: dict[str, Any]) -> TraceStep:
-        return TraceStep(
-            name="Weather Tool Node",
-            detail=(
-                f"{context['city_display']} {context['date_label']} weather loaded: "
-                f"{context['weather_summary']['condition']}"
-            ),
-            data=context["weather_summary"],
-        )
-
-    def _trace_shopping(self, context: dict[str, Any]) -> TraceStep:
-        return TraceStep(
-            name="Shopping History Analysis Node",
-            detail=(
-                f"styles={context['styles_text']}, colors={context['colors_text']}, "
-                f"records={context['shopping_item_count']}"
-            ),
-            data=context["shopping_analysis_summary"],
-        )
-
-    def _trace_recommendation(self, context: dict[str, Any]) -> TraceStep:
-        return TraceStep(
-            name="Recommendation Node",
-            detail=f"rule={context['matched_rule_name']}, items={len(context['recommended_items'])}",
-            data={
-                "avg_temp": context["avg_temp"],
-                "recommended_items": context["recommended_items"],
-                "ranked_items": context.get("ranked_items", []),
-                "extras": context["extras"],
-            },
-        )
-
-    def _trace_compose(self, context: dict[str, Any]) -> TraceStep:
-        return TraceStep(
-            name="Compose Node",
-            detail="final response rendered from output_template",
-            data={
-                "template_id": self.base_engine.config.get("agent_id"),
-                "workflow_id": self.workflow_config.get("workflow_id"),
-            },
-        )
-
-    def _runtime_trace(self, node_id: str, detail: str, data: dict[str, Any]) -> TraceStep:
-        return TraceStep(name=self._node_name(node_id), detail=detail, data=data)
-
-    def _maybe_run_local_llm_node(
-        self,
-        trace: list[TraceStep],
-        context: dict[str, Any],
-        answer: str,
-    ) -> str:
-        if not self.local_llm_node.enabled:
-            return answer
-
-        context["workflow_name"] = self.workflow_config["workflow_name"]
-        result = self.local_llm_node.run(context)
-        context["local_llm"] = {
-            "provider": result.provider,
-            "model": result.model,
-            "metrics": result.metrics,
-        }
-        context["local_llm_prompt"] = result.prompt
-        context["executed_agents"].append("local_llm")
-        trace.append(
-            TraceStep(
-                name="Local LLM Node",
-                detail=f"{result.provider} provider executed with model={result.model}",
-                data=context["local_llm"],
-            )
-        )
-        return answer + "\n\n" + result.text
-
-    def _node_name(self, node_id: str) -> str:
-        for agent in self.workflow_config.get("agents", []):
-            if agent.get("id") == node_id:
-                return agent.get("name", node_id)
-        return node_id
-
-    def _load_runtime_data(self) -> dict[str, Any]:
-        data_file = self.workflow_config.get("data_file")
-        if not data_file:
-            raise ValueError(f"{self.runtime_type} workflow requires data_file")
-        return self._load_json(self.data_dir / data_file)
 
     def _extract_duration_minutes(self, query: str, default: int) -> int:
         for token in query.replace("-", " ").split():
@@ -644,6 +655,12 @@ class MultiAgentWorkflowEngine:
                 if 1 <= value <= 180:
                     return value
         return default
+
+    def _load_runtime_data(self) -> dict[str, Any]:
+        data_file = self.workflow_config.get("data_file")
+        if not data_file:
+            raise ValueError(f"{self.runtime_type} workflow requires data_file")
+        return self._load_json(self.data_dir / data_file)
 
     def _match_knowledge_topics(
         self,
@@ -664,8 +681,12 @@ class MultiAgentWorkflowEngine:
         defaults = [topic for topic in knowledge.get("topics", []) if topic.get("id") in default_ids]
         return defaults or list(knowledge.get("topics", []))[:2]
 
+    @staticmethod
+    def _topic_titles(topics: list[Any]) -> list[str]:
+        return [topic.get("title", "") if isinstance(topic, dict) else str(topic) for topic in topics]
+
     def _build_presentation_outline(self, context: dict[str, Any]) -> list[str]:
-        matched = ", ".join(context.get("matched_topics", []))
+        matched = ", ".join(self._topic_titles(context.get("matched_topics", [])))
         return [
             f"Opening: define the presentation topic and why {matched} matters.",
             "Problem: explain why a single-domain MVP is not enough to prove a builder.",
@@ -679,7 +700,7 @@ class MultiAgentWorkflowEngine:
             "[Presentation Planning Workflow]",
             f"Topic: {context['topic']}",
             f"Duration: {context['duration_minutes']} minutes",
-            "Matched knowledge: " + ", ".join(context.get("matched_topics", [])),
+            "Matched knowledge: " + ", ".join(self._topic_titles(context.get("matched_topics", []))),
             "",
             "Outline",
         ]
@@ -691,7 +712,8 @@ class MultiAgentWorkflowEngine:
         lines.append("Trace proof: this outline was produced by a 6-node generated workflow.")
         return "\n".join(lines)
 
-    def _detect_support_intent(self, query: str) -> str:
+    @staticmethod
+    def _detect_support_intent(query: str) -> str:
         lower = query.lower()
         if any(word in lower for word in ("refund", "return", "cancel", "money back")):
             return "refund_or_return"
@@ -701,8 +723,8 @@ class MultiAgentWorkflowEngine:
             return "account_access"
         return "technical_help"
 
+    @staticmethod
     def _classify_support_ticket(
-        self,
         query: str,
         policy_data: dict[str, Any],
     ) -> tuple[dict[str, Any], list[str]]:
@@ -724,7 +746,8 @@ class MultiAgentWorkflowEngine:
                 return category, []
         return policy_data["categories"][0], []
 
-    def _render_support_answer(self, context: dict[str, Any]) -> str:
+    @staticmethod
+    def _render_support_answer(context: dict[str, Any]) -> str:
         lines = [
             "[Customer Support Ticket Workflow]",
             f"Category: {context['ticket_category']}",
@@ -744,6 +767,44 @@ class MultiAgentWorkflowEngine:
             f"{context['owner_team']} for follow-up."
         )
         return "\n".join(lines)
+
+    def _maybe_run_local_llm_node(
+        self,
+        trace: list[TraceStep],
+        context: dict[str, Any],
+        answer: str,
+    ) -> str:
+        if not self.local_llm_node.enabled:
+            return answer
+
+        context["workflow_name"] = self.workflow_config["workflow_name"]
+        started_at = datetime.now(timezone.utc).isoformat()
+        started = perf_counter()
+        result = self.local_llm_node.run(context)
+        finished_at = datetime.now(timezone.utc).isoformat()
+        context["local_llm"] = {
+            "provider": result.provider,
+            "model": result.model,
+            "metrics": result.metrics,
+        }
+        context["local_llm_prompt"] = result.prompt
+        context["executed_agents"].append("local_llm")
+        trace.append(
+            TraceStep(
+                name="Local LLM Node",
+                detail=f"{result.provider} provider executed with model={result.model}",
+                data=context["local_llm"],
+                node_id="local_llm",
+                node_type="local_llm",
+                status="SUCCESS",
+                started_at=started_at,
+                finished_at=finished_at,
+                duration_ms=round((perf_counter() - started) * 1000, 3),
+                input={"workflow_name": self.workflow_config["workflow_name"]},
+                output={"provider": result.provider, "model": result.model},
+            )
+        )
+        return answer + "\n\n" + result.text
 
     def _load_json(self, path: Path) -> Any:
         with path.open("r", encoding="utf-8") as file:

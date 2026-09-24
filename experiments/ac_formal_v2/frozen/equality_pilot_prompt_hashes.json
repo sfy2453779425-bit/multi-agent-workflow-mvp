@@ -1,0 +1,25 @@
+{
+  "items": [
+    {
+      "case_id": "CS01",
+      "generation_input_hash_equal": "True",
+      "prompt_text_hash_equal": "True",
+      "c_prompt_text_hash": "887e8fe7ce259a566fcf5d2bda0e72be1ee52fa0ab8b922ef6e461130829b820",
+      "d_prompt_text_hash": "887e8fe7ce259a566fcf5d2bda0e72be1ee52fa0ab8b922ef6e461130829b820"
+    },
+    {
+      "case_id": "CS10",
+      "generation_input_hash_equal": "True",
+      "prompt_text_hash_equal": "True",
+      "c_prompt_text_hash": "7b9d9d2356834f2c93a30268010bcdb768b3f22f390a9d70fc14b4cfda123c66",
+      "d_prompt_text_hash": "7b9d9d2356834f2c93a30268010bcdb768b3f22f390a9d70fc14b4cfda123c66"
+    },
+    {
+      "case_id": "CS12",
+      "generation_input_hash_equal": "True",
+      "prompt_text_hash_equal": "True",
+      "c_prompt_text_hash": "906dcec5356d5d6807588b64ebd2aa138dd3a620c5294cab26bb90ef7df78123",
+      "d_prompt_text_hash": "906dcec5356d5d6807588b64ebd2aa138dd3a620c5294cab26bb90ef7df78123"
+    }
+  ]
+}

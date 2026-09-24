@@ -1,5 +1,5 @@
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -11,7 +11,16 @@ from weather_agent.tools import CITY_ALIASES, WeatherTool
 class TraceStep:
     name: str
     detail: str
-    data: dict[str, Any]
+    data: dict[str, Any] = field(default_factory=dict)
+    node_id: str = ""
+    node_type: str = ""
+    status: str = "SUCCESS"
+    started_at: str = ""
+    finished_at: str = ""
+    duration_ms: float = 0.0
+    input: dict[str, Any] = field(default_factory=dict)
+    output: dict[str, Any] = field(default_factory=dict)
+    error: str | None = None
 
 
 @dataclass(frozen=True)
@@ -197,14 +206,21 @@ class AgentBuilderEngine:
         context["matched_rule_name"] = rule.get("name", "default")
         context["recommendation"] = self._format(rule.get("recommendation", ""), context)
 
-        items = [self._format(item, context) for item in rule.get("items", [])]
+        constraints = self.config.get("recommendation_constraints", {})
+        inventory_only = bool(constraints.get("inventory_only", False))
+        items = [] if inventory_only else [
+            self._format(item, context) for item in rule.get("items", [])
+        ]
         owned_items = select_owned_items(
             context.get("shopping_history", []),
             avg_temp=avg_temp,
             precipitation_probability=weather.precipitation_probability,
             target_categories=rule.get("owned_item_categories", []),
+            rain_safe_precipitation_min=int(
+                constraints.get("rain_safe_precipitation_min", 40)
+            ),
         )
-        extras = self._match_extras(context)
+        extras = [] if inventory_only else self._match_extras(context)
         additional_items = items + [extra["item"] for extra in extras if extra.get("item")]
 
         # Owned items rank higher (user already has them, zero cost).

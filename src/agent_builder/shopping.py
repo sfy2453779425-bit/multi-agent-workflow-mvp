@@ -42,6 +42,7 @@ def select_owned_items(
     avg_temp: float,
     precipitation_probability: int,
     target_categories: list[str],
+    rain_safe_precipitation_min: int = 40,
 ) -> list[str]:
     warmth = _warmth_for_temp(avg_temp)
     selected: list[str] = []
@@ -54,6 +55,7 @@ def select_owned_items(
             warmth=warmth,
             precipitation_probability=precipitation_probability,
             used_ids=used_ids,
+            rain_safe_precipitation_min=rain_safe_precipitation_min,
         )
         if candidate:
             selected.append(candidate["item"])
@@ -78,6 +80,7 @@ def _best_item_for_category(
     warmth: str,
     precipitation_probability: int,
     used_ids: set[str],
+    rain_safe_precipitation_min: int,
 ) -> dict[str, Any] | None:
     candidates = [
         item
@@ -86,6 +89,12 @@ def _best_item_for_category(
     ]
     if not candidates:
         return None
+
+    if precipitation_probability >= rain_safe_precipitation_min:
+        rain_safe_candidates = [item for item in candidates if item.get("rain_ok") is True]
+        if not rain_safe_candidates:
+            return None
+        candidates = rain_safe_candidates
 
     def score(item: dict[str, Any]) -> tuple[int, str]:
         value = 0

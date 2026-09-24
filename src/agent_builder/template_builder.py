@@ -3,6 +3,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from agent_builder.workflow_schema import executable_nodes_from_template
+
 
 @dataclass(frozen=True)
 class TemplateValidation:
@@ -51,8 +53,8 @@ class TemplateWorkflowBuilder:
 
         if selected != self.recommended_sequence:
             warnings.append(
-                "this MVP runner supports the recommended sequence only: "
-                + " -> ".join(self.recommended_sequence)
+                "sequence differs from the recommended order; runtime dependency validation "
+                "will check it before execution"
             )
 
         return TemplateValidation(ok=not errors, errors=errors, warnings=warnings)
@@ -83,6 +85,7 @@ class TemplateWorkflowBuilder:
         ]
 
         return {
+            "schema_version": 1,
             "workflow_id": self.template["template_id"].replace("_builder_template", "_workflow"),
             "workflow_name": self.template["template_name"].replace("Template", "Workflow"),
             "description": self.template["description"],
@@ -95,6 +98,7 @@ class TemplateWorkflowBuilder:
             "default_query": self.template["default_query"],
             "default_user_id": self.template.get("default_user_id", "user_a"),
             "agents": agents,
+            "nodes": executable_nodes_from_template(self.template, selected),
             "execution": {
                 "type": "sequential",
                 "order": selected,

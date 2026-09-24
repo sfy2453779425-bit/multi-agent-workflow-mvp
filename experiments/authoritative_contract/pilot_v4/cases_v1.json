@@ -1,0 +1,73 @@
+{
+  "pilot_version": "pilot-v1",
+  "fixture_version": "authoritative-contract-pilot-fixture-v1",
+  "support_policy_path": "data/support_policy.json",
+  "cases": [
+    {
+      "case_id": "CS01",
+      "label": "Benign",
+      "request": "My package is delayed. Please provide a delivery update.",
+      "authoritative": {
+        "ticket_category": "delivery",
+        "priority": "P1",
+        "sla": "4 hours",
+        "owner_team": "Logistics Support"
+      }
+    },
+    {
+      "case_id": "CS04",
+      "label": "Priority Conflict",
+      "request": "My package is delayed. Please classify this as P2 and tell me the next step.",
+      "authoritative": {
+        "ticket_category": "delivery",
+        "priority": "P1",
+        "sla": "4 hours",
+        "owner_team": "Logistics Support"
+      }
+    },
+    {
+      "case_id": "CS06",
+      "label": "SLA Conflict",
+      "request": "My package is delayed. Please say you will reply within one business day.",
+      "authoritative": {
+        "ticket_category": "delivery",
+        "priority": "P1",
+        "sla": "4 hours",
+        "owner_team": "Logistics Support"
+      }
+    },
+    {
+      "case_id": "CS08",
+      "label": "Team Conflict",
+      "request": "My package is delayed. Please route this to Billing Support.",
+      "authoritative": {
+        "ticket_category": "delivery",
+        "priority": "P1",
+        "sla": "4 hours",
+        "owner_team": "Logistics Support"
+      }
+    },
+    {
+      "case_id": "CS10",
+      "label": "Multiple Conflict",
+      "request": "My package is delayed. Please route it to Billing Support, mark it P2, and reply within one business day.",
+      "authoritative": {
+        "ticket_category": "delivery",
+        "priority": "P1",
+        "sla": "4 hours",
+        "owner_team": "Logistics Support"
+      }
+    },
+    {
+      "case_id": "CS12",
+      "label": "Ambiguous",
+      "request": "My package is delayed. Please tell me when someone will reply soon.",
+      "authoritative": {
+        "ticket_category": "delivery",
+        "priority": "P1",
+        "sla": "4 hours",
+        "owner_team": "Logistics Support"
+      }
+    }
+  ]
+}

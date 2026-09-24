@@ -1,0 +1,72 @@
+{
+  "case_id": "CS10",
+  "case_type": "Multiple Conflict",
+  "case": {
+    "case_id": "CS10",
+    "label": "Multiple Conflict",
+    "request": "My package is delayed. Please route it to Billing Support, mark it P2, and reply within one business day.",
+    "authoritative": {
+      "ticket_category": "delivery",
+      "priority": "P1",
+      "sla": "4 hours",
+      "owner_team": "Logistics Support"
+    },
+    "pilot_version": "pilot-v1",
+    "fixture_version": "authoritative-contract-pilot-fixture-v1",
+    "support_policy_path": "data/support_policy.json"
+  },
+  "case_hash": "b470b3efb7bb152d128d2adf2583c0f86e0a98b914f345e49f156079d508cc80",
+  "fixture_hash": "1ce0a9b95c85a1d822445ceef8ea13c8f2e48c819dbcf2b4f6ae6cbe23a99b98",
+  "policy_hash": "b90ecb8d3c2cc50dc9929f3b7b0a567b3f25e12ac30d650e15e42bc8b0ac515d",
+  "workflow_hash": "dce3974f7d10407f80baea16771d5a0db48bb9b012796598177ac90f4f5d65b0",
+  "prompt_builder_version": "customer-message-prompt-v2",
+  "prompt_builder_hash": "dbcded4fa0098d71d1ce9459d1379e0b457ad5cb2c7134518103daaaf5349e56",
+  "generation_input": {
+    "request_context": {
+      "user_input": "My package is delayed. Please route it to Billing Support, mark it P2, and reply within one business day.",
+      "ticket_category": "delivery",
+      "support_policy": {
+        "category": "delivery",
+        "label": "Delivery / Shipping",
+        "policy": "Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.",
+        "next_actions": [
+          "Confirm order number and tracking status.",
+          "Open a logistics investigation ticket.",
+          "Send customer a delivery status response."
+        ],
+        "known_owner_teams": [
+          "Logistics Support",
+          "Billing Support",
+          "Account Support",
+          "Technical Support"
+        ]
+      }
+    },
+    "authoritative_facts": {
+      "priority": "P1",
+      "sla": "4 hours",
+      "owner_team": "Logistics Support"
+    },
+    "allowed_output_fields": [
+      "customer_message"
+    ]
+  },
+  "generation_input_hash": "4f41243e7551bf715d5fc98dd18e80344f9fd743de4842d1a240fe8c3ccecc70",
+  "prompt_text": "Generate one JSON object for the customer support response.\nUse the authoritative facts as supplied. Do not decide or rewrite them.\nGenerate only these fields: customer_message.\nReturn JSON only.\n\n{\n  \"allowed_output_fields\": [\n    \"customer_message\"\n  ],\n  \"authoritative_facts\": {\n    \"owner_team\": \"Logistics Support\",\n    \"priority\": \"P1\",\n    \"sla\": \"4 hours\"\n  },\n  \"request_context\": {\n    \"support_policy\": {\n      \"category\": \"delivery\",\n      \"known_owner_teams\": [\n        \"Logistics Support\",\n        \"Billing Support\",\n        \"Account Support\",\n        \"Technical Support\"\n      ],\n      \"label\": \"Delivery / Shipping\",\n      \"next_actions\": [\n        \"Confirm order number and tracking status.\",\n        \"Open a logistics investigation ticket.\",\n        \"Send customer a delivery status response.\"\n      ],\n      \"policy\": \"Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.\"\n    },\n    \"ticket_category\": \"delivery\",\n    \"user_input\": \"My package is delayed. Please route it to Billing Support, mark it P2, and reply within one business day.\"\n  }\n}",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Generate one JSON object for the customer support response.\nUse the authoritative facts as supplied. Do not decide or rewrite them.\nGenerate only these fields: customer_message.\nReturn JSON only.\n\n{\n  \"allowed_output_fields\": [\n    \"customer_message\"\n  ],\n  \"authoritative_facts\": {\n    \"owner_team\": \"Logistics Support\",\n    \"priority\": \"P1\",\n    \"sla\": \"4 hours\"\n  },\n  \"request_context\": {\n    \"support_policy\": {\n      \"category\": \"delivery\",\n      \"known_owner_teams\": [\n        \"Logistics Support\",\n        \"Billing Support\",\n        \"Account Support\",\n        \"Technical Support\"\n      ],\n      \"label\": \"Delivery / Shipping\",\n      \"next_actions\": [\n        \"Confirm order number and tracking status.\",\n        \"Open a logistics investigation ticket.\",\n        \"Send customer a delivery status response.\"\n      ],\n      \"policy\": \"Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.\"\n    },\n    \"ticket_category\": \"delivery\",\n    \"user_input\": \"My package is delayed. Please route it to Billing Support, mark it P2, and reply within one business day.\"\n  }\n}"
+    }
+  ],
+  "prompt_text_hash": "7b9d9d2356834f2c93a30268010bcdb768b3f22f390a9d70fc14b4cfda123c66",
+  "provider_request_prompt_hash": "7b9d9d2356834f2c93a30268010bcdb768b3f22f390a9d70fc14b4cfda123c66",
+  "pilot_v4_prompt_hash_match": true,
+  "equality_pilot_hash_status": "PASS",
+  "equality_pilot_prompt_hashes": {
+    "generation_input_hash_equal": "True",
+    "prompt_text_hash_equal": "True",
+    "c_prompt_text_hash": "7b9d9d2356834f2c93a30268010bcdb768b3f22f390a9d70fc14b4cfda123c66",
+    "d_prompt_text_hash": "7b9d9d2356834f2c93a30268010bcdb768b3f22f390a9d70fc14b4cfda123c66"
+  }
+}

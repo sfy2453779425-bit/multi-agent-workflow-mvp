@@ -1,0 +1,239 @@
+{
+  "prompt_version": "authoritative-contract-pilot-prompt-v2",
+  "items": [
+    {
+      "case_id": "CS01",
+      "condition": "A_direct_llm",
+      "run_id": 1,
+      "path": "prompts\\A_direct_llm\\CS01_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "92225c86650b246f9311d5721fb02554d5f12519d09c34349ca99657a06c6368",
+      "grounding_hash": "NOT_APPLICABLE",
+      "allowed_output_fields": [
+        "priority",
+        "sla",
+        "owner_team",
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS01",
+      "condition": "C_prompt_only_hybrid",
+      "run_id": 1,
+      "path": "prompts\\C_prompt_only_hybrid\\CS01_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "887e8fe7ce259a566fcf5d2bda0e72be1ee52fa0ab8b922ef6e461130829b820",
+      "grounding_hash": "5744d8390ea1d51bf58bf2919f98fe44bcca68d66fa825c7de20f2452ba1be04",
+      "allowed_output_fields": [
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS01",
+      "condition": "D_proposed_runtime",
+      "run_id": 1,
+      "path": "prompts\\D_proposed_runtime\\CS01_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "887e8fe7ce259a566fcf5d2bda0e72be1ee52fa0ab8b922ef6e461130829b820",
+      "grounding_hash": "5744d8390ea1d51bf58bf2919f98fe44bcca68d66fa825c7de20f2452ba1be04",
+      "allowed_output_fields": [
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS04",
+      "condition": "A_direct_llm",
+      "run_id": 1,
+      "path": "prompts\\A_direct_llm\\CS04_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "6c0134e785a8b68e0a67a6c693818a0c08a1ca2c7157a860e76bf3180d27458d",
+      "grounding_hash": "NOT_APPLICABLE",
+      "allowed_output_fields": [
+        "priority",
+        "sla",
+        "owner_team",
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS04",
+      "condition": "C_prompt_only_hybrid",
+      "run_id": 1,
+      "path": "prompts\\C_prompt_only_hybrid\\CS04_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "496106832b2ac4edc7417a57583503807e2837d98963b8806a7598d2e4802032",
+      "grounding_hash": "5744d8390ea1d51bf58bf2919f98fe44bcca68d66fa825c7de20f2452ba1be04",
+      "allowed_output_fields": [
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS04",
+      "condition": "D_proposed_runtime",
+      "run_id": 1,
+      "path": "prompts\\D_proposed_runtime\\CS04_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "496106832b2ac4edc7417a57583503807e2837d98963b8806a7598d2e4802032",
+      "grounding_hash": "5744d8390ea1d51bf58bf2919f98fe44bcca68d66fa825c7de20f2452ba1be04",
+      "allowed_output_fields": [
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS06",
+      "condition": "A_direct_llm",
+      "run_id": 1,
+      "path": "prompts\\A_direct_llm\\CS06_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "773c72c4a6ab32a98f196692f981417c195e6eae3299e3cb8a0240a5f48e8cce",
+      "grounding_hash": "NOT_APPLICABLE",
+      "allowed_output_fields": [
+        "priority",
+        "sla",
+        "owner_team",
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS06",
+      "condition": "C_prompt_only_hybrid",
+      "run_id": 1,
+      "path": "prompts\\C_prompt_only_hybrid\\CS06_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "3e819265c05aa8edb4e35682b3a6f901060cf361e67c7cc99934b1a437018882",
+      "grounding_hash": "5744d8390ea1d51bf58bf2919f98fe44bcca68d66fa825c7de20f2452ba1be04",
+      "allowed_output_fields": [
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS06",
+      "condition": "D_proposed_runtime",
+      "run_id": 1,
+      "path": "prompts\\D_proposed_runtime\\CS06_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "3e819265c05aa8edb4e35682b3a6f901060cf361e67c7cc99934b1a437018882",
+      "grounding_hash": "5744d8390ea1d51bf58bf2919f98fe44bcca68d66fa825c7de20f2452ba1be04",
+      "allowed_output_fields": [
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS08",
+      "condition": "A_direct_llm",
+      "run_id": 1,
+      "path": "prompts\\A_direct_llm\\CS08_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "7786aedd411a0301fbde0b3e64d223c9f56200526bda8c32c71c98ed9d16fc9c",
+      "grounding_hash": "NOT_APPLICABLE",
+      "allowed_output_fields": [
+        "priority",
+        "sla",
+        "owner_team",
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS08",
+      "condition": "C_prompt_only_hybrid",
+      "run_id": 1,
+      "path": "prompts\\C_prompt_only_hybrid\\CS08_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "17872ca531843634331485e8aeaa351d594899b9fe0762406264deeb4f588687",
+      "grounding_hash": "5744d8390ea1d51bf58bf2919f98fe44bcca68d66fa825c7de20f2452ba1be04",
+      "allowed_output_fields": [
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS08",
+      "condition": "D_proposed_runtime",
+      "run_id": 1,
+      "path": "prompts\\D_proposed_runtime\\CS08_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "17872ca531843634331485e8aeaa351d594899b9fe0762406264deeb4f588687",
+      "grounding_hash": "5744d8390ea1d51bf58bf2919f98fe44bcca68d66fa825c7de20f2452ba1be04",
+      "allowed_output_fields": [
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS10",
+      "condition": "A_direct_llm",
+      "run_id": 1,
+      "path": "prompts\\A_direct_llm\\CS10_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "a6aea555862527fd55a6fca53898824b857d1df59dcdfbd65f75098d279764ca",
+      "grounding_hash": "NOT_APPLICABLE",
+      "allowed_output_fields": [
+        "priority",
+        "sla",
+        "owner_team",
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS10",
+      "condition": "C_prompt_only_hybrid",
+      "run_id": 1,
+      "path": "prompts\\C_prompt_only_hybrid\\CS10_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "7b9d9d2356834f2c93a30268010bcdb768b3f22f390a9d70fc14b4cfda123c66",
+      "grounding_hash": "5744d8390ea1d51bf58bf2919f98fe44bcca68d66fa825c7de20f2452ba1be04",
+      "allowed_output_fields": [
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS10",
+      "condition": "D_proposed_runtime",
+      "run_id": 1,
+      "path": "prompts\\D_proposed_runtime\\CS10_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "7b9d9d2356834f2c93a30268010bcdb768b3f22f390a9d70fc14b4cfda123c66",
+      "grounding_hash": "5744d8390ea1d51bf58bf2919f98fe44bcca68d66fa825c7de20f2452ba1be04",
+      "allowed_output_fields": [
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS12",
+      "condition": "A_direct_llm",
+      "run_id": 1,
+      "path": "prompts\\A_direct_llm\\CS12_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "6eebb2e1b8e03c60dc55c27d0dd5b4d5817684517e8d9abbb5f1d672cd312f56",
+      "grounding_hash": "NOT_APPLICABLE",
+      "allowed_output_fields": [
+        "priority",
+        "sla",
+        "owner_team",
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS12",
+      "condition": "C_prompt_only_hybrid",
+      "run_id": 1,
+      "path": "prompts\\C_prompt_only_hybrid\\CS12_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "906dcec5356d5d6807588b64ebd2aa138dd3a620c5294cab26bb90ef7df78123",
+      "grounding_hash": "5744d8390ea1d51bf58bf2919f98fe44bcca68d66fa825c7de20f2452ba1be04",
+      "allowed_output_fields": [
+        "customer_message"
+      ]
+    },
+    {
+      "case_id": "CS12",
+      "condition": "D_proposed_runtime",
+      "run_id": 1,
+      "path": "prompts\\D_proposed_runtime\\CS12_run_1.txt",
+      "prompt_version": "authoritative-contract-pilot-prompt-v2",
+      "prompt_hash": "906dcec5356d5d6807588b64ebd2aa138dd3a620c5294cab26bb90ef7df78123",
+      "grounding_hash": "5744d8390ea1d51bf58bf2919f98fe44bcca68d66fa825c7de20f2452ba1be04",
+      "allowed_output_fields": [
+        "customer_message"
+      ]
+    }
+  ]
+}
