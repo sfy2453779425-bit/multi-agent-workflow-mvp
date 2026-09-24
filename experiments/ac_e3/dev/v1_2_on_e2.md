@@ -7,7 +7,7 @@
 - 输入：E2 的 54 条原始回答（6 个冻结 Case × 3 个模型 × 3 次运行）。逐条检查了原文；没有修改原始回答、Prompt、Fixture、Policy 或 Case。
 - 重放：使用现有 `parse_candidate` 和 `experiments/ac_e3/replay_candidates.py`，分别选择 v1.1 / v1.2。
 - v1.1：54/54 行的决定与最终输出均通过脚本校验；默认输出文件重新生成后 SHA-256 仍为 `7837CA8F87D679850B0B2187220D978A48E4C75BC3F204FAB14CBE4066470A84`，`git diff` 为空，逐字节一致。
-- v1.2：54/54 行解析成功，按默认路径覆盖 `e2_v1_2_replay.jsonl`。没有创建 `_rework` 副本；66a0e90 中的旧文件仍保留在 Git 历史。与该旧版本相比，12 条 DeepSeek fallback 的最终文本变化（新版应用了过滤后的 next actions 和新标题）；candidate 与 ACCEPT/REJECT 决定均未变化。
+- v1.2：54/54 行解析成功，按默认路径覆盖 `e2_v1_2_replay.jsonl`。没有创建 `_rework` 副本；66a0e90 中的旧文件仍保留在 Git 历史。最终 JSONL 与 `f556899` 的上一版 v1.2 逐字节一致，决定、fallback 和字段状态均无变化。开发中曾发现配送语境把明确标注的 `4-hour SLA` 误归为其他过程时长；通过新增显式 SLA 标签回归测试并修复后，E2 行为恢复为与上一版一致。相对 66a0e90 的旧版 v1.2，12 条 DeepSeek fallback 文本仍体现已过滤的 next actions 和新标题。
 - 未读取 `experiments/ac_formal_v2_eval/`。
 
 ## 按模型的决定数
@@ -28,7 +28,7 @@ v1.2 的 12 条拒绝全部是 `non_reply_echo`：
 
 - Claude 的 9 条拒绝式/对比式回答改为 ACCEPT：CS04 run 1–2、CS06 run 1–2、CS08 run 1–3、CS10 run 1–2。
 - DeepSeek 的 CS01 run 1–2 和 CS12 run 1 从 ACCEPT 改为 REJECT，因为回答规范化后与客户输入相同或为其至少 20 个字符的子串。
-- 其余 42 条决定不变。与本轮预期相比：无不符条目。
+- 其余 42 条决定不变。相对 `f556899` 上一版 v1.2，本轮没有 E2 决定变化。与本轮预期相比：无不符条目。
 
 逐条核对中，E2 没有提供真正把错误优先级、时限或团队作为事实承诺的回答；其他 42 条通过，不能作为“未见错值冲突也能拦截”的证据。E2 因而无法验证冲突检测的漏检率，也不能替代独立合成测试。
 
@@ -38,10 +38,12 @@ v1.2 的 12 条拒绝全部是 `non_reply_echo`：
 
 | 版本 | 必须拒绝样例 | 拦截 | 漏检 | 必须放行样例 | 误拒 | 放行 |
 |---|---:|---:|---:|---:|---:|---:|
-| v1.1 | 53 | 36 | 17 | 34 | 19 | 15 |
-| v1.2 | 53 | 53 | 0 | 34 | 0 | 34 |
+| v1.1 | 72 | 45 | 27 | 60 | 30 | 30 |
+| v1.2 | 72 | 72 | 0 | 60 | 0 | 60 |
 
-53 条必须拒绝样例覆盖 priority、SLA、owner team，超过一半不含 `marked`、`reply` 或 `assigned` 等既有提示词。34 条必须放行样例覆盖值后否定、并列否定、对比、客户/留言复述、客户原文引用、合法团队别称、配送/到账时长、过去时长、未知团队的局部分派检测，以及分句边界。合成样例不复用 E2 回答。
+72 条必须拒绝样例覆盖 priority、SLA、owner team，包含 14 条“先复述、后同意/照办”和 5 条金融相关回复时限。原有 53 条样例仍有超过一半不含 `marked`、`reply` 或 `assigned` 等旧提示词。60 条必须放行样例覆盖原有否定、并列否定、对比、复述/引用、团队别称和一般过程时长，并新增：5 条否定的后续动作、5 条同分句权威值重申、5 条不同对象动作、5 条退款/银行入账时长、恢复的 “A one-day reply is not the promised interval.”，以及 5 条在配送/运输语境中明确标注 SLA 的时长。合成样例不复用 E2 回答，除两条为恢复的既有回归句外，其余第三轮措辞均为新写。
+
+第三轮恢复并验证了 “The customer's message asked for P2, and that level was approved.”（必须拒绝）及 “A one-day reply is not the promised interval.”（必须放行）。两条均通过，没有标记为 `expectedFailure` 的样例。
 
 ## 66a0e90 中原有 15 项 v1.2 测试的调整
 
@@ -63,12 +65,14 @@ v1.2 的 12 条拒绝全部是 `non_reply_echo`：
 | `test_assertion_rejection_has_field_value_sentence_and_trace_code` | 更换冲突句子 | 保留字段、值、权威值、触发句和 trace 检查 |
 | `test_fallback_includes_policy_actions_and_passes_v12` | 改为要求至少一条安全 action、新标题、自检通过及 fallback 可再次通过；冲突 action 的过滤另测 | 不再假设所有类别 action 都能安全拼入 fallback |
 
-另新增 10 项测试方法，覆盖 53/34 条合成语料、部分照抄、引文来源验证、未知团队局部分派、fallback action 过滤/回退自检，以及 v1.2 trace/context 版本字段。`tests/test_authoritative_contract.py` 已随测试专用提交一并纳入，因为 v1.2 测试导入其中的 runtime/policy helpers。
+另新增 10 项测试方法，覆盖上一轮的 53/34 条合成语料、部分照抄、引文来源验证、未知团队局部分派、fallback action 过滤/回退自检，以及 v1.2 trace/context 版本字段。`tests/test_authoritative_contract.py` 已随测试专用提交一并纳入，因为 v1.2 测试导入其中的 runtime/policy helpers。
+
+第三轮测试专用提交 `989a115` 增加 124 行、7 个测试方法；后续测试专用提交 `6e7a3a7` 再追加 19 行、1 个测试方法。两个测试提交之后都没有修改或删除任何测试。新增方法覆盖两条恢复的原样例、请求后照办、否定动作、重申权威值、不同对象动作、退款/银行过程时长、仍然属于回复时限的金融相关句子，以及配送/运输语境中的明确 SLA 标签。当前没有 `expectedFailure` 样例；本轮没有修改或删除的测试，因此无原句/新句替换项。
 
 ## 测试与工作树记录
 
-- 本机完整发现：213 项通过，0 failures / 0 errors / 0 skipped（188 项既有测试 + 当前 25 项 v1.2 测试）。
-- 干净 checkout（detached Git worktree）：109 项通过，0 failures / 0 errors / 0 skipped。其余 104 项来自本机存在、但未纳入分支的 9 个测试文件，因此干净 checkout 不会发现它们。
+- 本机完整发现：221 项通过，0 failures / 0 errors / 0 skipped（188 项既有测试 + 当前 33 项 v1.2 测试）。
+- 干净 checkout（detached Git worktree）：117 项通过，0 failures / 0 errors / 0 skipped。其余 104 项来自本机存在、但未纳入分支的 9 个测试文件，因此干净 checkout 不会发现它们。
 - 仍未提交的测试文件：
   - `tests/test_authoritative_contract_experiment.py`
   - `tests/test_authoritative_contract_pilot.py`

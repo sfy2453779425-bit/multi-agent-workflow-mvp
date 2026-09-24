@@ -243,7 +243,11 @@ _ATTRIBUTION_RE = re.compile(
     r"(?:the\s+)?client(?:['’]s)?(?:\s+(?:message|note|email|comment))?|"
     r"(?:the\s+)?user(?:['’]s)?(?:\s+(?:message|note|email|comment))?)\s+"
     r"(?:ask(?:ed|s)?|request(?:ed|s|ing)|mention(?:ed|s)?|said|says|want(?:ed|s)?|"
+    r"seek(?:s|ing)?|sought|"
     r"would\s+like|(?:['’]d|would)\s+like)\b|"
+    r"\bthe\s+(?:message|note|email|comment)\s+"
+    r"(?:ask(?:ed|s)?|request(?:ed|s|ing)|mention(?:ed|s)?|want(?:ed|s)?|"
+    r"seek(?:s|ing)?|sought|would\s+like)\b|"
     r"\b(?:your|the\s+customer's|the\s+customer’s|the\s+client's|the\s+client’s)\s+request\s+for\b",
     re.IGNORECASE,
 )
@@ -264,9 +268,41 @@ _NEGATION_AFTER_RE = re.compile(
     r"didn't|didn’t)\b",
     re.IGNORECASE,
 )
-_AGREEMENT_RE = re.compile(
-    r"\b(?:approved|approval|granted|accepted|acceptance|authorized|authorised|"
-    r"confirmed|done|implemented|as\s+requested|as\s+you\s+asked|per\s+your\s+request)\b",
+_NEGATION_AFTER_NOMINAL_RE = re.compile(
+    r"^\s+(?:(?:the|a|an|our|your|their|promised)\s+)?"
+    r"(?:reply|response|answer|turnaround|interval|window|timeframe|target|commitment)\s+"
+    r"(?:(?:is|are|was|were|has|have|had|will|would|should|could|can|do|does|did)\s+)?"
+    r"(?:not(?!\s+only)|never|isn't|isn’t|aren't|aren’t|wasn't|wasn’t|weren't|weren’t|"
+    r"hasn't|hasn’t|haven't|haven’t|hadn't|hadn’t|won't|won’t|wouldn't|wouldn’t|"
+    r"shouldn't|shouldn’t|couldn't|couldn’t|can't|can’t|don't|don’t|doesn't|doesn’t|"
+    r"didn't|didn’t)\b",
+    re.IGNORECASE,
+)
+_FOLLOW_THROUGH_RE = re.compile(
+    r"\b(?:approv(?:e|ed|es|ing|al)|grant(?:ed|s|ing)?|accept(?:ed|s|ing|ance)?|"
+    r"authori[sz](?:e|ed|es|ing|ation)|confirm(?:ed|s|ing|ation)?|done|"
+    r"implement(?:ed|s|ing|ation)?|updat(?:e|ed|es|ing)|chang(?:e|ed|es|ing)|"
+    r"switch(?:ed|es|ing)|modif(?:y|ied|ies|ying)|select(?:ed|s|ing)|set|"
+    r"guarantee(?:d|s|ing)?|promise(?:d|s|ing)?|own(?:s|ed|ing)?|responsible|"
+    r"appl(?:y|ies|ied|ying)|effective|in\s+(?:place|effect|force)|"
+    r"assign(?:ed|s|ing)?|rout(?:e|ed|es|ing)|forward(?:ed|s|ing)?|"
+    r"transfer(?:red|s|ring)?|move(?:d|s|ing)?|escalat(?:e|ed|es|ing)|"
+    r"pass(?:ed|es|ing)|sort(?:ed|s|ing)|taken\s+care\s+of|handle(?:d|s|ing)?|"
+    r"process(?:ed|es|ing)?|fulfill(?:ed|s|ing|ment)?|complete(?:d|s|ing)|"
+    r"add(?:ed|s|ing)?|make\s+(?:(?:the|that|this|a)\s+)?change|"
+    r"as\s+requested|as\s+you\s+asked|per\s+your\s+request)\b",
+    re.IGNORECASE,
+)
+_FOLLOW_THROUGH_OTHER_OBJECT_RE = re.compile(
+    r"\b(?:comment|annotation|attachment|invoice|spreadsheet|document|image|"
+    r"photo(?:graph)?s?|picture|receipt|brochure|summary)\b",
+    re.IGNORECASE,
+)
+_TEAM_FOLLOW_THROUGH_RE = re.compile(
+    r"\b(?:assign(?:ed|s|ing)?|rout(?:e|ed|es|ing)|forward(?:ed|s|ing)?|"
+    r"transfer(?:red|s|ring)?|move(?:d|s|ing)?|escalat(?:e|ed|es|ing)|"
+    r"pass(?:ed|es|ing)|send(?:s|ing)?|sent|direct(?:ed|s|ing)?|refer(?:red|s|ring)?|"
+    r"own(?:s|ed|ing)?|responsible|handle(?:d|s|ing)?)\b",
     re.IGNORECASE,
 )
 _TEAM_ASSIGNMENT_RE = re.compile(
@@ -279,13 +315,18 @@ _TEAM_ASSIGNMENT_RE = re.compile(
 _SLA_NONCOMMITMENT_RE = re.compile(
     r"\b(?:ago|since|for\s+the\s+past|over\s+the\s+last|during\s+the\s+last|"
     r"delivery|deliveries|delivered|arrival|arrivals|arrived|transit|parcels?|packages?|"
-    r"shipments?|shipping|carriers?|settlement|settled|deposits?|credited|credits?|payments?)\b",
+    r"shipments?|shipping|carriers?|settlement|settled|deposits?|credited|credits?|payments?|"
+    r"refunds?|reimburs(?:e|ed|es|ing|ement|ements)|banks?|banking|payouts?|"
+    r"disbursements?|remittances?|reversals?)\b",
     re.IGNORECASE,
 )
-_SLA_SERVICE_WORK_RE = re.compile(
-    r"\b(?:reply|respond|response|hear\s+from|get\s+back|follow\s*up|"
-    r"investigation|investigate|review|resolve|resolution|case|ticket|support|"
-    r"process|processing|complete|completion|handle|handling|work)\b",
+_SLA_RESPONSE_WORK_RE = re.compile(
+    r"\b(?:reply|repl(?:y|ies)|respond|response|answer|hear\s+from|get\s+back|"
+    r"follow\s*up|status\s+update|send\s+(?:you\s+)?(?:an?\s+)?update)\b",
+    re.IGNORECASE,
+)
+_SLA_EXPLICIT_LABEL_RE = re.compile(
+    r"\b(?:sla|service[- ]level(?:\s+(?:target|agreement|commitment))?)\b",
     re.IGNORECASE,
 )
 
@@ -411,7 +452,8 @@ def _is_negated_list_member(
 def _negation_follows_value(sentence: str, claim_end: int) -> bool:
     clause, clause_start = _clause_for_offset(sentence, claim_end)
     tail_start = max(0, claim_end - clause_start)
-    return bool(_NEGATION_AFTER_RE.match(clause[tail_start:]))
+    tail = clause[tail_start:]
+    return bool(_NEGATION_AFTER_RE.match(tail) or _NEGATION_AFTER_NOMINAL_RE.match(tail))
 
 
 def _contrast_exempts_value(clause: str, local_start: int) -> bool:
@@ -450,13 +492,27 @@ def _unknown_team_has_local_route(sentence: str, claim_start: int, claim_end: in
     return bool(_TEAM_ASSIGNMENT_RE.search(sentence[start:end]))
 
 
-def _duration_describes_other_process(sentence: str, claim_start: int) -> bool:
-    local, _local_start = _clause_for_offset(sentence, claim_start)
+def _duration_describes_other_process(
+    sentence: str, claim_start: int, claim_end: int
+) -> bool:
+    local, clause_start = _clause_for_offset(sentence, claim_start)
+    if _SLA_RESPONSE_WORK_RE.search(local):
+        return False
+    local_start = claim_start - clause_start
+    local_end = claim_end - clause_start
+    for label in _SLA_EXPLICIT_LABEL_RE.finditer(local):
+        gap = (
+            local[label.end():local_start]
+            if label.end() <= local_start
+            else local[local_end:label.start()]
+            if local_end <= label.start()
+            else ""
+        )
+        if gap == "" or len(re.findall(r"[\w’'-]+", gap, re.UNICODE)) <= 2:
+            return False
     if re.search(r"\b(?:ago|since|for\s+the\s+past|over\s+the\s+last|during\s+the\s+last)\b", local, re.IGNORECASE):
         return True
-    if not _SLA_NONCOMMITMENT_RE.search(local):
-        return False
-    return not bool(_SLA_SERVICE_WORK_RE.search(local))
+    return bool(_SLA_NONCOMMITMENT_RE.search(local))
 
 
 def _number_value(value: str) -> float | None:
@@ -561,6 +617,61 @@ def _team_claims(text: str, known_teams: list[str]) -> list[tuple[int, int, str,
     return sorted(claims)
 
 
+def _authoritative_value_in_clause(
+    clause: str,
+    field: str,
+    expected_normalized: str,
+    known_teams: list[str],
+) -> bool:
+    if field == "priority":
+        values = (
+            match.group().casefold()
+            for match in re.finditer(r"(?<![A-Za-z0-9])P[0-4](?![A-Za-z0-9])", clause, re.IGNORECASE)
+        )
+    elif field == "sla":
+        values = (normalized.casefold() for _start, _end, _surface, normalized in _duration_claims(clause))
+    else:
+        teams = _team_claims(clause, list(dict.fromkeys([*known_teams, expected_normalized])))
+        values = (normalized.casefold() for _start, _end, _surface, normalized in teams)
+    return expected_normalized.casefold() in values
+
+
+def _attribution_followed_by_fulfillment(
+    sentence: str,
+    claim_end: int,
+    next_sentence: str,
+    field: str,
+    expected_normalized: str,
+    known_teams: list[str],
+) -> bool:
+    for following_text in (sentence[claim_end:], next_sentence):
+        for match in _FOLLOW_THROUGH_RE.finditer(following_text):
+            clause, clause_start = _clause_for_offset(following_text, match.start())
+            local_start = match.start() - clause_start
+            local_end = local_start + len(match.group())
+            if field != "owner_team" and _TEAM_FOLLOW_THROUGH_RE.search(clause):
+                relevant_field = (
+                    r"\b(?:priority|level|classification|severity)\b"
+                    if field == "priority"
+                    else r"\b(?:reply|response|answer|turnaround|interval|window|"
+                    r"timeframe|target|commitment|deadline|sla)\b"
+                )
+                if not re.search(relevant_field, clause, re.IGNORECASE):
+                    continue
+            if _negation_precedes_value(clause, local_start) or _negation_follows_value(
+                clause, local_end
+            ):
+                continue
+            if _FOLLOW_THROUGH_OTHER_OBJECT_RE.search(clause):
+                continue
+            if _authoritative_value_in_clause(
+                clause, field, expected_normalized, known_teams
+            ):
+                continue
+            return True
+    return False
+
+
 def _is_asserted_value(
     sentence: str,
     claim_start: int,
@@ -570,6 +681,8 @@ def _is_asserted_value(
     known_teams: list[str],
     user_input: str,
     claims_in_sentence: list[tuple[int, int]],
+    expected_normalized: str,
+    next_sentence: str,
 ) -> bool:
     if _quoted_claim_is_user_text(sentence, claim_start, claim_end, user_input):
         return False
@@ -577,7 +690,14 @@ def _is_asserted_value(
     local_start = claim_start - clause_start
     local_end = claim_end - clause_start
     before, after = clause[:local_start], clause[local_end:]
-    if _ATTRIBUTION_RE.search(before) and not _AGREEMENT_RE.search(clause):
+    if _ATTRIBUTION_RE.search(before) and not _attribution_followed_by_fulfillment(
+        sentence,
+        claim_end,
+        next_sentence,
+        field,
+        expected_normalized,
+        known_teams,
+    ):
         return False
     if (
         _negation_precedes_value(clause, local_start)
@@ -587,7 +707,9 @@ def _is_asserted_value(
         return False
     if _contrast_exempts_value(clause, local_start):
         return False
-    if field == "sla" and _duration_describes_other_process(sentence, claim_start):
+    if field == "sla" and _duration_describes_other_process(
+        sentence, claim_start, claim_end
+    ):
         return False
     if field == "owner_team":
         surface = sentence[claim_start:claim_end]
@@ -611,8 +733,9 @@ def _v12_field_consistency(
     )
     asserted: list[tuple[str, str, str]] = []
     mentioned: list[str] = []
+    sentence_spans = _sentence_spans(text)
     for start, end, surface, normalized in claims:
-        for sentence_start, sentence_end, sentence in _sentence_spans(text):
+        for sentence_index, (sentence_start, sentence_end, sentence) in enumerate(sentence_spans):
             if sentence_start <= start and end <= sentence_end:
                 sentence_claims = [
                     (claim_start - sentence_start, claim_end - sentence_start)
@@ -627,6 +750,12 @@ def _v12_field_consistency(
                     known_teams=known_teams,
                     user_input=user_input,
                     claims_in_sentence=sentence_claims,
+                    expected_normalized=expected_normalized,
+                    next_sentence=(
+                        sentence_spans[sentence_index + 1][2]
+                        if sentence_index + 1 < len(sentence_spans)
+                        else ""
+                    ),
                 ):
                     asserted.append((surface, normalized, sentence))
                 elif surface.casefold() not in [item.casefold() for item in mentioned]:
