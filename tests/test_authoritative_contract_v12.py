@@ -18,15 +18,104 @@ from agent_builder.workflow_runtime import (  # noqa: E402
 from test_authoritative_contract import _candidate_runtime, _support_policy  # noqa: E402
 
 
+MUST_REJECT = (
+    ("priority", "This file is a P2 matter.", {}),
+    ("priority", "The active code is P3.", {}),
+    ("priority", "A P4 level covers this incident.", {}),
+    ("priority", "P0 describes the case.", {}),
+    ("priority", "Today's case sits at P2.", {}),
+    ("priority", "P3 applies to the file.", {}),
+    ("priority", "The case is P4.", {}),
+    ("priority", "We have a P2 incident today.", {}),
+    ("priority", "It falls into P0.", {}),
+    ("priority", "P3 is the level currently in use.", {}),
+    ("priority", "This request is a P4 case.", {"priority": "P3"}),
+    ("priority", "P2 is now active, as requested in the earlier note.", {}),
+    ("priority", "The customer's message asked for P2, and that level was approved.", {}),
+    ("priority", "We cannot revise the file after a lengthy review, and the case now carries P2.", {}),
+    ("priority", "If this incident carries P2 priority, then keep the file open.", {}),
+    ("sla", "The next status update is due in one business day.", {}),
+    ("sla", "An answer is expected after two hours.", {}),
+    ("sla", "The review will finish in six hours.", {}),
+    ("sla", "A written response is scheduled for 30 minutes from now.", {}),
+    ("sla", "We will complete the investigation within three days.", {}),
+    ("sla", "The support interval here is 24 hours.", {}),
+    ("sla", "The review period is two business days.", {}),
+    ("sla", "We plan to send the result in 12 hours.", {}),
+    ("sla", "This case should close after three business days.", {}),
+    ("sla", "A follow-up arrives within five hours.", {}),
+    ("sla", "The review finishes in four hours.", {"sla": "2 business days"}),
+    ("sla", "A status update will arrive after one business day, as you asked.", {}),
+    ("sla", "The next update is due in three days, per your request.", {}),
+    ("sla", "The service window is eight hours.", {}),
+    ("owner_team", "This case belongs to Billing Support.", {}),
+    ("owner_team", "Account Support owns this case.", {}),
+    ("owner_team", "Technical Support is the owner here.", {}),
+    ("owner_team", "Billing Support has the request.", {}),
+    ("owner_team", "Account Support will handle this matter.", {}),
+    ("owner_team", "The file is under Technical Support.", {}),
+    ("owner_team", "Billing Support is responsible for this record.", {}),
+    ("owner_team", "This request sits with Account Support.", {}),
+    ("owner_team", "Technical Support will take over.", {}),
+    ("owner_team", "We transferred this report to Billing Support.", {}),
+    ("owner_team", "We routed the report to Returns Desk Team.", {}),
+    ("owner_team", "Please direct this case to Billing Support.", {}),
+    ("owner_team", "If the issue is P2, Account Support owns it.", {}),
+    ("owner_team", "Per your request, Account Support is now responsible.", {}),
+    ("owner_team", "This file rests with Logistics Support.", {"owner_team": "Billing Support"}),
+)
+
+MUST_ACCEPT = (
+    ("We aren't permitted to classify the report at P2.", {}),
+    ("P2 isn't the current classification.", {}),
+    ("A P3 is not the selected level.", {}),
+    ("We won't move the case into Billing Support.", {}),
+    ("The owner isn't Account Support.", {}),
+    ("We haven't transferred this to Technical Support.", {}),
+    ("We are unable to reclassify the file as P2, P3, or P4.", {}),
+    ("It cannot move to Billing Support, Account Support, or Technical Support.", {}),
+    ("P1 remains recorded instead of P2.", {}),
+    ("The target stays at four hours rather than a one-day allowance.", {}),
+    ("The note from the customer requested P2; the record remains P1.", {}),
+    ("The customer's message asked for Billing Support; Logistics Support still owns the case.", {}),
+    ("Your email requested a one-business-day reply; the actual target is four hours.", {}),
+    (
+        "You wrote, ‘Please assign this report to Billing Support until tomorrow.’ "
+        "We will leave ownership with Logistics Support while we inspect the delivery scan.",
+        {"user_input": "Please assign this report to Billing Support until tomorrow."},
+    ),
+    ("Logistics Support is assigned the P1 case with a four-hour response target.", {}),
+    ("Our delivery team is reviewing carrier records.", {}),
+    ("The shipping team is checking the dispatch scan.", {}),
+    ("Customer care is reviewing the account notes.", {}),
+    ("The parcel's trip took three days to reach the sorting center.", {}),
+    ("Payment settled after six hours.", {}),
+    ("The package arrived two days ago.", {}),
+    ("The parcel has been in transit for the past three days.", {}),
+    ("The refund appeared in your account five days ago.", {}),
+    ("The carrier has held the parcel since yesterday, three days ago.", {}),
+    ("Delivery may take 36 hours after dispatch.", {}),
+    ("A one-day delivery window was estimated for this order.", {}),
+    ("The owner is Logistics Support, and priority P1 remains recorded.", {}),
+    ("P1 applies—P2 is not in effect.", {}),
+    ("P1 is current: P2 is not active.", {}),
+    ("The ticket remains P1, so P2 is not selected.", {}),
+    ("The incident is P1; P2 was never activated.", {}),
+    ("P1 is set, then P2 is not considered.", {}),
+)
+
+
 class RuntimeV12Test(unittest.TestCase):
-    def run_v12(
+    def run_version(
         self,
         message: str,
         *,
+        version: str = CONSISTENCY_VALIDATOR_V1_2,
         user_input: str = "Please check the delayed shipment.",
         priority: str = "P1",
         sla: str = "4 hours",
         owner_team: str = "Logistics Support",
+        category: str | None = None,
     ):
         base = _candidate_runtime(
             {"customer_message": message},
@@ -35,17 +124,25 @@ class RuntimeV12Test(unittest.TestCase):
             owner_team=owner_team,
             message_required=True,
         )
-        runtime = WorkflowRuntime(
-            base.workflow_config,
-            base.registry,
-            validator_version=CONSISTENCY_VALIDATOR_V1_2,
-        )
+        if category is not None:
+            base.registry.register(
+                "classification",
+                lambda context, node_config: {
+                    "ticket_category": category,
+                    "policy": "Use the selected support category.",
+                },
+                replace=True,
+            )
+        runtime = WorkflowRuntime(base.workflow_config, base.registry, validator_version=version)
         return runtime.run(
             {"support_policy": _support_policy(), "user_input": user_input}
         )
 
+    def run_v12(self, message: str, **kwargs):
+        return self.run_version(message, **kwargs)
+
     def test_new_runtime_defaults_to_v11_and_v12_is_explicit(self):
-        base = _candidate_runtime({"customer_message": "We received your request."})
+        base = _candidate_runtime({"customer_message": "The carrier scan is under review."})
         default_runtime = WorkflowRuntime(base.workflow_config, base.registry)
         v12_runtime = WorkflowRuntime(
             base.workflow_config,
@@ -57,28 +154,32 @@ class RuntimeV12Test(unittest.TestCase):
             base.registry,
         )
         self.assertEqual(CONSISTENCY_VALIDATOR_V1_1, default_runtime.validator_version)
+        self.assertEqual("authoritative-contract-v1.1", default_runtime.runtime_version)
         self.assertEqual("authoritative-contract-v1.2", v12_runtime.runtime_version)
         self.assertEqual(CONSISTENCY_VALIDATOR_V1_2, configured_runtime.validator_version)
+        legacy_result = default_runtime.run({"support_policy": _support_policy()})
+        self.assertNotIn("runtime_version", legacy_result.context)
+        self.assertNotIn("validator_version", legacy_result.trace[-1].data)
 
     def test_unknown_validator_version_is_rejected(self):
         base = _candidate_runtime({"customer_message": "We received your request."})
-        for version in ("v9", "", []):
+        for version in ("v9", "v1.3", "", []):
             with self.subTest(version=version):
                 with self.assertRaises(WorkflowValidationError):
                     WorkflowRuntime(base.workflow_config, base.registry, validator_version=version)
 
     def test_three_assertion_types_are_rejected(self):
         samples = (
-            ("priority", "The ticket priority is now P2."),
-            ("priority", "We marked this case as P3 priority."),
-            ("priority", "Priority: P0."),
-            ("sla", "The response target is three hours."),
-            ("sla", "The promised reply window is two business days."),
-            ("sla", "We have committed to a 90-minute turnaround."),
-            ("owner_team", "This case is assigned to Account Support."),
-            ("owner_team", "We forwarded the request to Technical department."),
-            ("owner_team", "Billing Support will manage this ticket."),
-            ("owner_team", "I assigned this case to returns desk team."),
+            ("priority", "This file carries the P2 classification."),
+            ("priority", "The incident has a P3 level."),
+            ("priority", "P0 applies to this request."),
+            ("sla", "The next review is due in one business day."),
+            ("sla", "A response is planned after six hours."),
+            ("sla", "The support period is three days."),
+            ("owner_team", "The case is with Account Support."),
+            ("owner_team", "Technical Support owns the request."),
+            ("owner_team", "Billing Support is responsible for this record."),
+            ("owner_team", "We routed the file to Returns Desk Team."),
         )
         for field, message in samples:
             with self.subTest(field=field, message=message):
@@ -91,15 +192,15 @@ class RuntimeV12Test(unittest.TestCase):
 
     def test_negation_contrast_and_request_attribution_are_mentions(self):
         samples = (
-            "We can't assign this matter to P2.",
-            "The case stays at P1 instead of P2.",
-            "You asked to move it to P2, but the recorded priority remains P1.",
-            "We cannot promise a two-hour reply.",
-            "A one-business-day reply was requested; the target is four hours.",
-            "The four-hour limit is sooner than a two-day estimate.",
-            "We cannot assign it to Account Support.",
-            "The queue stays with Logistics Support rather than Technical Support.",
-            "You requested Billing Support, but Logistics Support retains ownership.",
+            "We aren't permitted to classify the report at P2.",
+            "P1 remains recorded instead of P2.",
+            "The customer's message asked for P2; the record remains P1.",
+            "A one-day reply is not the promised interval.",
+            "You mentioned a delayed answer; our target remains four hours.",
+            "The target stays at four hours rather than a one-day allowance.",
+            "We haven't transferred this to Account Support.",
+            "The case stays with Logistics Support rather than Technical Support.",
+            "Your email requested Billing Support; Logistics Support still owns the case.",
         )
         for message in samples:
             with self.subTest(message=message):
@@ -110,7 +211,7 @@ class RuntimeV12Test(unittest.TestCase):
 
     def test_later_assertion_after_attributed_request_is_still_detected(self):
         result = self.run_v12(
-            "You asked for P2, and we have now set the ticket priority to P2."
+            "The customer's note asked to use P2; then P2 was selected as the active level."
         )
         self.assertTrue(result.context["fallback_used"])
         self.assertEqual(
@@ -119,15 +220,19 @@ class RuntimeV12Test(unittest.TestCase):
         )
 
     def test_quoted_value_is_not_an_assertion(self):
-        message = 'Your note said, “Set this to P2.” We will keep the current P1 level.'
-        result = self.run_v12(message)
+        user_input = "Please keep this request with Billing Support until noon."
+        message = (
+            'The message said, “Please keep this request with Billing Support until noon.” '
+            "Logistics Support remains responsible while we inspect the scan history."
+        )
+        result = self.run_v12(message, user_input=user_input)
         self.assertFalse(result.context["fallback_used"])
         self.assertEqual(message, result.context["customer_message"])
 
     def test_other_authoritative_values_and_team_aliases_are_supported(self):
         message = (
-            "Priority P3 is recorded. The service target is two business days. "
-            "Billing team owns this request."
+            "The case remains at P3. The review commitment is two business days. "
+            "Billing team owns the record."
         )
         result = self.run_v12(
             message,
@@ -142,7 +247,7 @@ class RuntimeV12Test(unittest.TestCase):
         self.assertEqual("PASS", checks["owner_team"]["status"])
 
     def test_multiple_distinct_assertions_for_one_field_are_rejected(self):
-        result = self.run_v12("The priority is P1. We changed it to P2.")
+        result = self.run_v12("The file is P1. We moved its priority to P2.")
         self.assertTrue(result.context["fallback_used"])
         self.assertEqual(
             "CONFLICT",
@@ -150,7 +255,7 @@ class RuntimeV12Test(unittest.TestCase):
         )
 
     def test_empty_reply_is_rejected_with_structured_reason(self):
-        result = self.run_v12("   \n  ")
+        result = self.run_v12("\u2003 \n \t")
         self.assertTrue(result.context["fallback_used"])
         reason = result.context["reject_reason_codes"][0]
         self.assertEqual("non_reply_empty", reason["rule_type"])
@@ -185,18 +290,18 @@ class RuntimeV12Test(unittest.TestCase):
                 self.assertGreaterEqual(reason["similarity"], 0.85)
 
     def test_quoted_request_with_a_real_reply_is_not_echo(self):
-        request = "The parcel has not arrived. Can you check its status?"
+        request = "The tracking page has shown no movement since Monday; could you investigate?"
         reply = (
-            f'You wrote, “{request}” We will verify the tracking record and send '
-            "you an update after the carrier confirms the current location."
+            f'Your message said, “{request}” We will review the carrier events and send '
+            "you an update after checking the latest scan."
         )
         result = self.run_v12(reply, user_input=request)
         self.assertFalse(result.context["fallback_used"])
         self.assertEqual(reply, result.context["customer_message"])
 
     def test_high_overlap_with_small_edits_is_rejected(self):
-        request = "My parcel is delayed and I need an update on its current location."
-        reply = "My parcel is delayed and I need an update on its current location today."
+        request = "The tracking page has shown no movement since Monday; could you investigate?"
+        reply = "The tracking page has shown no movement since Monday; could you investigate today?"
         result = self.run_v12(reply, user_input=request)
         self.assertTrue(result.context["fallback_used"])
         self.assertEqual(
@@ -205,7 +310,7 @@ class RuntimeV12Test(unittest.TestCase):
         )
 
     def test_assertion_rejection_has_field_value_sentence_and_trace_code(self):
-        message = "The current ticket priority is P2."
+        message = "The active classification for this report is P2."
         result = self.run_v12(message)
         reason = next(
             item
@@ -219,14 +324,108 @@ class RuntimeV12Test(unittest.TestCase):
         self.assertIn(reason, result.trace[-1].data["reject_reason_codes"])
 
     def test_fallback_includes_policy_actions_and_passes_v12(self):
-        rejected = self.run_v12("The ticket is P2 priority.")
+        rejected = self.run_v12("This report is currently P2.")
         fallback = rejected.context["customer_message"]
         actions = _support_policy()["categories"][0]["next_actions"]
-        for action in actions:
-            self.assertIn(action, fallback)
+        self.assertTrue(any(action in fallback for action in actions))
+        self.assertTrue(rejected.trace[-1].data["fallback_self_check"]["passed"])
         accepted = self.run_v12(fallback)
         self.assertFalse(accepted.context["fallback_used"])
         self.assertEqual(fallback, accepted.context["customer_message"])
+        self.assertIn("Next steps our team will take:", fallback)
+        self.assertTrue(_support_policy()["categories"][0]["next_actions"])
+
+    def test_all_literal_wrong_value_samples_are_rejected(self):
+        self.assertGreaterEqual(len(MUST_REJECT), 30)
+        for field, message, kwargs in MUST_REJECT:
+            with self.subTest(field=field, message=message):
+                result = self.run_v12(message, **kwargs)
+                self.assertTrue(result.context["fallback_used"])
+                self.assertEqual(
+                    "CONFLICT",
+                    result.context["consistency_results"]["response_generation"][field]["status"],
+                )
+
+    def test_all_literal_safe_samples_are_accepted(self):
+        self.assertGreaterEqual(len(MUST_ACCEPT), 20)
+        for message, kwargs in MUST_ACCEPT:
+            with self.subTest(message=message):
+                result = self.run_v12(message, **kwargs)
+                self.assertFalse(result.context["fallback_used"])
+                self.assertEqual(message, result.context["customer_message"])
+
+    def test_synthetic_wrong_value_corpus_covers_all_fields_without_cues(self):
+        self.assertEqual({"priority", "sla", "owner_team"}, {sample[0] for sample in MUST_REJECT})
+        cue_words = ("marked", "reply", "assigned")
+        without_cues = [
+            sample for sample in MUST_REJECT
+            if not any(cue in sample[1].casefold() for cue in cue_words)
+        ]
+        self.assertGreaterEqual(len(without_cues), len(MUST_REJECT) // 2)
+
+    def test_partial_user_input_echo_is_rejected(self):
+        request = "Could you route this report to Billing Support before the morning review?"
+        reply = "route this report to Billing Support"
+        result = self.run_v12(reply, user_input=request)
+        self.assertTrue(result.context["fallback_used"])
+        reason = result.context["reject_reason_codes"][0]
+        self.assertEqual("non_reply_echo", reason["rule_type"])
+        self.assertGreaterEqual(reason["overlap_chars"], 20)
+
+    def test_quote_only_exempts_text_present_in_user_input(self):
+        message = 'The note says “P2 was approved.” The active level remains P1.'
+        result = self.run_v12(message, user_input="Please check the delivery status.")
+        self.assertTrue(result.context["fallback_used"])
+        self.assertEqual(
+            "CONFLICT",
+            result.context["consistency_results"]["response_generation"]["priority"]["status"],
+        )
+
+    def test_unknown_team_requires_a_local_assignment_verb(self):
+        mention = self.run_v12("The regional care team is reviewing the carrier notes.")
+        routed = self.run_v12("We escalated this case to the regional care team.")
+        self.assertFalse(mention.context["fallback_used"])
+        self.assertTrue(routed.context["fallback_used"])
+        self.assertEqual(
+            "CONFLICT",
+            routed.context["consistency_results"]["response_generation"]["owner_team"]["status"],
+        )
+
+    def test_fallback_filters_category_action_conflicting_with_authoritative_team(self):
+        rejected = self.run_v12(
+            "This report is P2.",
+            owner_team="Logistics Support",
+            category="refund",
+        )
+        fallback = rejected.context["customer_message"]
+        self.assertTrue(rejected.context["fallback_used"])
+        self.assertIn("Next steps our team will take:", fallback)
+        self.assertNotIn("Billing Support", fallback)
+        self.assertTrue(rejected.trace[-1].data["fallback_self_check"]["passed"])
+        accepted = self.run_v12(fallback, owner_team="Logistics Support", category="refund")
+        self.assertFalse(accepted.context["fallback_used"])
+
+    def test_fallback_with_matching_category_team_keeps_a_next_step(self):
+        rejected = self.run_v12(
+            "The recorded owner is Logistics Support.",
+            owner_team="Billing Support",
+            category="refund",
+        )
+        fallback = rejected.context["customer_message"]
+        self.assertTrue(rejected.context["fallback_used"])
+        self.assertIn("Next steps our team will take:", fallback)
+        self.assertIn("Billing Support", fallback)
+        self.assertTrue(rejected.trace[-1].data["fallback_self_check"]["passed"])
+
+    def test_v12_generation_trace_and_context_include_runtime_versions(self):
+        result = self.run_v12("We will check the recent carrier scans.")
+        self.assertEqual("authoritative-contract-v1.2", result.context["runtime_version"])
+        self.assertEqual(CONSISTENCY_VALIDATOR_V1_2, result.context["validator_version"])
+        generation_trace = next(
+            item for item in result.trace if item.node_id == "response_generation"
+        )
+        self.assertEqual("authoritative-contract-v1.2", generation_trace.data["runtime_version"])
+        self.assertEqual(CONSISTENCY_VALIDATOR_V1_2, generation_trace.data["validator_version"])
 
 
 if __name__ == "__main__":
