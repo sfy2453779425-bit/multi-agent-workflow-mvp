@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.1",
+  "lookup": "recursive_json_keys_any_depth",
+  "allowed_output_fields": [
+    "customer_message"
+  ],
+  "message_fields": [
+    "customer_message",
+    "message",
+    "reply",
+    "response"
+  ],
+  "authority_fields": {
+    "priority": [
+      "priority"
+    ],
+    "sla": [
+      "sla",
+      "sla_hours",
+      "sla_minutes"
+    ],
+    "owner_team": [
+      "owner_team",
+      "owner",
+      "team",
+      "assigned_team"
+    ]
+  },
+  "team_names": [
+    "Logistics Support",
+    "Billing Support",
+    "Account Support",
+    "Technical Support"
+  ],
+  "team_alias_suffixes": [
+    "Support",
+    "team",
+    "department"
+  ],
+  "notes": [
+    "Candidate availability requires exact customer_message key; the other message aliases are used only for text extraction.",
+    "Do not infer field aliases from runtime or validator implementation."
+  ]
+}
