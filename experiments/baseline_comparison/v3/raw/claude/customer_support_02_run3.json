@@ -1,0 +1,94 @@
+{
+  "experiment_id": "builder_v3_threeway_20260925",
+  "experiment_status": "FORMAL",
+  "system": "Claude-CLI",
+  "case_id": "customer_support_02",
+  "case_type": "customer-support-2026-09-16-v2-refund",
+  "run": 3,
+  "run_id": "Claude-CLI_customer_support_02_run3",
+  "schedule_index": 80,
+  "model_requested": "claude-opus-5-5",
+  "model_returned": [
+    "claude-opus-5-5"
+  ],
+  "cli_version": "2.1.281 (Claude Code)",
+  "call_path": "claude -p --output-format json",
+  "prompt_text_hash": "b4fe1442b7fa86f86721f465453ec14b22b44e3f8da0a4cdbfc273786ad42377",
+  "fixture_hash": "614dc169a5f24bcb897851d7f81e85a61146c19e7c815ebce360dfe036516214",
+  "fixture_file_sha256": "5a8ca1b48a999eebb437f321860c2158cf5204ecc45dbdf1ad95e199b905a05a",
+  "timestamp_start_utc": "2026-09-24T23:04:13.737Z",
+  "timestamp_end_utc": "2026-09-24T23:04:23.029Z",
+  "latency_ms": 9292,
+  "finish_reason": "end_turn",
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 1118,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 693,
+    "output_tokens_details": {
+      "thinking_tokens": 0
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 1118,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 693,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 1118,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1118
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "output_tokens": 693,
+  "output_limit": "not set",
+  "reasoning_effort": "not applicable / CLI default",
+  "raw_stdout_path": "raw/claude/customer_support_02_run3.raw",
+  "raw_stdout_sha256": "5106549ebdfd26214e47569452243f9adf0bbc5d8c8e25d885e8f00667391333",
+  "raw_stdout_bytes": 3837,
+  "raw_text": "**Ticket Classification & Routing: Customer Support**\n\n**Input**\n- **User ID:** user_a\n- **Query:** \"Customer requests a refund after being charged twice.\"\n\n---\n\n### 1. Classification\n| Field | Value |\n|---|---|\n| **category** | `refund` (Refund / Return) |\n\n**Why:** The query contains the category keywords **\"refund\"** and **\"charged\"**, and it describes a payment problem (a duplicate charge). These match the `refund` category's keyword list. That category is also the configured `default_category`.\n\n### 2. Routing Decision\n| Field | Value |\n|---|---|\n| **owner_team** | Billing Support |\n\n### 3. Priority & SLA\n| Field | Value |\n|---|---|\n| **priority** | P2 |\n| **sla** | 1 business day |\n\n### 4. Policy Application\nFrozen policy: *\"Check order eligibility and payment status. If eligible, route to billing support for refund processing.\"*\n\n- **Order eligibility:** **Not determinable.** No order ID, order details, or eligibility criteria were provided.\n- **Payment status:** **Not determinable.** No transaction records were provided to confirm the duplicate charge.\n- **Result:** The ticket is assigned to Billing Support as the category owner. Refund processing depends on eligibility and payment status being verified first. No refund approval is assumed.\n\n### 5. Next Actions\n1. Check refund eligibility.\n2. Verify payment transaction status.\n3. Route to billing support if refund criteria are met.\n\n---\n\n### Missing Information (not invented)\n- Order ID or order details for the affected purchase\n- Transaction IDs, amounts, and dates of the two charges, needed to confirm a true duplicate rather than, for example, a pending authorization plus a settled charge\n- Payment method used\n- The specific refund eligibility criteria (the policy says to check eligibility but does not define the criteria)\n- Customer account or payment history for user_a\n\nIt is recommended to ask the customer for the order ID and the charge details (dates and amounts) so that verification can proceed within the 1-business-day SLA.",
+  "raw_text_sha256": "5149fa68b51ee8e10fd4a56e6e3d03ebee32a8bd5d9f535dc0d48967d1e70255",
+  "parse_status": "CLI_OUTPUT_PRESENT",
+  "parse_errors": [],
+  "attempts": [
+    {
+      "attempt_no": 1,
+      "exit_code": 0,
+      "timed_out": false,
+      "retryable_transport_error": false,
+      "error_message": null,
+      "raw_stdout_sha256": "5106549ebdfd26214e47569452243f9adf0bbc5d8c8e25d885e8f00667391333",
+      "raw_stdout_bytes": 3837,
+      "parse_status": "CLI_OUTPUT_PRESENT"
+    }
+  ],
+  "transport_failure": false,
+  "cli_exit_code": 0,
+  "fatal_auth_error": false,
+  "isolation": {
+    "model_requested": "claude-opus-5-5",
+    "cli": "claude.EXE",
+    "cli_version": "2.1.281 (Claude Code)",
+    "call_path": "claude -p --output-format json",
+    "system_prompt": "empty",
+    "tools": "none",
+    "setting_sources": "none",
+    "session_persistence": "disabled",
+    "output_limit": "not set",
+    "fresh_session": "one process and clean temporary workdir per call"
+  },
+  "sampling_parameters": "not explicitly set by this experiment"
+}

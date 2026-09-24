@@ -1,0 +1,94 @@
+{
+  "experiment_id": "builder_v3_threeway_20260925",
+  "experiment_status": "FORMAL",
+  "system": "Claude-CLI",
+  "case_id": "outfit_03",
+  "case_type": "outfit-2026-09-16-v2-commute",
+  "run": 3,
+  "run_id": "Claude-CLI_outfit_03_run3",
+  "schedule_index": 68,
+  "model_requested": "claude-opus-5-5",
+  "model_returned": [
+    "claude-opus-5-5"
+  ],
+  "cli_version": "2.1.281 (Claude Code)",
+  "call_path": "claude -p --output-format json",
+  "prompt_text_hash": "cee1b96f6765e7e9d8b12b3b771aa7b975748cf351f0f57ac8b3325b39cfcde7",
+  "fixture_hash": "a169262507936026d7f615f16b1521a237c49e97a846ee42a6d09123de6a3776",
+  "fixture_file_sha256": "ce109c197b2f6e30c14e087f6766cdb8f580c9e323c312c7ac3df908e77b516f",
+  "timestamp_start_utc": "2026-09-24T23:01:49.925Z",
+  "timestamp_end_utc": "2026-09-24T23:02:06.509Z",
+  "latency_ms": 16584,
+  "finish_reason": "end_turn",
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 1456,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1214,
+    "output_tokens_details": {
+      "thinking_tokens": 244
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 1456,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1214,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 1456,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1456
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "output_tokens": 1214,
+  "output_limit": "not set",
+  "reasoning_effort": "not applicable / CLI default",
+  "raw_stdout_path": "raw/claude/outfit_03_run3.raw",
+  "raw_stdout_sha256": "3108803a92a509e5513ed67ef2fd43eafd4134171ace1634b3b05f2d908e3886",
+  "raw_stdout_bytes": 3823,
+  "raw_text": "# 서울 내일 출근 포멀 코디 추천 (user_b)\n\n## ⚠️ 날짜 확인 필요\n- 오늘은 **2026-09-25**이므로 \"내일\"은 **2026-09-26**입니다.\n- 제공된 날씨 데이터는 **2026-09-24** 기준입니다.\n- 지침(`use_frozen_weather`)에 따라 이 데이터로 추천했습니다. 다만 9월 26일의 실제 예보는 제공되지 않아, 실제 날씨와 다를 수 있습니다.\n\n## 날씨 요약 (제공 데이터 기준)\n| 항목 | 값 |\n|---|---|\n| **weather** | 서울, 흐림 (weather_code 3) |\n| **temperature** | 최저 6.0°C / 최고 14.0°C |\n| **precipitation** | 강수확률 20% |\n\n강수확률 20%는 우천 대비 기준(40%)보다 낮습니다. 따라서 비에 약한 아이템도 착용할 수 있습니다.\n\n## 추천 아이템 (보유 아이템만 사용, 순위순)\n| 순위 | ID | 아이템 | 카테고리 | 이유 |\n|---|---|---|---|---|\n| 1 | B001 | 네이비 블레이저 | outer | 아침 최저 6°C로 쌀쌀해 보온(medium)이 필요합니다. 포멀 출근룩의 중심 아이템입니다. |\n| 2 | B002 | 그레이 슬랙스 | bottom | 포멀 스타일이고 보온은 medium입니다. 네이비 블레이저와 색 조합이 좋습니다. |\n| 3 | B003 | 화이트 셔츠 | top | 포멀 기본 이너입니다. 두께가 얇아(light) 한낮 14°C에서 블레이저를 벗어도 무난합니다. |\n| 4 | B004 | 블랙 로퍼 | shoes | 포멀 스타일이고 사계절용(all)입니다. 비에는 약하지만(rain_ok: false) 강수확률이 20%라 착용 가능합니다. |\n\n**완성 코디:** 네이비 블레이저 + 화이트 셔츠 + 그레이 슬랙스 + 블랙 로퍼\n\n## 참고\n- 아침 6°C는 블레이저만으로 다소 추울 수 있습니다. 보유 목록에는 코트나 니트 같은 보온 아이템이 없어 추가 레이어는 추천하지 못했습니다.\n- 9월 26일 실제 예보에서 강수확률이 40% 이상이면 블랙 로퍼(비에 약함)는 적합하지 않습니다. 하지만 보유 목록에 비에 강한 대체 신발이 없습니다.",
+  "raw_text_sha256": "cb89d7a6025a7d852a2b181551f2ea5d7b3cc3c865340594ea47fd2baf79ac0a",
+  "parse_status": "CLI_OUTPUT_PRESENT",
+  "parse_errors": [],
+  "attempts": [
+    {
+      "attempt_no": 1,
+      "exit_code": 0,
+      "timed_out": false,
+      "retryable_transport_error": false,
+      "error_message": null,
+      "raw_stdout_sha256": "3108803a92a509e5513ed67ef2fd43eafd4134171ace1634b3b05f2d908e3886",
+      "raw_stdout_bytes": 3823,
+      "parse_status": "CLI_OUTPUT_PRESENT"
+    }
+  ],
+  "transport_failure": false,
+  "cli_exit_code": 0,
+  "fatal_auth_error": false,
+  "isolation": {
+    "model_requested": "claude-opus-5-5",
+    "cli": "claude.EXE",
+    "cli_version": "2.1.281 (Claude Code)",
+    "call_path": "claude -p --output-format json",
+    "system_prompt": "empty",
+    "tools": "none",
+    "setting_sources": "none",
+    "session_persistence": "disabled",
+    "output_limit": "not set",
+    "fresh_session": "one process and clean temporary workdir per call"
+  },
+  "sampling_parameters": "not explicitly set by this experiment"
+}

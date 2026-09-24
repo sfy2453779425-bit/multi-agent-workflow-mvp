@@ -1,0 +1,94 @@
+{
+  "experiment_id": "builder_v3_threeway_20260925",
+  "experiment_status": "FORMAL",
+  "system": "Claude-CLI",
+  "case_id": "presentation_01",
+  "case_type": "presentation-2026-09-16-v1",
+  "run": 1,
+  "run_id": "Claude-CLI_presentation_01_run1",
+  "schedule_index": 11,
+  "model_requested": "claude-opus-5-5",
+  "model_returned": [
+    "claude-opus-5-5"
+  ],
+  "cli_version": "2.1.281 (Claude Code)",
+  "call_path": "claude -p --output-format json",
+  "prompt_text_hash": "d338d253b192dd3d8024754620592e1bef14c87588067d7d0253b8005b79c715",
+  "fixture_hash": "4d8bb302d1ea4dd207a13d02414e03069c7714406b8e85b85cb1bc8a32928aef",
+  "fixture_file_sha256": "b1060d4572b1683617f307dd1a914614d5d43c91fb6e4a5d203ce4da1df9ee4e",
+  "timestamp_start_utc": "2026-09-24T22:52:49.946Z",
+  "timestamp_end_utc": "2026-09-24T22:53:10.078Z",
+  "latency_ms": 20132,
+  "finish_reason": "end_turn",
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 1776,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 2158,
+    "output_tokens_details": {
+      "thinking_tokens": 176
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 1776,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 2158,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 1776,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1776
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "output_tokens": 2158,
+  "output_limit": "not set",
+  "reasoning_effort": "not applicable / CLI default",
+  "raw_stdout_path": "raw/claude/presentation_01_run1.raw",
+  "raw_stdout_sha256": "8561fbb25541ce4a68510859d23cebb07d5c5b0b4e88cc34f94813a80fc13b19",
+  "raw_stdout_bytes": 7363,
+  "raw_text": "# Presentation Outline: Harness Engineering and Multi-Agent Workflow Builder MVP\n\n**Duration:** 15 minutes\n**Topics used:** `harness_engineering` (named in the query), `multi_agent_builder` and `workflow_template` (defaults)\n**Source:** Supplied knowledge only (fixture presentation-2026-09-16-v1)\n\n---\n\n## Outline Sections\n\n### 1. Opening (0:00–2:00, 2 min)\n**Goal:** Frame the talk around one idea: Agent = Model + Harness.\n- Slide: \"Agent = Model + Harness.\"\n- Define Harness Engineering as the execution structure around an agent: tools, memory, constraints, verification and feedback loops.\n- Preview the flow: problem → architecture → multi-domain evidence → conclusion.\n\n**Evidence points:**\n- Harness Engineering is the execution structure around an agent, including tools, memory, constraints, verification and feedback loops. *(harness_engineering)*\n\n---\n\n### 2. Problem (2:00–5:00, 3 min)\n**Goal:** Say plainly why this MVP matters when generic harnesses already exist.\n- Harness Engineering can make multi-agent development easier. That raises the question of what value this project adds beyond a generic harness.\n- Slide: Split harness parts into **generic** (execution plumbing) and **project-specific** (domain workflow templates and evidence).\n- Workflows that stay as static diagrams cannot be executed or verified.\n\n**Evidence points:**\n- Harness Engineering can make multi-agent development easier, so a project must explain what value remains beyond using a generic harness. *(harness_engineering)*\n- The differentiating value should move from generic execution plumbing to domain-specific workflow templates and evidence. *(harness_engineering)*\n- The MVP should show that templates can generate executable Workflow JSON instead of staying as static diagrams. *(multi_agent_builder)*\n\n---\n\n### 3. Architecture (5:00–9:00, 4 min)\n**Goal:** Walk through the pipeline and the contract that holds it together.\n- Slide: **Template → Workflow JSON → Engine → Trace**\n- **Template:** defines node order, node roles, required fields and builder equivalents.\n- **Workflow JSON:** the contract between the visual builder and the execution engine.\n- **Engine:** runs the nodes sequentially.\n- **Trace:** records that each node ran in the expected order and produced intermediate evidence.\n- A workflow builder turns a domain process into ordered nodes with defined inputs and outputs.\n\n**Evidence points:**\n- A workflow builder turns a domain process into ordered nodes with defined inputs and outputs. *(multi_agent_builder)*\n- A template defines node order, node roles, required fields and builder equivalents. *(workflow_template)*\n- The generated Workflow JSON is the contract between the visual builder and the execution engine. *(workflow_template)*\n- Sequential execution and trace output make the result explainable during a presentation. *(multi_agent_builder)*\n\n---\n\n### 4. Multi-Domain Evidence (9:00–13:00, 4 min)\n**Goal:** Show that the builder is not hard-coded to one recommendation scenario.\n- Slide: Compare templates side by side across domains. Highlight the **common structure** and the **domain-specific nodes**.\n- **Live demo (under 2 min):** select a template, then show the resulting trace.\n- Use the trace as proof that the template is executable.\n\n**Evidence points:**\n- Using multiple domains proves the builder is not hard-coded to one recommendation scenario. *(multi_agent_builder)*\n- Trace verifies that each node ran in the expected order and produced intermediate evidence. *(workflow_template)*\n- Keep the demo under two minutes by showing template selection and trace. *(multi_agent_builder)*\n\n---\n\n### 5. Conclusion (13:00–15:00, 2 min)\n**Goal:** Close with the positioning statement.\n- Recap: generic harness = execution plumbing; this MVP = domain-specific workflow templates that compile to executable Workflow JSON and produce verifiable traces.\n- **Defensive sentence (draft, built only from supplied points):** *\"A generic harness supplies the execution plumbing. Our MVP adds domain-specific workflow templates that generate executable Workflow JSON and produce trace evidence for every node.\"*\n- Q&A buffer if time allows.\n\n**Evidence points:**\n- The differentiating value should move from generic execution plumbing to domain-specific workflow templates and evidence. *(harness_engineering)*\n- Templates generate executable Workflow JSON rather than static diagrams. *(multi_agent_builder)*\n\n---\n\n## Timing Summary\n| Section | Time | Minutes |\n|---|---|---|\n| Opening | 0:00–2:00 | 2 |\n| Problem | 2:00–5:00 | 3 |\n| Architecture | 5:00–9:00 | 4 |\n| Multi-Domain Evidence | 9:00–13:00 | 4 |\n| Conclusion | 13:00–15:00 | 2 |\n| **Total** | | **15** |\n\n---\n\n## Missing Information (not invented)\nThe supplied data does not include the following, so you will need to add it before presenting:\n1. **Specific domains:** The data says \"multiple domains\" and mentions a \"recommendation scenario,\" but names no domains and gives no template contents.\n2. **Actual trace output:** There are no sample traces, node names or intermediate results for the demo or evidence slides.\n3. **Workflow JSON schema or example:** No concrete fields or sample JSON are provided.\n4. **Named generic harness tools:** There are no specific competing frameworks for the positioning slide.\n5. **Metrics or results:** There are no performance, accuracy or user-feedback data.\n6. **Speaker, audience and venue details:** None are provided.",
+  "raw_text_sha256": "d5dcfbc1973ce1f62bce2414d0e08aad3d5a4d1abcf3971e8f6479305c65fcd9",
+  "parse_status": "CLI_OUTPUT_PRESENT",
+  "parse_errors": [],
+  "attempts": [
+    {
+      "attempt_no": 1,
+      "exit_code": 0,
+      "timed_out": false,
+      "retryable_transport_error": false,
+      "error_message": null,
+      "raw_stdout_sha256": "8561fbb25541ce4a68510859d23cebb07d5c5b0b4e88cc34f94813a80fc13b19",
+      "raw_stdout_bytes": 7363,
+      "parse_status": "CLI_OUTPUT_PRESENT"
+    }
+  ],
+  "transport_failure": false,
+  "cli_exit_code": 0,
+  "fatal_auth_error": false,
+  "isolation": {
+    "model_requested": "claude-opus-5-5",
+    "cli": "claude.EXE",
+    "cli_version": "2.1.281 (Claude Code)",
+    "call_path": "claude -p --output-format json",
+    "system_prompt": "empty",
+    "tools": "none",
+    "setting_sources": "none",
+    "session_persistence": "disabled",
+    "output_limit": "not set",
+    "fresh_session": "one process and clean temporary workdir per call"
+  },
+  "sampling_parameters": "not explicitly set by this experiment"
+}

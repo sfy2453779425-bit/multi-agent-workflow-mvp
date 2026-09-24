@@ -1,0 +1,945 @@
+{
+  "run_id": "builder_presentation_02_1",
+  "experiment_id": "builder_v3_threeway_20260925",
+  "builder_version": "current-runtime-v1.2-source-snapshot",
+  "case_id": "presentation_02",
+  "run": 1,
+  "system": "Builder",
+  "timestamp": "2026-09-24T22:50:28.321375+00:00",
+  "finished_at": "2026-09-24T22:50:28.324415+00:00",
+  "input": {
+    "query": "Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Builder MVP.",
+    "user_id": "user_a"
+  },
+  "fixture_version": "presentation-2026-09-16-v2-10-minute",
+  "fixture_sha256": "bc3f34cd62224a68fd5d9d04fcbc06469c6426ca0d6af913f9576e62ff077295",
+  "prompt_version": "prompt-v1",
+  "workflow_json": {
+    "schema_version": 1,
+    "workflow_id": "presentation_planning_workflow_v1",
+    "workflow_name": "Presentation Planning Workflow",
+    "description": "A builder template for turning a presentation topic into a structured outline with supporting knowledge and traceable planning steps.",
+    "runtime_type": "presentation_planning",
+    "base_agent_config": null,
+    "data_file": "presentation_knowledge.json",
+    "data_dir": null,
+    "default_query": "Prepare a 15-minute presentation outline about Harness Engineering and Multi-Agent Workflow Builder MVP.",
+    "default_user_id": "user_a",
+    "agents": [
+      {
+        "id": "request_parser",
+        "name": "Presentation Request Parser Node",
+        "role": "Extract presentation topic, target duration and expected output from the user request.",
+        "builder_equivalent": "Start Node + Parser/Prompt Node"
+      },
+      {
+        "id": "question",
+        "name": "Presentation Question Node",
+        "role": "Ask for the missing presentation topic before planning.",
+        "builder_equivalent": "Condition Node + User Input Node"
+      },
+      {
+        "id": "topic_analysis",
+        "name": "Topic Analysis Node",
+        "role": "Identify relevant concepts and decide which knowledge notes are needed.",
+        "builder_equivalent": "Classifier Node + Tag Extraction Node"
+      },
+      {
+        "id": "knowledge_lookup",
+        "name": "Knowledge Lookup Node",
+        "role": "Load local knowledge notes for the matched presentation topics.",
+        "builder_equivalent": "Local Knowledge / RAG Node"
+      },
+      {
+        "id": "outline_generation",
+        "name": "Outline Generation Node",
+        "role": "Create a section-by-section presentation outline from the topic and knowledge notes.",
+        "builder_equivalent": "Planning / LLM Decision Node"
+      },
+      {
+        "id": "compose",
+        "name": "Presentation Compose Node",
+        "role": "Render the final outline with evidence points and execution trace.",
+        "builder_equivalent": "Output Template Node"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "request_parser",
+        "type": "presentation_request_parser",
+        "name": "Presentation Request Parser Node",
+        "role": "Extract presentation topic, target duration and expected output from the user request.",
+        "builder_equivalent": "Start Node + Parser/Prompt Node",
+        "inputs": {
+          "user_message": "context.query",
+          "user_id": "context.user_id"
+        },
+        "outputs": {
+          "topic": "context.topic",
+          "duration_minutes": "context.duration_minutes",
+          "output_type": "context.output_type"
+        },
+        "required_inputs": [
+          "user_message",
+          "user_id"
+        ],
+        "config": {}
+      },
+      {
+        "id": "question",
+        "type": "presentation_question",
+        "name": "Presentation Question Node",
+        "role": "Ask for the missing presentation topic before planning.",
+        "builder_equivalent": "Condition Node + User Input Node",
+        "inputs": {
+          "topic": "context.topic"
+        },
+        "outputs": {
+          "missing_fields": "context.missing_fields",
+          "needs_clarification": "context.needs_clarification",
+          "next_question_field": "context.next_question_field",
+          "clarification_message": "context.clarification_message"
+        },
+        "required_inputs": [
+          "topic"
+        ],
+        "config": {}
+      },
+      {
+        "id": "topic_analysis",
+        "type": "topic_analysis",
+        "name": "Topic Analysis Node",
+        "role": "Identify relevant concepts and decide which knowledge notes are needed.",
+        "builder_equivalent": "Classifier Node + Tag Extraction Node",
+        "inputs": {
+          "topic": "context.topic"
+        },
+        "outputs": {
+          "matched_topics": "context.matched_topics",
+          "planning_goal": "context.planning_goal"
+        },
+        "required_inputs": [
+          "topic"
+        ],
+        "config": {}
+      },
+      {
+        "id": "knowledge_lookup",
+        "type": "knowledge_lookup",
+        "name": "Knowledge Lookup Node",
+        "role": "Load local knowledge notes for the matched presentation topics.",
+        "builder_equivalent": "Local Knowledge / RAG Node",
+        "inputs": {
+          "matched_topics": "context.matched_topics"
+        },
+        "outputs": {
+          "knowledge_points": "context.knowledge_points",
+          "slide_suggestions": "context.slide_suggestions"
+        },
+        "required_inputs": [
+          "matched_topics"
+        ],
+        "config": {}
+      },
+      {
+        "id": "outline_generation",
+        "type": "outline_generation",
+        "name": "Outline Generation Node",
+        "role": "Create a section-by-section presentation outline from the topic and knowledge notes.",
+        "builder_equivalent": "Planning / LLM Decision Node",
+        "inputs": {
+          "knowledge_points": "context.knowledge_points",
+          "duration_minutes": "context.duration_minutes",
+          "planning_goal": "context.planning_goal"
+        },
+        "outputs": {
+          "outline_sections": "context.outline_sections",
+          "speaker_focus": "context.speaker_focus"
+        },
+        "required_inputs": [
+          "knowledge_points",
+          "duration_minutes",
+          "planning_goal"
+        ],
+        "config": {}
+      },
+      {
+        "id": "compose",
+        "type": "presentation_compose",
+        "name": "Presentation Compose Node",
+        "role": "Render the final outline with evidence points and execution trace.",
+        "builder_equivalent": "Output Template Node",
+        "inputs": {
+          "outline_sections": "context.outline_sections",
+          "knowledge_points": "context.knowledge_points",
+          "speaker_focus": "context.speaker_focus"
+        },
+        "outputs": {
+          "final_answer": "context.final_answer",
+          "summary_cards": "context.summary_cards"
+        },
+        "required_inputs": [
+          "outline_sections",
+          "knowledge_points",
+          "speaker_focus"
+        ],
+        "config": {}
+      }
+    ],
+    "execution": {
+      "type": "sequential",
+      "order": [
+        "request_parser",
+        "question",
+        "topic_analysis",
+        "knowledge_lookup",
+        "outline_generation",
+        "compose"
+      ],
+      "generated_by": "TemplateWorkflowBuilder"
+    },
+    "question_agent": {
+      "required_fields": [
+        "topic"
+      ],
+      "clarification_questions": {
+        "topic": "Please provide the presentation topic before generating an outline."
+      }
+    },
+    "experiment_mode": {
+      "type": "frozen_fixture",
+      "fixture_version": "presentation-2026-09-16-v2-10-minute",
+      "fixture_sha256": "bc3f34cd62224a68fd5d9d04fcbc06469c6426ca0d6af913f9576e62ff077295"
+    }
+  },
+  "workflow_sha256": "00159d28dde131fe9370603f64bcdec53d2b1eb5ffebb1fff4bce64f4e8d90de",
+  "final_result": {
+    "answer": "[Presentation Planning Workflow]\nTopic: Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Builder MVP.\nDuration: 10 minutes\nMatched knowledge: Multi-Agent Workflow Builder, Workflow Template\n\nOutline\n1. Opening: define the presentation topic and why Multi-Agent Workflow Builder, Workflow Template matters.\n2. Problem: explain why a single-domain MVP is not enough to prove a builder.\n3. Architecture: show Template -> Workflow JSON -> Multi-Agent Engine -> Trace.\n4. Multi-domain evidence: compare recommendation, presentation planning and support ticket workflows.\n5. Conclusion: position the current semester as the executable foundation for next semester.\n\nKey evidence\n- A workflow builder turns a domain process into ordered nodes with defined inputs and outputs.\n- The MVP generates executable Workflow JSON and uses sequential execution and trace output to make the result explainable.\n- A template defines node order, node roles and required fields.\n- The generated Workflow JSON is the contract between the builder and the execution engine.\n\nTrace proof: this outline was produced by a 6-node generated workflow.",
+    "context": {
+      "query": "Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Builder MVP.",
+      "user_id": "user_a",
+      "runtime_type": "presentation_planning",
+      "workflow_name": "Presentation Planning Workflow",
+      "executed_agents": [
+        "request_parser",
+        "question",
+        "topic_analysis",
+        "knowledge_lookup",
+        "outline_generation",
+        "compose"
+      ],
+      "executed_tools": [
+        "presentation_knowledge"
+      ],
+      "topic": "Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Builder MVP.",
+      "duration_minutes": 10,
+      "output_type": "presentation_outline",
+      "missing_fields": [],
+      "needs_clarification": false,
+      "next_question_field": "",
+      "clarification_message": "",
+      "matched_topics": [
+        {
+          "id": "multi_agent_builder",
+          "title": "Multi-Agent Workflow Builder",
+          "keywords": [
+            "multi-agent",
+            "multi agent",
+            "builder",
+            "workflow builder",
+            "agent builder"
+          ],
+          "points": [
+            "A workflow builder turns a domain process into ordered nodes with defined inputs and outputs.",
+            "The MVP generates executable Workflow JSON and uses sequential execution and trace output to make the result explainable."
+          ],
+          "slide_suggestions": [
+            "Show Template -> Workflow JSON -> Engine -> Trace.",
+            "Keep the demo under two minutes."
+          ]
+        },
+        {
+          "id": "workflow_template",
+          "title": "Workflow Template",
+          "keywords": [
+            "template",
+            "workflow",
+            "node",
+            "trace"
+          ],
+          "points": [
+            "A template defines node order, node roles and required fields.",
+            "The generated Workflow JSON is the contract between the builder and the execution engine."
+          ],
+          "slide_suggestions": [
+            "Compare templates across domains.",
+            "Use trace as proof that the template is executable."
+          ]
+        }
+      ],
+      "planning_goal": "Build a defensible presentation outline from local knowledge notes.",
+      "knowledge_points": [
+        "A workflow builder turns a domain process into ordered nodes with defined inputs and outputs.",
+        "The MVP generates executable Workflow JSON and uses sequential execution and trace output to make the result explainable.",
+        "A template defines node order, node roles and required fields.",
+        "The generated Workflow JSON is the contract between the builder and the execution engine."
+      ],
+      "slide_suggestions": [
+        "Show Template -> Workflow JSON -> Engine -> Trace.",
+        "Keep the demo under two minutes.",
+        "Compare templates across domains.",
+        "Use trace as proof that the template is executable."
+      ],
+      "outline_sections": [
+        "Opening: define the presentation topic and why Multi-Agent Workflow Builder, Workflow Template matters.",
+        "Problem: explain why a single-domain MVP is not enough to prove a builder.",
+        "Architecture: show Template -> Workflow JSON -> Multi-Agent Engine -> Trace.",
+        "Multi-domain evidence: compare recommendation, presentation planning and support ticket workflows.",
+        "Conclusion: position the current semester as the executable foundation for next semester."
+      ],
+      "speaker_focus": [
+        "Position the project as a workflow builder, not as a single recommendation feature.",
+        "Use multiple domains to prove template portability.",
+        "Show trace output as executable evidence."
+      ],
+      "final_answer": "[Presentation Planning Workflow]\nTopic: Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Builder MVP.\nDuration: 10 minutes\nMatched knowledge: Multi-Agent Workflow Builder, Workflow Template\n\nOutline\n1. Opening: define the presentation topic and why Multi-Agent Workflow Builder, Workflow Template matters.\n2. Problem: explain why a single-domain MVP is not enough to prove a builder.\n3. Architecture: show Template -> Workflow JSON -> Multi-Agent Engine -> Trace.\n4. Multi-domain evidence: compare recommendation, presentation planning and support ticket workflows.\n5. Conclusion: position the current semester as the executable foundation for next semester.\n\nKey evidence\n- A workflow builder turns a domain process into ordered nodes with defined inputs and outputs.\n- The MVP generates executable Workflow JSON and uses sequential execution and trace output to make the result explainable.\n- A template defines node order, node roles and required fields.\n- The generated Workflow JSON is the contract between the builder and the execution engine.\n\nTrace proof: this outline was produced by a 6-node generated workflow.",
+      "summary_cards": [
+        {
+          "title": "Presentation Topic",
+          "rows": [
+            {
+              "label": "Duration",
+              "value": "10 minutes"
+            },
+            {
+              "label": "Matched Topics",
+              "value": "Multi-Agent Workflow Builder, Workflow Template"
+            }
+          ]
+        },
+        {
+          "title": "Knowledge Evidence",
+          "rows": [
+            {
+              "label": "Points",
+              "value": "4"
+            },
+            {
+              "label": "Trace",
+              "value": "6 nodes executed"
+            }
+          ]
+        },
+        {
+          "title": "Outline Result",
+          "rows": [
+            {
+              "label": "1",
+              "value": "Opening: define the presentation topic and why Multi-Agent Workflow Builder, Workflow Template matters."
+            },
+            {
+              "label": "2",
+              "value": "Problem: explain why a single-domain MVP is not enough to prove a builder."
+            },
+            {
+              "label": "3",
+              "value": "Architecture: show Template -> Workflow JSON -> Multi-Agent Engine -> Trace."
+            },
+            {
+              "label": "4",
+              "value": "Multi-domain evidence: compare recommendation, presentation planning and support ticket workflows."
+            }
+          ]
+        }
+      ],
+      "workflow_agents": [
+        {
+          "id": "request_parser",
+          "name": "Presentation Request Parser Node",
+          "role": "Extract presentation topic, target duration and expected output from the user request.",
+          "builder_equivalent": "Start Node + Parser/Prompt Node"
+        },
+        {
+          "id": "question",
+          "name": "Presentation Question Node",
+          "role": "Ask for the missing presentation topic before planning.",
+          "builder_equivalent": "Condition Node + User Input Node"
+        },
+        {
+          "id": "topic_analysis",
+          "name": "Topic Analysis Node",
+          "role": "Identify relevant concepts and decide which knowledge notes are needed.",
+          "builder_equivalent": "Classifier Node + Tag Extraction Node"
+        },
+        {
+          "id": "knowledge_lookup",
+          "name": "Knowledge Lookup Node",
+          "role": "Load local knowledge notes for the matched presentation topics.",
+          "builder_equivalent": "Local Knowledge / RAG Node"
+        },
+        {
+          "id": "outline_generation",
+          "name": "Outline Generation Node",
+          "role": "Create a section-by-section presentation outline from the topic and knowledge notes.",
+          "builder_equivalent": "Planning / LLM Decision Node"
+        },
+        {
+          "id": "compose",
+          "name": "Presentation Compose Node",
+          "role": "Render the final outline with evidence points and execution trace.",
+          "builder_equivalent": "Output Template Node"
+        }
+      ],
+      "workflow_nodes": [
+        {
+          "id": "request_parser",
+          "type": "presentation_request_parser",
+          "name": "Presentation Request Parser Node",
+          "role": "Extract presentation topic, target duration and expected output from the user request.",
+          "builder_equivalent": "Start Node + Parser/Prompt Node",
+          "inputs": {
+            "user_message": "context.query",
+            "user_id": "context.user_id"
+          },
+          "outputs": {
+            "topic": "context.topic",
+            "duration_minutes": "context.duration_minutes",
+            "output_type": "context.output_type"
+          },
+          "required_inputs": [
+            "user_message",
+            "user_id"
+          ],
+          "config": {}
+        },
+        {
+          "id": "question",
+          "type": "presentation_question",
+          "name": "Presentation Question Node",
+          "role": "Ask for the missing presentation topic before planning.",
+          "builder_equivalent": "Condition Node + User Input Node",
+          "inputs": {
+            "topic": "context.topic"
+          },
+          "outputs": {
+            "missing_fields": "context.missing_fields",
+            "needs_clarification": "context.needs_clarification",
+            "next_question_field": "context.next_question_field",
+            "clarification_message": "context.clarification_message"
+          },
+          "required_inputs": [
+            "topic"
+          ],
+          "config": {}
+        },
+        {
+          "id": "topic_analysis",
+          "type": "topic_analysis",
+          "name": "Topic Analysis Node",
+          "role": "Identify relevant concepts and decide which knowledge notes are needed.",
+          "builder_equivalent": "Classifier Node + Tag Extraction Node",
+          "inputs": {
+            "topic": "context.topic"
+          },
+          "outputs": {
+            "matched_topics": "context.matched_topics",
+            "planning_goal": "context.planning_goal"
+          },
+          "required_inputs": [
+            "topic"
+          ],
+          "config": {}
+        },
+        {
+          "id": "knowledge_lookup",
+          "type": "knowledge_lookup",
+          "name": "Knowledge Lookup Node",
+          "role": "Load local knowledge notes for the matched presentation topics.",
+          "builder_equivalent": "Local Knowledge / RAG Node",
+          "inputs": {
+            "matched_topics": "context.matched_topics"
+          },
+          "outputs": {
+            "knowledge_points": "context.knowledge_points",
+            "slide_suggestions": "context.slide_suggestions"
+          },
+          "required_inputs": [
+            "matched_topics"
+          ],
+          "config": {}
+        },
+        {
+          "id": "outline_generation",
+          "type": "outline_generation",
+          "name": "Outline Generation Node",
+          "role": "Create a section-by-section presentation outline from the topic and knowledge notes.",
+          "builder_equivalent": "Planning / LLM Decision Node",
+          "inputs": {
+            "knowledge_points": "context.knowledge_points",
+            "duration_minutes": "context.duration_minutes",
+            "planning_goal": "context.planning_goal"
+          },
+          "outputs": {
+            "outline_sections": "context.outline_sections",
+            "speaker_focus": "context.speaker_focus"
+          },
+          "required_inputs": [
+            "knowledge_points",
+            "duration_minutes",
+            "planning_goal"
+          ],
+          "config": {}
+        },
+        {
+          "id": "compose",
+          "type": "presentation_compose",
+          "name": "Presentation Compose Node",
+          "role": "Render the final outline with evidence points and execution trace.",
+          "builder_equivalent": "Output Template Node",
+          "inputs": {
+            "outline_sections": "context.outline_sections",
+            "knowledge_points": "context.knowledge_points",
+            "speaker_focus": "context.speaker_focus"
+          },
+          "outputs": {
+            "final_answer": "context.final_answer",
+            "summary_cards": "context.summary_cards"
+          },
+          "required_inputs": [
+            "outline_sections",
+            "knowledge_points",
+            "speaker_focus"
+          ],
+          "config": {}
+        }
+      ],
+      "workflow_execution": {
+        "type": "sequential",
+        "order": [
+          "request_parser",
+          "question",
+          "topic_analysis",
+          "knowledge_lookup",
+          "outline_generation",
+          "compose"
+        ],
+        "generated_by": "TemplateWorkflowBuilder"
+      }
+    }
+  },
+  "full_trace": [
+    {
+      "name": "Presentation Request Parser Node",
+      "detail": "topic extracted, duration=10 minutes",
+      "data": {
+        "topic": "Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Builder MVP.",
+        "duration_minutes": 10,
+        "output_type": "presentation_outline"
+      },
+      "node_id": "request_parser",
+      "node_type": "presentation_request_parser",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.323261+00:00",
+      "finished_at": "2026-09-24T22:50:28.323284+00:00",
+      "duration_ms": 0.02,
+      "input": {
+        "user_message": "Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Builder MVP.",
+        "user_id": "user_a"
+      },
+      "output": {
+        "topic": "Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Builder MVP.",
+        "duration_minutes": 10,
+        "output_type": "presentation_outline"
+      },
+      "error": null
+    },
+    {
+      "name": "Presentation Question Node",
+      "detail": "presentation context is complete",
+      "data": {
+        "missing_fields": [],
+        "needs_clarification": false,
+        "next_question_field": "",
+        "clarification_message": ""
+      },
+      "node_id": "question",
+      "node_type": "presentation_question",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.323302+00:00",
+      "finished_at": "2026-09-24T22:50:28.323311+00:00",
+      "duration_ms": 0.009,
+      "input": {
+        "topic": "Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Builder MVP."
+      },
+      "output": {
+        "missing_fields": [],
+        "needs_clarification": false,
+        "next_question_field": "",
+        "clarification_message": ""
+      },
+      "error": null
+    },
+    {
+      "name": "Topic Analysis Node",
+      "detail": "matched topics: Multi-Agent Workflow Builder, Workflow Template",
+      "data": {
+        "matched_topic_ids": [
+          "multi_agent_builder",
+          "workflow_template"
+        ],
+        "planning_goal": "Build a defensible presentation outline from local knowledge notes."
+      },
+      "node_id": "topic_analysis",
+      "node_type": "topic_analysis",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.323322+00:00",
+      "finished_at": "2026-09-24T22:50:28.323471+00:00",
+      "duration_ms": 0.151,
+      "input": {
+        "topic": "Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Builder MVP."
+      },
+      "output": {
+        "matched_topics": [
+          {
+            "id": "multi_agent_builder",
+            "title": "Multi-Agent Workflow Builder",
+            "keywords": [
+              "multi-agent",
+              "multi agent",
+              "builder",
+              "workflow builder",
+              "agent builder"
+            ],
+            "points": [
+              "A workflow builder turns a domain process into ordered nodes with defined inputs and outputs.",
+              "The MVP generates executable Workflow JSON and uses sequential execution and trace output to make the result explainable."
+            ],
+            "slide_suggestions": [
+              "Show Template -> Workflow JSON -> Engine -> Trace.",
+              "Keep the demo under two minutes."
+            ]
+          },
+          {
+            "id": "workflow_template",
+            "title": "Workflow Template",
+            "keywords": [
+              "template",
+              "workflow",
+              "node",
+              "trace"
+            ],
+            "points": [
+              "A template defines node order, node roles and required fields.",
+              "The generated Workflow JSON is the contract between the builder and the execution engine."
+            ],
+            "slide_suggestions": [
+              "Compare templates across domains.",
+              "Use trace as proof that the template is executable."
+            ]
+          }
+        ],
+        "planning_goal": "Build a defensible presentation outline from local knowledge notes."
+      },
+      "error": null
+    },
+    {
+      "name": "Knowledge Lookup Node",
+      "detail": "loaded 4 knowledge points from local notes",
+      "data": {
+        "knowledge_points": [
+          "A workflow builder turns a domain process into ordered nodes with defined inputs and outputs.",
+          "The MVP generates executable Workflow JSON and uses sequential execution and trace output to make the result explainable.",
+          "A template defines node order, node roles and required fields.",
+          "The generated Workflow JSON is the contract between the builder and the execution engine."
+        ],
+        "slide_suggestions": [
+          "Show Template -> Workflow JSON -> Engine -> Trace.",
+          "Keep the demo under two minutes.",
+          "Compare templates across domains.",
+          "Use trace as proof that the template is executable."
+        ],
+        "source": "presentation_knowledge.json"
+      },
+      "node_id": "knowledge_lookup",
+      "node_type": "knowledge_lookup",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.323494+00:00",
+      "finished_at": "2026-09-24T22:50:28.323503+00:00",
+      "duration_ms": 0.009,
+      "input": {
+        "matched_topics": [
+          {
+            "id": "multi_agent_builder",
+            "title": "Multi-Agent Workflow Builder",
+            "keywords": [
+              "multi-agent",
+              "multi agent",
+              "builder",
+              "workflow builder",
+              "agent builder"
+            ],
+            "points": [
+              "A workflow builder turns a domain process into ordered nodes with defined inputs and outputs.",
+              "The MVP generates executable Workflow JSON and uses sequential execution and trace output to make the result explainable."
+            ],
+            "slide_suggestions": [
+              "Show Template -> Workflow JSON -> Engine -> Trace.",
+              "Keep the demo under two minutes."
+            ]
+          },
+          {
+            "id": "workflow_template",
+            "title": "Workflow Template",
+            "keywords": [
+              "template",
+              "workflow",
+              "node",
+              "trace"
+            ],
+            "points": [
+              "A template defines node order, node roles and required fields.",
+              "The generated Workflow JSON is the contract between the builder and the execution engine."
+            ],
+            "slide_suggestions": [
+              "Compare templates across domains.",
+              "Use trace as proof that the template is executable."
+            ]
+          }
+        ]
+      },
+      "output": {
+        "knowledge_points": [
+          "A workflow builder turns a domain process into ordered nodes with defined inputs and outputs.",
+          "The MVP generates executable Workflow JSON and uses sequential execution and trace output to make the result explainable.",
+          "A template defines node order, node roles and required fields.",
+          "The generated Workflow JSON is the contract between the builder and the execution engine."
+        ],
+        "slide_suggestions": [
+          "Show Template -> Workflow JSON -> Engine -> Trace.",
+          "Keep the demo under two minutes.",
+          "Compare templates across domains.",
+          "Use trace as proof that the template is executable."
+        ]
+      },
+      "error": null
+    },
+    {
+      "name": "Outline Generation Node",
+      "detail": "generated 5 outline sections",
+      "data": {
+        "outline_sections": [
+          "Opening: define the presentation topic and why Multi-Agent Workflow Builder, Workflow Template matters.",
+          "Problem: explain why a single-domain MVP is not enough to prove a builder.",
+          "Architecture: show Template -> Workflow JSON -> Multi-Agent Engine -> Trace.",
+          "Multi-domain evidence: compare recommendation, presentation planning and support ticket workflows.",
+          "Conclusion: position the current semester as the executable foundation for next semester."
+        ],
+        "speaker_focus": [
+          "Position the project as a workflow builder, not as a single recommendation feature.",
+          "Use multiple domains to prove template portability.",
+          "Show trace output as executable evidence."
+        ]
+      },
+      "node_id": "outline_generation",
+      "node_type": "outline_generation",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.323526+00:00",
+      "finished_at": "2026-09-24T22:50:28.323536+00:00",
+      "duration_ms": 0.01,
+      "input": {
+        "knowledge_points": [
+          "A workflow builder turns a domain process into ordered nodes with defined inputs and outputs.",
+          "The MVP generates executable Workflow JSON and uses sequential execution and trace output to make the result explainable.",
+          "A template defines node order, node roles and required fields.",
+          "The generated Workflow JSON is the contract between the builder and the execution engine."
+        ],
+        "duration_minutes": 10,
+        "planning_goal": "Build a defensible presentation outline from local knowledge notes."
+      },
+      "output": {
+        "outline_sections": [
+          "Opening: define the presentation topic and why Multi-Agent Workflow Builder, Workflow Template matters.",
+          "Problem: explain why a single-domain MVP is not enough to prove a builder.",
+          "Architecture: show Template -> Workflow JSON -> Multi-Agent Engine -> Trace.",
+          "Multi-domain evidence: compare recommendation, presentation planning and support ticket workflows.",
+          "Conclusion: position the current semester as the executable foundation for next semester."
+        ],
+        "speaker_focus": [
+          "Position the project as a workflow builder, not as a single recommendation feature.",
+          "Use multiple domains to prove template portability.",
+          "Show trace output as executable evidence."
+        ]
+      },
+      "error": null
+    },
+    {
+      "name": "Presentation Compose Node",
+      "detail": "final presentation outline rendered",
+      "data": {
+        "summary_cards": [
+          {
+            "title": "Presentation Topic",
+            "rows": [
+              {
+                "label": "Duration",
+                "value": "10 minutes"
+              },
+              {
+                "label": "Matched Topics",
+                "value": "Multi-Agent Workflow Builder, Workflow Template"
+              }
+            ]
+          },
+          {
+            "title": "Knowledge Evidence",
+            "rows": [
+              {
+                "label": "Points",
+                "value": "4"
+              },
+              {
+                "label": "Trace",
+                "value": "6 nodes executed"
+              }
+            ]
+          },
+          {
+            "title": "Outline Result",
+            "rows": [
+              {
+                "label": "1",
+                "value": "Opening: define the presentation topic and why Multi-Agent Workflow Builder, Workflow Template matters."
+              },
+              {
+                "label": "2",
+                "value": "Problem: explain why a single-domain MVP is not enough to prove a builder."
+              },
+              {
+                "label": "3",
+                "value": "Architecture: show Template -> Workflow JSON -> Multi-Agent Engine -> Trace."
+              },
+              {
+                "label": "4",
+                "value": "Multi-domain evidence: compare recommendation, presentation planning and support ticket workflows."
+              }
+            ]
+          }
+        ]
+      },
+      "node_id": "compose",
+      "node_type": "presentation_compose",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.323550+00:00",
+      "finished_at": "2026-09-24T22:50:28.323571+00:00",
+      "duration_ms": 0.021,
+      "input": {
+        "outline_sections": [
+          "Opening: define the presentation topic and why Multi-Agent Workflow Builder, Workflow Template matters.",
+          "Problem: explain why a single-domain MVP is not enough to prove a builder.",
+          "Architecture: show Template -> Workflow JSON -> Multi-Agent Engine -> Trace.",
+          "Multi-domain evidence: compare recommendation, presentation planning and support ticket workflows.",
+          "Conclusion: position the current semester as the executable foundation for next semester."
+        ],
+        "knowledge_points": [
+          "A workflow builder turns a domain process into ordered nodes with defined inputs and outputs.",
+          "The MVP generates executable Workflow JSON and uses sequential execution and trace output to make the result explainable.",
+          "A template defines node order, node roles and required fields.",
+          "The generated Workflow JSON is the contract between the builder and the execution engine."
+        ],
+        "speaker_focus": [
+          "Position the project as a workflow builder, not as a single recommendation feature.",
+          "Use multiple domains to prove template portability.",
+          "Show trace output as executable evidence."
+        ]
+      },
+      "output": {
+        "final_answer": "[Presentation Planning Workflow]\nTopic: Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Builder MVP.\nDuration: 10 minutes\nMatched knowledge: Multi-Agent Workflow Builder, Workflow Template\n\nOutline\n1. Opening: define the presentation topic and why Multi-Agent Workflow Builder, Workflow Template matters.\n2. Problem: explain why a single-domain MVP is not enough to prove a builder.\n3. Architecture: show Template -> Workflow JSON -> Multi-Agent Engine -> Trace.\n4. Multi-domain evidence: compare recommendation, presentation planning and support ticket workflows.\n5. Conclusion: position the current semester as the executable foundation for next semester.\n\nKey evidence\n- A workflow builder turns a domain process into ordered nodes with defined inputs and outputs.\n- The MVP generates executable Workflow JSON and uses sequential execution and trace output to make the result explainable.\n- A template defines node order, node roles and required fields.\n- The generated Workflow JSON is the contract between the builder and the execution engine.\n\nTrace proof: this outline was produced by a 6-node generated workflow.",
+        "summary_cards": [
+          {
+            "title": "Presentation Topic",
+            "rows": [
+              {
+                "label": "Duration",
+                "value": "10 minutes"
+              },
+              {
+                "label": "Matched Topics",
+                "value": "Multi-Agent Workflow Builder, Workflow Template"
+              }
+            ]
+          },
+          {
+            "title": "Knowledge Evidence",
+            "rows": [
+              {
+                "label": "Points",
+                "value": "4"
+              },
+              {
+                "label": "Trace",
+                "value": "6 nodes executed"
+              }
+            ]
+          },
+          {
+            "title": "Outline Result",
+            "rows": [
+              {
+                "label": "1",
+                "value": "Opening: define the presentation topic and why Multi-Agent Workflow Builder, Workflow Template matters."
+              },
+              {
+                "label": "2",
+                "value": "Problem: explain why a single-domain MVP is not enough to prove a builder."
+              },
+              {
+                "label": "3",
+                "value": "Architecture: show Template -> Workflow JSON -> Multi-Agent Engine -> Trace."
+              },
+              {
+                "label": "4",
+                "value": "Multi-domain evidence: compare recommendation, presentation planning and support ticket workflows."
+              }
+            ]
+          }
+        ]
+      },
+      "error": null
+    }
+  ],
+  "duration_ms": 3.041,
+  "node_statuses": [
+    {
+      "node_id": "request_parser",
+      "node_type": "presentation_request_parser",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "question",
+      "node_type": "presentation_question",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "topic_analysis",
+      "node_type": "topic_analysis",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "knowledge_lookup",
+      "node_type": "knowledge_lookup",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "outline_generation",
+      "node_type": "outline_generation",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "compose",
+      "node_type": "presentation_compose",
+      "status": "SUCCESS"
+    }
+  ],
+  "errors": [],
+  "failure_mode": null
+}

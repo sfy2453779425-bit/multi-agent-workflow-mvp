@@ -1,0 +1,94 @@
+{
+  "experiment_id": "builder_v3_threeway_20260925",
+  "experiment_status": "FORMAL",
+  "system": "Claude-CLI",
+  "case_id": "outfit_02",
+  "case_type": "outfit-2026-09-16-v2-high-precipitation",
+  "run": 2,
+  "run_id": "Claude-CLI_outfit_02_run2",
+  "schedule_index": 35,
+  "model_requested": "claude-opus-5-5",
+  "model_returned": [
+    "claude-opus-5-5"
+  ],
+  "cli_version": "2.1.281 (Claude Code)",
+  "call_path": "claude -p --output-format json",
+  "prompt_text_hash": "b292435426064654c8bb863f9983003f2006f2c189c2c77ad3b76a0104574648",
+  "fixture_hash": "7da0f4d9502976d46b07237d5eac999db5555d94048f73a3b00b01e6a7b9eec9",
+  "fixture_file_sha256": "6719ff6aba1eb8132ad96566e57aff655a3443a454fdb357a2b7421c3a400e74",
+  "timestamp_start_utc": "2026-09-24T22:56:27.684Z",
+  "timestamp_end_utc": "2026-09-24T22:56:44.405Z",
+  "latency_ms": 16721,
+  "finish_reason": "end_turn",
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 1705,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1529,
+    "output_tokens_details": {
+      "thinking_tokens": 355
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 1705,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1529,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 1705,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1705
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "output_tokens": 1529,
+  "output_limit": "not set",
+  "reasoning_effort": "not applicable / CLI default",
+  "raw_stdout_path": "raw/claude/outfit_02_run2.raw",
+  "raw_stdout_sha256": "b8586b867395805d8abc057963c8514b5ddcd086932d309445170c9ff26dde20",
+  "raw_stdout_bytes": 4278,
+  "raw_text": "# 칭다오 비 오는 날 캐주얼 코디 추천 (보유 아이템 기준)\n\n## 날씨 요약\n| 항목 | 내용 |\n|---|---|\n| **날씨 (weather)** | 비 (weather code 63) |\n| **기온 (temperature)** | 최저 12.0°C / 최고 18.0°C |\n| **강수 (precipitation)** | 강수확률 80% |\n\n⚠️ **날짜 확인 필요:** 제공된 날씨 데이터는 **2026-09-24** 기준입니다. \"다음 주\" 날씨가 아니고, 오늘(2026-09-25)보다 이전 날짜입니다. 규칙에 따라 이 고정 데이터로 추천했습니다. 실제 여행 날짜의 예보는 제공되지 않았으니 출발 전에 다시 확인하세요.\n\n강수확률이 80%로 기준치(40%) 이상이어서, **비에 적합한(rain_ok: true) 아이템만** 선택했습니다.\n\n## 추천 아이템 (순위)\n\n| 순위 | ID | 아이템 | 역할 | 선택 이유 (reason) |\n|---|---|---|---|---|\n| 1 | A003 | 라이트 그레이 바람막이 | 아우터 | 비에 적합한 유일한 아우터입니다. 가벼워서 12~18°C에 레이어드하기 좋습니다. |\n| 2 | A001 | 블랙 후드티 | 상의 | 캐주얼 스타일이고 비에 적합합니다. 보온성이 중간이라 최저 12°C의 쌀쌀함에 대응할 수 있습니다. |\n| 3 | A002 | 네이비 조거 팬츠 | 하의 | 비에 적합한 유일한 하의입니다. 보온성이 중간이고 여행 중 활동하기 편합니다. |\n| 4 | A005 | 화이트 반팔 티셔츠 | 이너 | 비에 적합하고 캐주얼합니다. 낮 최고 18°C일 때 후드티 대신 입거나 이너로 레이어드할 수 있습니다. |\n\n**추천 조합:** 바람막이(A003) + 후드티(A001) + 조거 팬츠(A002)\n기온이 오르면 후드티를 반팔 티(A005)로 바꿔 입으세요.\n\n## 제외한 아이템\n- **A004 블랙 패딩:** 비에 부적합(rain_ok: false)하고, 12~18°C에는 너무 두껍습니다(heavy).\n- **A006 블랙 캔버스 스니커즈:** 비에 부적합합니다(rain_ok: false).\n\n## 부족한 정보 및 참고사항\n- **신발:** 보유 목록에 비에 적합한 신발이 없어 추천할 수 없습니다. 방수 신발 정보가 필요합니다.\n- **우산·우비 등 우천 소품:** 보유 목록에 없어 추천하지 않았습니다.\n- **스타일:** 조거 팬츠(스트릿)와 바람막이(스포티)는 엄밀히 \"캐주얼\"로 분류된 아이템은 아닙니다. 다만 비에 적합한 하의와 아우터가 각각 이것 하나뿐이어서 포함했습니다. 둘 다 캐주얼 코디와 잘 어울립니다.",
+  "raw_text_sha256": "a4785e3994bf43aee6f040025e06b5aa30f145fac814ef77b562f8295a0f9ed4",
+  "parse_status": "CLI_OUTPUT_PRESENT",
+  "parse_errors": [],
+  "attempts": [
+    {
+      "attempt_no": 1,
+      "exit_code": 0,
+      "timed_out": false,
+      "retryable_transport_error": false,
+      "error_message": null,
+      "raw_stdout_sha256": "b8586b867395805d8abc057963c8514b5ddcd086932d309445170c9ff26dde20",
+      "raw_stdout_bytes": 4278,
+      "parse_status": "CLI_OUTPUT_PRESENT"
+    }
+  ],
+  "transport_failure": false,
+  "cli_exit_code": 0,
+  "fatal_auth_error": false,
+  "isolation": {
+    "model_requested": "claude-opus-5-5",
+    "cli": "claude.EXE",
+    "cli_version": "2.1.281 (Claude Code)",
+    "call_path": "claude -p --output-format json",
+    "system_prompt": "empty",
+    "tools": "none",
+    "setting_sources": "none",
+    "session_persistence": "disabled",
+    "output_limit": "not set",
+    "fresh_session": "one process and clean temporary workdir per call"
+  },
+  "sampling_parameters": "not explicitly set by this experiment"
+}

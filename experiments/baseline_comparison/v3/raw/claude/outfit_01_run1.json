@@ -1,0 +1,94 @@
+{
+  "experiment_id": "builder_v3_threeway_20260925",
+  "experiment_status": "FORMAL",
+  "system": "Claude-CLI",
+  "case_id": "outfit_01",
+  "case_type": "outfit-2026-09-16-v1",
+  "run": 1,
+  "run_id": "Claude-CLI_outfit_01_run1",
+  "schedule_index": 2,
+  "model_requested": "claude-opus-5-5",
+  "model_returned": [
+    "claude-opus-5-5"
+  ],
+  "cli_version": "2.1.281 (Claude Code)",
+  "call_path": "claude -p --output-format json",
+  "prompt_text_hash": "81e6e0b7a3369a911d83c3cadf025045ef382bcf82f55a94a79c131bf90f89c4",
+  "fixture_hash": "3e3b3417dce7482094d73e04368f2c1420c3548bb89e3d3bab0ac46c6b521678",
+  "fixture_file_sha256": "a3d78ec1e6818ccd2071a99a453f9e58ce8143c056b4ec444592ecf3379c2e6e",
+  "timestamp_start_utc": "2026-09-24T22:51:08.409Z",
+  "timestamp_end_utc": "2026-09-24T22:51:27.185Z",
+  "latency_ms": 18776,
+  "finish_reason": "end_turn",
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 1663,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1503,
+    "output_tokens_details": {
+      "thinking_tokens": 435
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 1663,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1503,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 1663,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1663
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "output_tokens": 1503,
+  "output_limit": "not set",
+  "reasoning_effort": "not applicable / CLI default",
+  "raw_stdout_path": "raw/claude/outfit_01_run1.raw",
+  "raw_stdout_sha256": "185fad581ab3664a2fdd5deb1be564ec2c8f9311e4b0f9790bf32784b8049d96",
+  "raw_stdout_bytes": 4015,
+  "raw_text": "# 칭다오 여행 캐주얼 코디 추천\n\n## 날씨 (고정 데이터 기준)\n- **날씨**: 흐림 (칭다오, 2026-09-23)\n- **기온**: 최저 10.0°C / 최고 21.0°C (일교차 11°C)\n- **강수**: 강수 확률 20%\n\n일교차가 커서 아침·저녁에는 쌀쌀하고 낮에는 선선합니다. 겹쳐 입고 벗기 쉬운 코디가 좋습니다.\n\n## 추천 아이템 (보유 옷 중 순위)\n\n| 순위 | 아이템 | 이유 |\n|---|---|---|\n| 1 | **A001 블랙 후드티** | 캐주얼 스타일이고 보온성이 중간이라 10~21°C에 잘 맞습니다. 여행 코디의 중심 아이템입니다. |\n| 2 | **A003 라이트 그레이 바람막이** | 가벼운 아우터로 아침·저녁 10°C대에 걸치기 좋습니다. 비에도 괜찮아서(rain_ok) 20% 강수 확률에 대비할 수 있고, 낮에는 벗어서 들고 다니기 편합니다. |\n| 3 | **A002 네이비 조거 팬츠** | 보온성이 중간이고 비에도 괜찮아서 오래 걷는 여행에 편합니다. 스타일은 스트릿이지만 후드티와 캐주얼하게 잘 어울립니다. |\n| 4 | **A005 화이트 반팔 티셔츠** | 후드티 안에 이너로 입으세요. 낮 기온이 21°C까지 오르면 후드티를 벗고 가볍게 다닐 수 있습니다. |\n| 5 | **A006 블랙 캔버스 스니커즈** | 보유 신발 중 유일한 선택지이고 코디와 잘 맞습니다. 다만 비에 약하니(rain_ok: false) 비가 오면 젖지 않게 주의하세요. |\n\n**제외: A004 블랙 패딩**. 보온성이 높아(heavy) 최저 10°C 날씨에는 과하고, 비에도 약합니다.\n\n**추천 코디**: 화이트 반팔 + 블랙 후드티 + 그레이 바람막이 + 네이비 조거 + 블랙 스니커즈\n\n## 부족한 정보\n- **여행 날짜와 기간**: 제공된 날씨는 2026-09-23 하루치뿐입니다. 오늘(2026-09-25) 기준으로는 이미 지난 날짜여서 실제 \"다음 주\" 날씨와 다를 수 있습니다. 출발 전에 최신 예보를 확인하세요.\n- 풍속, 습도 등 다른 날씨 정보는 제공되지 않아 반영하지 못했습니다.\n- 추천은 제공된 구매 이력 6개 안에서만 했습니다. 여러 날 여행이라면 갈아입을 상의와 하의가 부족할 수 있습니다.",
+  "raw_text_sha256": "74d0c349b1215640617a8349e69e23f1979794fbcccf5a5df8ccb9f11bcb31d6",
+  "parse_status": "CLI_OUTPUT_PRESENT",
+  "parse_errors": [],
+  "attempts": [
+    {
+      "attempt_no": 1,
+      "exit_code": 0,
+      "timed_out": false,
+      "retryable_transport_error": false,
+      "error_message": null,
+      "raw_stdout_sha256": "185fad581ab3664a2fdd5deb1be564ec2c8f9311e4b0f9790bf32784b8049d96",
+      "raw_stdout_bytes": 4015,
+      "parse_status": "CLI_OUTPUT_PRESENT"
+    }
+  ],
+  "transport_failure": false,
+  "cli_exit_code": 0,
+  "fatal_auth_error": false,
+  "isolation": {
+    "model_requested": "claude-opus-5-5",
+    "cli": "claude.EXE",
+    "cli_version": "2.1.281 (Claude Code)",
+    "call_path": "claude -p --output-format json",
+    "system_prompt": "empty",
+    "tools": "none",
+    "setting_sources": "none",
+    "session_persistence": "disabled",
+    "output_limit": "not set",
+    "fresh_session": "one process and clean temporary workdir per call"
+  },
+  "sampling_parameters": "not explicitly set by this experiment"
+}

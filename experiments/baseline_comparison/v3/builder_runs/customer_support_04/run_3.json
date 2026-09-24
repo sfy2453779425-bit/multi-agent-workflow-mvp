@@ -1,0 +1,885 @@
+{
+  "run_id": "builder_customer_support_04_3",
+  "experiment_id": "builder_v3_threeway_20260925",
+  "builder_version": "current-runtime-v1.2-source-snapshot",
+  "case_id": "customer_support_04",
+  "run": 3,
+  "system": "Builder",
+  "timestamp": "2026-09-24T22:50:28.395269+00:00",
+  "finished_at": "2026-09-24T22:50:28.398046+00:00",
+  "input": {
+    "query": "The mobile app crashes with an error and is not working after the update.",
+    "user_id": "user_a"
+  },
+  "fixture_version": "customer-support-2026-09-16-v2-technical",
+  "fixture_sha256": "0cf815ee0ece6249587845067c566974a87345d83519eb743c09374dabb8f001",
+  "prompt_version": "prompt-v1",
+  "workflow_json": {
+    "schema_version": 1,
+    "workflow_id": "customer_support_ticket_workflow_v1",
+    "workflow_name": "Customer Support Ticket Workflow",
+    "description": "A builder template for classifying a customer support request, selecting a policy and routing the ticket to the right team.",
+    "runtime_type": "customer_support",
+    "base_agent_config": null,
+    "data_file": "support_policy.json",
+    "data_dir": null,
+    "default_query": "Customer says the delivery is late and asks whether the order can be refunded.",
+    "default_user_id": "user_a",
+    "agents": [
+      {
+        "id": "request_parser",
+        "name": "Support Request Parser Node",
+        "role": "Extract issue keywords, customer intent and available ticket context.",
+        "builder_equivalent": "Start Node + Parser/Prompt Node"
+      },
+      {
+        "id": "question",
+        "name": "Support Question Node",
+        "role": "Ask for missing issue details before routing the ticket.",
+        "builder_equivalent": "Condition Node + User Input Node"
+      },
+      {
+        "id": "ticket_classification",
+        "name": "Ticket Classification Node",
+        "role": "Classify the ticket category by matching local policy keywords.",
+        "builder_equivalent": "Classifier Node"
+      },
+      {
+        "id": "policy_lookup",
+        "name": "Policy Lookup Node",
+        "role": "Load the local support policy for the matched ticket category.",
+        "builder_equivalent": "Local Knowledge / RAG Node"
+      },
+      {
+        "id": "routing_decision",
+        "name": "Routing Decision Node",
+        "role": "Decide ticket owner, priority and next actions from classification and policy.",
+        "builder_equivalent": "Rule/LLM Decision Node"
+      },
+      {
+        "id": "compose",
+        "name": "Support Compose Node",
+        "role": "Render the ticket summary, routing decision and response draft.",
+        "builder_equivalent": "Output Template Node"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "request_parser",
+        "type": "support_request_parser",
+        "name": "Support Request Parser Node",
+        "role": "Extract issue keywords, customer intent and available ticket context.",
+        "builder_equivalent": "Start Node + Parser/Prompt Node",
+        "inputs": {
+          "user_message": "context.query",
+          "user_id": "context.user_id"
+        },
+        "outputs": {
+          "issue_text": "context.issue_text",
+          "intent": "context.intent"
+        },
+        "required_inputs": [
+          "user_message",
+          "user_id"
+        ],
+        "config": {}
+      },
+      {
+        "id": "question",
+        "type": "support_question",
+        "name": "Support Question Node",
+        "role": "Ask for missing issue details before routing the ticket.",
+        "builder_equivalent": "Condition Node + User Input Node",
+        "inputs": {
+          "issue_text": "context.issue_text"
+        },
+        "outputs": {
+          "missing_fields": "context.missing_fields",
+          "needs_clarification": "context.needs_clarification",
+          "next_question_field": "context.next_question_field",
+          "clarification_message": "context.clarification_message"
+        },
+        "required_inputs": [
+          "issue_text"
+        ],
+        "config": {}
+      },
+      {
+        "id": "ticket_classification",
+        "type": "ticket_classification",
+        "name": "Ticket Classification Node",
+        "role": "Classify the ticket category by matching local policy keywords.",
+        "builder_equivalent": "Classifier Node",
+        "inputs": {
+          "issue_text": "context.issue_text"
+        },
+        "outputs": {
+          "ticket_category_record": "context.ticket_category_record",
+          "ticket_category": "context.ticket_category",
+          "ticket_category_id": "context.ticket_category_id",
+          "matched_keywords": "context.matched_keywords",
+          "priority_candidate": "context.priority_candidate"
+        },
+        "required_inputs": [
+          "issue_text"
+        ],
+        "config": {}
+      },
+      {
+        "id": "policy_lookup",
+        "type": "policy_lookup",
+        "name": "Policy Lookup Node",
+        "role": "Load the local support policy for the matched ticket category.",
+        "builder_equivalent": "Local Knowledge / RAG Node",
+        "inputs": {
+          "category": "context.ticket_category_record"
+        },
+        "outputs": {
+          "policy": "context.policy",
+          "sla": "context.sla",
+          "owner_team": "context.owner_team"
+        },
+        "required_inputs": [
+          "category"
+        ],
+        "config": {}
+      },
+      {
+        "id": "routing_decision",
+        "type": "routing_decision",
+        "name": "Routing Decision Node",
+        "role": "Decide ticket owner, priority and next actions from classification and policy.",
+        "builder_equivalent": "Rule/LLM Decision Node",
+        "inputs": {
+          "category": "context.ticket_category_record",
+          "policy": "context.policy"
+        },
+        "outputs": {
+          "priority": "context.priority",
+          "next_actions": "context.next_actions"
+        },
+        "required_inputs": [
+          "category",
+          "policy"
+        ],
+        "config": {}
+      },
+      {
+        "id": "compose",
+        "type": "support_compose",
+        "name": "Support Compose Node",
+        "role": "Render the ticket summary, routing decision and response draft.",
+        "builder_equivalent": "Output Template Node",
+        "inputs": {
+          "owner_team": "context.owner_team",
+          "priority": "context.priority",
+          "next_actions": "context.next_actions",
+          "policy": "context.policy"
+        },
+        "outputs": {
+          "final_answer": "context.final_answer",
+          "summary_cards": "context.summary_cards"
+        },
+        "required_inputs": [
+          "owner_team",
+          "priority",
+          "next_actions",
+          "policy"
+        ],
+        "config": {}
+      }
+    ],
+    "execution": {
+      "type": "sequential",
+      "order": [
+        "request_parser",
+        "question",
+        "ticket_classification",
+        "policy_lookup",
+        "routing_decision",
+        "compose"
+      ],
+      "generated_by": "TemplateWorkflowBuilder"
+    },
+    "question_agent": {
+      "required_fields": [
+        "issue_text"
+      ],
+      "clarification_questions": {
+        "issue_text": "Please describe the customer issue before routing the ticket."
+      }
+    },
+    "experiment_mode": {
+      "type": "frozen_fixture",
+      "fixture_version": "customer-support-2026-09-16-v2-technical",
+      "fixture_sha256": "0cf815ee0ece6249587845067c566974a87345d83519eb743c09374dabb8f001"
+    }
+  },
+  "workflow_sha256": "0e0452c53fa5c884e9472d65a1748b0df298f09cbadd466c35556d539675545b",
+  "final_result": {
+    "answer": "[Customer Support Ticket Workflow]\nCategory: Technical Issue\nIntent: technical_help\nOwner team: Technical Support\nPriority: P2 / SLA: 1 business day\n\nPolicy basis:\nCollect reproduction steps and device information, then route to technical support for diagnosis.\n\nNext actions\n1. Collect reproduction steps.\n2. Ask for device, browser or app version.\n3. Route to technical support with logs if available.\n\nResponse draft: We have classified the issue and routed it to Technical Support for follow-up.",
+    "context": {
+      "query": "The mobile app crashes with an error and is not working after the update.",
+      "user_id": "user_a",
+      "runtime_type": "customer_support",
+      "workflow_name": "Customer Support Ticket Workflow",
+      "executed_agents": [
+        "request_parser",
+        "question",
+        "ticket_classification",
+        "policy_lookup",
+        "routing_decision",
+        "compose"
+      ],
+      "executed_tools": [
+        "support_policy"
+      ],
+      "issue_text": "The mobile app crashes with an error and is not working after the update.",
+      "intent": "technical_help",
+      "missing_fields": [],
+      "needs_clarification": false,
+      "next_question_field": "",
+      "clarification_message": "",
+      "ticket_category_record": {
+        "id": "technical",
+        "label": "Technical Issue",
+        "keywords": [
+          "error",
+          "bug",
+          "app",
+          "website",
+          "crash",
+          "not working",
+          "api",
+          "update"
+        ],
+        "owner_team": "Technical Support",
+        "priority": "P2",
+        "sla": "1 business day",
+        "policy": "Collect reproduction steps and device information, then route to technical support for diagnosis.",
+        "next_actions": [
+          "Collect reproduction steps.",
+          "Ask for device, browser or app version.",
+          "Route to technical support with logs if available."
+        ]
+      },
+      "ticket_category": "Technical Issue",
+      "ticket_category_id": "technical",
+      "matched_keywords": [
+        "error",
+        "app",
+        "crash",
+        "not working",
+        "update"
+      ],
+      "priority_candidate": "P2",
+      "policy": "Collect reproduction steps and device information, then route to technical support for diagnosis.",
+      "sla": "1 business day",
+      "owner_team": "Technical Support",
+      "priority": "P2",
+      "next_actions": [
+        "Collect reproduction steps.",
+        "Ask for device, browser or app version.",
+        "Route to technical support with logs if available."
+      ],
+      "final_answer": "[Customer Support Ticket Workflow]\nCategory: Technical Issue\nIntent: technical_help\nOwner team: Technical Support\nPriority: P2 / SLA: 1 business day\n\nPolicy basis:\nCollect reproduction steps and device information, then route to technical support for diagnosis.\n\nNext actions\n1. Collect reproduction steps.\n2. Ask for device, browser or app version.\n3. Route to technical support with logs if available.\n\nResponse draft: We have classified the issue and routed it to Technical Support for follow-up.",
+      "summary_cards": [
+        {
+          "title": "Ticket Classification",
+          "rows": [
+            {
+              "label": "Category",
+              "value": "Technical Issue"
+            },
+            {
+              "label": "Intent",
+              "value": "technical_help"
+            }
+          ]
+        },
+        {
+          "title": "Routing Decision",
+          "rows": [
+            {
+              "label": "Owner",
+              "value": "Technical Support"
+            },
+            {
+              "label": "Priority",
+              "value": "P2"
+            },
+            {
+              "label": "SLA",
+              "value": "1 business day"
+            }
+          ]
+        },
+        {
+          "title": "Next Actions",
+          "rows": [
+            {
+              "label": "1",
+              "value": "Collect reproduction steps."
+            },
+            {
+              "label": "2",
+              "value": "Ask for device, browser or app version."
+            },
+            {
+              "label": "3",
+              "value": "Route to technical support with logs if available."
+            }
+          ]
+        }
+      ],
+      "workflow_agents": [
+        {
+          "id": "request_parser",
+          "name": "Support Request Parser Node",
+          "role": "Extract issue keywords, customer intent and available ticket context.",
+          "builder_equivalent": "Start Node + Parser/Prompt Node"
+        },
+        {
+          "id": "question",
+          "name": "Support Question Node",
+          "role": "Ask for missing issue details before routing the ticket.",
+          "builder_equivalent": "Condition Node + User Input Node"
+        },
+        {
+          "id": "ticket_classification",
+          "name": "Ticket Classification Node",
+          "role": "Classify the ticket category by matching local policy keywords.",
+          "builder_equivalent": "Classifier Node"
+        },
+        {
+          "id": "policy_lookup",
+          "name": "Policy Lookup Node",
+          "role": "Load the local support policy for the matched ticket category.",
+          "builder_equivalent": "Local Knowledge / RAG Node"
+        },
+        {
+          "id": "routing_decision",
+          "name": "Routing Decision Node",
+          "role": "Decide ticket owner, priority and next actions from classification and policy.",
+          "builder_equivalent": "Rule/LLM Decision Node"
+        },
+        {
+          "id": "compose",
+          "name": "Support Compose Node",
+          "role": "Render the ticket summary, routing decision and response draft.",
+          "builder_equivalent": "Output Template Node"
+        }
+      ],
+      "workflow_nodes": [
+        {
+          "id": "request_parser",
+          "type": "support_request_parser",
+          "name": "Support Request Parser Node",
+          "role": "Extract issue keywords, customer intent and available ticket context.",
+          "builder_equivalent": "Start Node + Parser/Prompt Node",
+          "inputs": {
+            "user_message": "context.query",
+            "user_id": "context.user_id"
+          },
+          "outputs": {
+            "issue_text": "context.issue_text",
+            "intent": "context.intent"
+          },
+          "required_inputs": [
+            "user_message",
+            "user_id"
+          ],
+          "config": {}
+        },
+        {
+          "id": "question",
+          "type": "support_question",
+          "name": "Support Question Node",
+          "role": "Ask for missing issue details before routing the ticket.",
+          "builder_equivalent": "Condition Node + User Input Node",
+          "inputs": {
+            "issue_text": "context.issue_text"
+          },
+          "outputs": {
+            "missing_fields": "context.missing_fields",
+            "needs_clarification": "context.needs_clarification",
+            "next_question_field": "context.next_question_field",
+            "clarification_message": "context.clarification_message"
+          },
+          "required_inputs": [
+            "issue_text"
+          ],
+          "config": {}
+        },
+        {
+          "id": "ticket_classification",
+          "type": "ticket_classification",
+          "name": "Ticket Classification Node",
+          "role": "Classify the ticket category by matching local policy keywords.",
+          "builder_equivalent": "Classifier Node",
+          "inputs": {
+            "issue_text": "context.issue_text"
+          },
+          "outputs": {
+            "ticket_category_record": "context.ticket_category_record",
+            "ticket_category": "context.ticket_category",
+            "ticket_category_id": "context.ticket_category_id",
+            "matched_keywords": "context.matched_keywords",
+            "priority_candidate": "context.priority_candidate"
+          },
+          "required_inputs": [
+            "issue_text"
+          ],
+          "config": {}
+        },
+        {
+          "id": "policy_lookup",
+          "type": "policy_lookup",
+          "name": "Policy Lookup Node",
+          "role": "Load the local support policy for the matched ticket category.",
+          "builder_equivalent": "Local Knowledge / RAG Node",
+          "inputs": {
+            "category": "context.ticket_category_record"
+          },
+          "outputs": {
+            "policy": "context.policy",
+            "sla": "context.sla",
+            "owner_team": "context.owner_team"
+          },
+          "required_inputs": [
+            "category"
+          ],
+          "config": {}
+        },
+        {
+          "id": "routing_decision",
+          "type": "routing_decision",
+          "name": "Routing Decision Node",
+          "role": "Decide ticket owner, priority and next actions from classification and policy.",
+          "builder_equivalent": "Rule/LLM Decision Node",
+          "inputs": {
+            "category": "context.ticket_category_record",
+            "policy": "context.policy"
+          },
+          "outputs": {
+            "priority": "context.priority",
+            "next_actions": "context.next_actions"
+          },
+          "required_inputs": [
+            "category",
+            "policy"
+          ],
+          "config": {}
+        },
+        {
+          "id": "compose",
+          "type": "support_compose",
+          "name": "Support Compose Node",
+          "role": "Render the ticket summary, routing decision and response draft.",
+          "builder_equivalent": "Output Template Node",
+          "inputs": {
+            "owner_team": "context.owner_team",
+            "priority": "context.priority",
+            "next_actions": "context.next_actions",
+            "policy": "context.policy"
+          },
+          "outputs": {
+            "final_answer": "context.final_answer",
+            "summary_cards": "context.summary_cards"
+          },
+          "required_inputs": [
+            "owner_team",
+            "priority",
+            "next_actions",
+            "policy"
+          ],
+          "config": {}
+        }
+      ],
+      "workflow_execution": {
+        "type": "sequential",
+        "order": [
+          "request_parser",
+          "question",
+          "ticket_classification",
+          "policy_lookup",
+          "routing_decision",
+          "compose"
+        ],
+        "generated_by": "TemplateWorkflowBuilder"
+      }
+    }
+  },
+  "full_trace": [
+    {
+      "name": "Support Request Parser Node",
+      "detail": "support intent=technical_help",
+      "data": {
+        "issue_text": "The mobile app crashes with an error and is not working after the update.",
+        "intent": "technical_help"
+      },
+      "node_id": "request_parser",
+      "node_type": "support_request_parser",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.396855+00:00",
+      "finished_at": "2026-09-24T22:50:28.396878+00:00",
+      "duration_ms": 0.021,
+      "input": {
+        "user_message": "The mobile app crashes with an error and is not working after the update.",
+        "user_id": "user_a"
+      },
+      "output": {
+        "issue_text": "The mobile app crashes with an error and is not working after the update.",
+        "intent": "technical_help"
+      },
+      "error": null
+    },
+    {
+      "name": "Support Question Node",
+      "detail": "ticket context is complete",
+      "data": {
+        "missing_fields": [],
+        "needs_clarification": false,
+        "next_question_field": "",
+        "clarification_message": ""
+      },
+      "node_id": "question",
+      "node_type": "support_question",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.396900+00:00",
+      "finished_at": "2026-09-24T22:50:28.396910+00:00",
+      "duration_ms": 0.01,
+      "input": {
+        "issue_text": "The mobile app crashes with an error and is not working after the update."
+      },
+      "output": {
+        "missing_fields": [],
+        "needs_clarification": false,
+        "next_question_field": "",
+        "clarification_message": ""
+      },
+      "error": null
+    },
+    {
+      "name": "Ticket Classification Node",
+      "detail": "category=Technical Issue, matched=error, app, crash, not working, update",
+      "data": {
+        "category": "Technical Issue",
+        "priority_candidate": "P2",
+        "matched_keywords": [
+          "error",
+          "app",
+          "crash",
+          "not working",
+          "update"
+        ]
+      },
+      "node_id": "ticket_classification",
+      "node_type": "ticket_classification",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.396921+00:00",
+      "finished_at": "2026-09-24T22:50:28.397062+00:00",
+      "duration_ms": 0.143,
+      "input": {
+        "issue_text": "The mobile app crashes with an error and is not working after the update."
+      },
+      "output": {
+        "ticket_category_record": {
+          "id": "technical",
+          "label": "Technical Issue",
+          "keywords": [
+            "error",
+            "bug",
+            "app",
+            "website",
+            "crash",
+            "not working",
+            "api",
+            "update"
+          ],
+          "owner_team": "Technical Support",
+          "priority": "P2",
+          "sla": "1 business day",
+          "policy": "Collect reproduction steps and device information, then route to technical support for diagnosis.",
+          "next_actions": [
+            "Collect reproduction steps.",
+            "Ask for device, browser or app version.",
+            "Route to technical support with logs if available."
+          ]
+        },
+        "ticket_category": "Technical Issue",
+        "ticket_category_id": "technical",
+        "matched_keywords": [
+          "error",
+          "app",
+          "crash",
+          "not working",
+          "update"
+        ],
+        "priority_candidate": "P2"
+      },
+      "error": null
+    },
+    {
+      "name": "Policy Lookup Node",
+      "detail": "loaded policy for Technical Issue",
+      "data": {
+        "policy": "Collect reproduction steps and device information, then route to technical support for diagnosis.",
+        "sla": "1 business day",
+        "owner_team": "Technical Support",
+        "source": "support_policy.json"
+      },
+      "node_id": "policy_lookup",
+      "node_type": "policy_lookup",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.397086+00:00",
+      "finished_at": "2026-09-24T22:50:28.397094+00:00",
+      "duration_ms": 0.008,
+      "input": {
+        "category": {
+          "id": "technical",
+          "label": "Technical Issue",
+          "keywords": [
+            "error",
+            "bug",
+            "app",
+            "website",
+            "crash",
+            "not working",
+            "api",
+            "update"
+          ],
+          "owner_team": "Technical Support",
+          "priority": "P2",
+          "sla": "1 business day",
+          "policy": "Collect reproduction steps and device information, then route to technical support for diagnosis.",
+          "next_actions": [
+            "Collect reproduction steps.",
+            "Ask for device, browser or app version.",
+            "Route to technical support with logs if available."
+          ]
+        }
+      },
+      "output": {
+        "policy": "Collect reproduction steps and device information, then route to technical support for diagnosis.",
+        "sla": "1 business day",
+        "owner_team": "Technical Support"
+      },
+      "error": null
+    },
+    {
+      "name": "Routing Decision Node",
+      "detail": "route to Technical Support with priority P2",
+      "data": {
+        "owner_team": "Technical Support",
+        "policy": "Collect reproduction steps and device information, then route to technical support for diagnosis.",
+        "priority": "P2",
+        "next_actions": [
+          "Collect reproduction steps.",
+          "Ask for device, browser or app version.",
+          "Route to technical support with logs if available."
+        ]
+      },
+      "node_id": "routing_decision",
+      "node_type": "routing_decision",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.397109+00:00",
+      "finished_at": "2026-09-24T22:50:28.397116+00:00",
+      "duration_ms": 0.007,
+      "input": {
+        "category": {
+          "id": "technical",
+          "label": "Technical Issue",
+          "keywords": [
+            "error",
+            "bug",
+            "app",
+            "website",
+            "crash",
+            "not working",
+            "api",
+            "update"
+          ],
+          "owner_team": "Technical Support",
+          "priority": "P2",
+          "sla": "1 business day",
+          "policy": "Collect reproduction steps and device information, then route to technical support for diagnosis.",
+          "next_actions": [
+            "Collect reproduction steps.",
+            "Ask for device, browser or app version.",
+            "Route to technical support with logs if available."
+          ]
+        },
+        "policy": "Collect reproduction steps and device information, then route to technical support for diagnosis."
+      },
+      "output": {
+        "priority": "P2",
+        "next_actions": [
+          "Collect reproduction steps.",
+          "Ask for device, browser or app version.",
+          "Route to technical support with logs if available."
+        ]
+      },
+      "error": null
+    },
+    {
+      "name": "Support Compose Node",
+      "detail": "support ticket response rendered",
+      "data": {
+        "summary_cards": [
+          {
+            "title": "Ticket Classification",
+            "rows": [
+              {
+                "label": "Category",
+                "value": "Technical Issue"
+              },
+              {
+                "label": "Intent",
+                "value": "technical_help"
+              }
+            ]
+          },
+          {
+            "title": "Routing Decision",
+            "rows": [
+              {
+                "label": "Owner",
+                "value": "Technical Support"
+              },
+              {
+                "label": "Priority",
+                "value": "P2"
+              },
+              {
+                "label": "SLA",
+                "value": "1 business day"
+              }
+            ]
+          },
+          {
+            "title": "Next Actions",
+            "rows": [
+              {
+                "label": "1",
+                "value": "Collect reproduction steps."
+              },
+              {
+                "label": "2",
+                "value": "Ask for device, browser or app version."
+              },
+              {
+                "label": "3",
+                "value": "Route to technical support with logs if available."
+              }
+            ]
+          }
+        ]
+      },
+      "node_id": "compose",
+      "node_type": "support_compose",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.397133+00:00",
+      "finished_at": "2026-09-24T22:50:28.397151+00:00",
+      "duration_ms": 0.018,
+      "input": {
+        "owner_team": "Technical Support",
+        "priority": "P2",
+        "next_actions": [
+          "Collect reproduction steps.",
+          "Ask for device, browser or app version.",
+          "Route to technical support with logs if available."
+        ],
+        "policy": "Collect reproduction steps and device information, then route to technical support for diagnosis."
+      },
+      "output": {
+        "final_answer": "[Customer Support Ticket Workflow]\nCategory: Technical Issue\nIntent: technical_help\nOwner team: Technical Support\nPriority: P2 / SLA: 1 business day\n\nPolicy basis:\nCollect reproduction steps and device information, then route to technical support for diagnosis.\n\nNext actions\n1. Collect reproduction steps.\n2. Ask for device, browser or app version.\n3. Route to technical support with logs if available.\n\nResponse draft: We have classified the issue and routed it to Technical Support for follow-up.",
+        "summary_cards": [
+          {
+            "title": "Ticket Classification",
+            "rows": [
+              {
+                "label": "Category",
+                "value": "Technical Issue"
+              },
+              {
+                "label": "Intent",
+                "value": "technical_help"
+              }
+            ]
+          },
+          {
+            "title": "Routing Decision",
+            "rows": [
+              {
+                "label": "Owner",
+                "value": "Technical Support"
+              },
+              {
+                "label": "Priority",
+                "value": "P2"
+              },
+              {
+                "label": "SLA",
+                "value": "1 business day"
+              }
+            ]
+          },
+          {
+            "title": "Next Actions",
+            "rows": [
+              {
+                "label": "1",
+                "value": "Collect reproduction steps."
+              },
+              {
+                "label": "2",
+                "value": "Ask for device, browser or app version."
+              },
+              {
+                "label": "3",
+                "value": "Route to technical support with logs if available."
+              }
+            ]
+          }
+        ]
+      },
+      "error": null
+    }
+  ],
+  "duration_ms": 2.775,
+  "node_statuses": [
+    {
+      "node_id": "request_parser",
+      "node_type": "support_request_parser",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "question",
+      "node_type": "support_question",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "ticket_classification",
+      "node_type": "ticket_classification",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "policy_lookup",
+      "node_type": "policy_lookup",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "routing_decision",
+      "node_type": "routing_decision",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "compose",
+      "node_type": "support_compose",
+      "status": "SUCCESS"
+    }
+  ],
+  "errors": [],
+  "failure_mode": null
+}

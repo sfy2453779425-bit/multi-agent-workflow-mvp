@@ -1,0 +1,94 @@
+{
+  "experiment_id": "builder_v3_threeway_20260925",
+  "experiment_status": "FORMAL",
+  "system": "Claude-CLI",
+  "case_id": "customer_support_03",
+  "case_type": "customer-support-2026-09-16-v2-account",
+  "run": 3,
+  "run_id": "Claude-CLI_customer_support_03_run3",
+  "schedule_index": 83,
+  "model_requested": "claude-opus-5-5",
+  "model_returned": [
+    "claude-opus-5-5"
+  ],
+  "cli_version": "2.1.281 (Claude Code)",
+  "call_path": "claude -p --output-format json",
+  "prompt_text_hash": "461d37b24935604ba52853868f6f7cd442a9ef5f705437687cf55ec283e69c86",
+  "fixture_hash": "83a6225518b919e292a47d4f5a81d95d7d4fd2d3ad38eb3b8b8095b3b1451861",
+  "fixture_file_sha256": "96886458c31a306d3fa45f15df5c7502b7bfe0126911a2eaeaaa377453a03ec0",
+  "timestamp_start_utc": "2026-09-24T23:04:31.899Z",
+  "timestamp_end_utc": "2026-09-24T23:04:41.165Z",
+  "latency_ms": 9266,
+  "finish_reason": "end_turn",
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 1101,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 642,
+    "output_tokens_details": {
+      "thinking_tokens": 55
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 1101,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 642,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 1101,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1101
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "output_tokens": 642,
+  "output_limit": "not set",
+  "reasoning_effort": "not applicable / CLI default",
+  "raw_stdout_path": "raw/claude/customer_support_03_run3.raw",
+  "raw_stdout_sha256": "e34a0428a0a5034e145debec5745595b44637ca69362b7500d332a7e2dfdfadb",
+  "raw_stdout_bytes": 3623,
+  "raw_text": "# Ticket Classification & Routing: `user_a`\n\n**Query:** \"Customer cannot login because the account is locked and needs a password reset.\"\n\n## Classification\n| Field | Value |\n|---|---|\n| **category** | `account` (Account / Login) |\n| **Match basis** | The query contains the category keywords **account**, **login**, **locked**, and **password**. This also matches `default_category`. |\n\n## Routing Decision\n| Field | Value |\n|---|---|\n| **owner_team** | Account Support |\n\n## Priority & SLA\n| Field | Value |\n|---|---|\n| **priority** | P3 |\n| **sla** | 2 business days |\n\n## Policy Application\n**Policy:** \"Verify customer identity before changing account information or unlocking access.\"\n\nThe customer is asking for an unlock and a password reset, which is exactly the kind of access change this policy covers. **Do not unlock the account or issue reset credentials until identity verification succeeds.**\n\n## next_actions\n1. **Ask for identity verification.** This is a blocking step required by policy.\n2. **Check account lock status.** Only do this after identity is verified.\n3. **Provide password reset or unlock instructions.** Only do this after identity is verified.\n\n## Missing Information\nThe supplied data does not include the following, so none of it has been assumed:\n- **Verification status:** whether the customer's identity has already been verified.\n- **Verification method:** which identity checks are acceptable (for example, email code or security questions).\n- **Lock details:** the reason for the lock (such as failed attempts or a security flag) and the current lock status.\n- **Reset details:** the specific reset or unlock procedure, links, or tooling.\n- **Customer profile:** any tier or history for `user_a` that might change priority. None was provided, so the category default of P3 applies.",
+  "raw_text_sha256": "59acad441da7f7e5a88d115dc98eb1d2fa56e2900d590f8397e934994fd5bf27",
+  "parse_status": "CLI_OUTPUT_PRESENT",
+  "parse_errors": [],
+  "attempts": [
+    {
+      "attempt_no": 1,
+      "exit_code": 0,
+      "timed_out": false,
+      "retryable_transport_error": false,
+      "error_message": null,
+      "raw_stdout_sha256": "e34a0428a0a5034e145debec5745595b44637ca69362b7500d332a7e2dfdfadb",
+      "raw_stdout_bytes": 3623,
+      "parse_status": "CLI_OUTPUT_PRESENT"
+    }
+  ],
+  "transport_failure": false,
+  "cli_exit_code": 0,
+  "fatal_auth_error": false,
+  "isolation": {
+    "model_requested": "claude-opus-5-5",
+    "cli": "claude.EXE",
+    "cli_version": "2.1.281 (Claude Code)",
+    "call_path": "claude -p --output-format json",
+    "system_prompt": "empty",
+    "tools": "none",
+    "setting_sources": "none",
+    "session_persistence": "disabled",
+    "output_limit": "not set",
+    "fresh_session": "one process and clean temporary workdir per call"
+  },
+  "sampling_parameters": "not explicitly set by this experiment"
+}

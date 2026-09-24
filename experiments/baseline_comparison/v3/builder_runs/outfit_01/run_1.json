@@ -1,0 +1,1349 @@
+{
+  "run_id": "builder_outfit_01_1",
+  "experiment_id": "builder_v3_threeway_20260925",
+  "builder_version": "current-runtime-v1.2-source-snapshot",
+  "case_id": "outfit_01",
+  "run": 1,
+  "system": "Builder",
+  "timestamp": "2026-09-24T22:50:28.249283+00:00",
+  "finished_at": "2026-09-24T22:50:28.254580+00:00",
+  "input": {
+    "query": "다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘",
+    "user_id": "user_a"
+  },
+  "fixture_version": "outfit-2026-09-16-v1",
+  "fixture_sha256": "3e3b3417dce7482094d73e04368f2c1420c3548bb89e3d3bab0ac46c6b521678",
+  "prompt_version": "prompt-v1",
+  "workflow_json": {
+    "schema_version": 1,
+    "workflow_id": "outfit_recommendation_workflow_v1",
+    "workflow_name": "Personalized Outfit Recommendation Workflow",
+    "description": "A builder template for assembling the outfit recommendation sample workflow from reusable nodes.",
+    "runtime_type": "outfit_recommendation",
+    "base_agent_config": "D:\\综合设计\\configs\\outfit_agent.json",
+    "data_file": null,
+    "data_dir": null,
+    "default_query": "다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘",
+    "default_user_id": "user_a",
+    "agents": [
+      {
+        "id": "request_parser",
+        "name": "Request Parser Node",
+        "role": "Extract city, date, user and intent from the user request.",
+        "builder_equivalent": "Start Node + Parser/Prompt Node"
+      },
+      {
+        "id": "question",
+        "name": "Question Node",
+        "role": "Detect missing context and ask a follow-up question before tool calls.",
+        "builder_equivalent": "Condition Node + User Input Node"
+      },
+      {
+        "id": "weather",
+        "name": "Weather Tool Node",
+        "role": "Call the weather tool and normalize weather data.",
+        "builder_equivalent": "HTTP/API Tool Node"
+      },
+      {
+        "id": "shopping_analysis",
+        "name": "Shopping History Analysis Node",
+        "role": "Load purchase history and analyze user style preferences.",
+        "builder_equivalent": "Data Loader Node + Analysis Node"
+      },
+      {
+        "id": "recommendation",
+        "name": "Recommendation Node",
+        "role": "Match weather and shopping analysis with recommendation rules.",
+        "builder_equivalent": "Rule/LLM Decision Node"
+      },
+      {
+        "id": "compose",
+        "name": "Compose Node",
+        "role": "Render the final answer with the configured output template.",
+        "builder_equivalent": "Output Template Node"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "request_parser",
+        "type": "request_parser",
+        "name": "Request Parser Node",
+        "role": "Extract city, date, user and intent from the user request.",
+        "builder_equivalent": "Start Node + Parser/Prompt Node",
+        "inputs": {
+          "user_message": "context.query",
+          "user_id": "context.user_id"
+        },
+        "outputs": {
+          "agent_name": "context.agent_name",
+          "city_display": "context.city_display",
+          "city_query": "context.city_query",
+          "day_offset": "context.day_offset",
+          "date_label": "context.date_label",
+          "matched_keywords": "context.matched_keywords"
+        },
+        "required_inputs": [
+          "user_message",
+          "user_id"
+        ],
+        "config": {}
+      },
+      {
+        "id": "question",
+        "type": "question",
+        "name": "Question Node",
+        "role": "Detect missing context and ask a follow-up question before tool calls.",
+        "builder_equivalent": "Condition Node + User Input Node",
+        "inputs": {
+          "query": "context.query",
+          "city": "context.city_display",
+          "date": "context.date_label"
+        },
+        "outputs": {
+          "detected_purpose": "context.detected_purpose",
+          "detected_style": "context.detected_style",
+          "missing_fields": "context.missing_fields",
+          "next_question_field": "context.next_question_field",
+          "needs_clarification": "context.needs_clarification",
+          "clarification_message": "context.clarification_message"
+        },
+        "required_inputs": [
+          "query",
+          "city",
+          "date"
+        ],
+        "config": {}
+      },
+      {
+        "id": "weather",
+        "type": "weather",
+        "name": "Weather Tool Node",
+        "role": "Call the weather tool and normalize weather data.",
+        "builder_equivalent": "HTTP/API Tool Node",
+        "inputs": {
+          "city_query": "context.city_query",
+          "day_offset": "context.day_offset"
+        },
+        "outputs": {
+          "weather": "context.weather",
+          "weather_summary": "context.weather_summary"
+        },
+        "required_inputs": [
+          "city_query",
+          "day_offset"
+        ],
+        "config": {}
+      },
+      {
+        "id": "shopping_analysis",
+        "type": "shopping_analysis",
+        "name": "Shopping History Analysis Node",
+        "role": "Load purchase history and analyze user style preferences.",
+        "builder_equivalent": "Data Loader Node + Analysis Node",
+        "inputs": {
+          "user_id": "context.user_id"
+        },
+        "outputs": {
+          "shopping_history": "context.shopping_history",
+          "shopping_history_summary": "context.shopping_history_summary",
+          "shopping_analysis": "context.shopping_analysis",
+          "shopping_item_count": "context.shopping_item_count",
+          "styles_text": "context.styles_text",
+          "colors_text": "context.colors_text",
+          "favorite_items_text": "context.favorite_items_text",
+          "top_categories_text": "context.top_categories_text",
+          "user_name": "context.user_name",
+          "shopping_analysis_summary": "context.shopping_analysis_summary"
+        },
+        "required_inputs": [
+          "user_id"
+        ],
+        "config": {}
+      },
+      {
+        "id": "recommendation",
+        "type": "recommendation",
+        "name": "Recommendation Node",
+        "role": "Match weather and shopping analysis with recommendation rules.",
+        "builder_equivalent": "Rule/LLM Decision Node",
+        "inputs": {
+          "weather": "context.weather",
+          "shopping_analysis": "context.shopping_analysis"
+        },
+        "outputs": {
+          "avg_temp": "context.avg_temp",
+          "temp_min": "context.temp_min",
+          "temp_max": "context.temp_max",
+          "weather_date": "context.weather_date",
+          "weather_condition": "context.weather_condition",
+          "precipitation_probability": "context.precipitation_probability",
+          "matched_rule_name": "context.matched_rule_name",
+          "recommendation": "context.recommendation",
+          "owned_recommended_items": "context.owned_recommended_items",
+          "owned_recommended_items_text": "context.owned_recommended_items_text",
+          "additional_items": "context.additional_items",
+          "additional_items_text": "context.additional_items_text",
+          "recommended_items": "context.recommended_items",
+          "recommended_items_text": "context.recommended_items_text",
+          "ranked_items": "context.ranked_items",
+          "ranked_items_text": "context.ranked_items_text",
+          "extras": "context.extras",
+          "extras_text": "context.extras_text"
+        },
+        "required_inputs": [
+          "weather",
+          "shopping_analysis"
+        ],
+        "config": {}
+      },
+      {
+        "id": "compose",
+        "type": "compose",
+        "name": "Compose Node",
+        "role": "Render the final answer with the configured output template.",
+        "builder_equivalent": "Output Template Node",
+        "inputs": {
+          "recommendation": "context.recommendation",
+          "ranked_items": "context.ranked_items"
+        },
+        "outputs": {
+          "final_answer": "context.final_answer"
+        },
+        "required_inputs": [
+          "recommendation",
+          "ranked_items"
+        ],
+        "config": {}
+      }
+    ],
+    "execution": {
+      "type": "sequential",
+      "order": [
+        "request_parser",
+        "question",
+        "weather",
+        "shopping_analysis",
+        "recommendation",
+        "compose"
+      ],
+      "generated_by": "TemplateWorkflowBuilder"
+    },
+    "question_agent": {
+      "purpose_keywords": [
+        "여행",
+        "출장",
+        "통학",
+        "출근",
+        "학교",
+        "데이트",
+        "행사",
+        "휴가",
+        "비즈니스",
+        "쇼핑",
+        "출퇴근"
+      ],
+      "style_keywords": [
+        "캐주얼",
+        "포멀",
+        "스트릿",
+        "미니멀",
+        "스포티",
+        "정장",
+        "비즈니스"
+      ],
+      "clarification_message": "정보가 부족합니다. 여행 목적과 선호 스타일을 알려주세요. (예: 출장 / 캐주얼 등)",
+      "clarification_questions": {
+        "city": "어느 도시나 여행지를 기준으로 추천할까요? (예: 서울, 칭다오)",
+        "date": "언제 입을 옷인가요? (예: 내일, 다음 주)",
+        "purpose_or_style": "여행/출근/데이트 같은 목적이나 캐주얼/포멀 같은 선호 스타일을 알려주세요."
+      }
+    },
+    "experiment_mode": {
+      "type": "frozen_fixture",
+      "fixture_version": "outfit-2026-09-16-v1",
+      "fixture_sha256": "3e3b3417dce7482094d73e04368f2c1420c3548bb89e3d3bab0ac46c6b521678"
+    }
+  },
+  "workflow_sha256": "a13756f21a19c458575cf4bb5d517caf610a659aa175e54788b2bc83924fc17c",
+  "final_result": {
+    "answer": "[Personalized Outfit Agent]\n칭다오의 다음 주(2026-09-23) 날씨는 흐림, 평균 15.5°C, 강수확률 20%입니다.\n쇼핑 기록 분석: 총 6개 구매 기록에서 선호 스타일은 캐주얼, 스트릿, 스포티, 선호 색상은 블랙, 네이비, 그레이로 분석되었습니다.\n추천 방향: 일교차를 고려한 가벼운 레이어드가 적합합니다.\n추천 순위: 1. 라이트 그레이 바람막이 | 2. 블랙 후드티 | 3. 네이비 조거 팬츠 | 4. 블랙 캔버스 스니커즈\n보유 단품 기반 추천: 1. 라이트 그레이 바람막이, 2. 블랙 후드티, 3. 네이비 조거 팬츠, 4. 블랙 캔버스 스니커즈\n추가 추천: \n추가 조건: ",
+    "context": {
+      "query": "다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘",
+      "user_id": "user_a",
+      "runtime_type": "outfit_recommendation",
+      "workflow_name": "Personalized Outfit Recommendation Workflow",
+      "executed_agents": [
+        "request_parser",
+        "question",
+        "weather",
+        "shopping_analysis",
+        "recommendation",
+        "compose"
+      ],
+      "executed_tools": [
+        "weather",
+        "shopping_history"
+      ],
+      "agent_name": "Personalized Outfit Agent",
+      "city_display": "칭다오",
+      "city_query": "Qingdao",
+      "day_offset": 7,
+      "date_label": "다음 주",
+      "matched_keywords": [
+        "옷",
+        "추천"
+      ],
+      "detected_purpose": [
+        "여행",
+        "여행"
+      ],
+      "detected_style": [
+        "캐주얼",
+        "캐주얼"
+      ],
+      "missing_fields": [],
+      "next_question_field": "",
+      "needs_clarification": false,
+      "clarification_message": "",
+      "weather": {
+        "city_name": "칭다오",
+        "country": "중국",
+        "date": "2026-09-23",
+        "condition": "흐림",
+        "weather_code": 3,
+        "temp_min": 10.0,
+        "temp_max": 21.0,
+        "precipitation_probability": 20,
+        "latitude": 36.0671,
+        "longitude": 120.3826
+      },
+      "weather_summary": {
+        "date": "2026-09-23",
+        "condition": "흐림",
+        "temp_min": 10.0,
+        "temp_max": 21.0,
+        "precipitation_probability": 20
+      },
+      "shopping_history": [
+        {
+          "id": "A001",
+          "item": "블랙 후드티",
+          "category": "top",
+          "color": "블랙",
+          "style": "캐주얼",
+          "warmth": "medium",
+          "rain_ok": true,
+          "purchased_at": "2026-02-12"
+        },
+        {
+          "id": "A002",
+          "item": "네이비 조거 팬츠",
+          "category": "bottom",
+          "color": "네이비",
+          "style": "스트릿",
+          "warmth": "medium",
+          "rain_ok": true,
+          "purchased_at": "2026-02-20"
+        },
+        {
+          "id": "A003",
+          "item": "라이트 그레이 바람막이",
+          "category": "outer",
+          "color": "그레이",
+          "style": "스포티",
+          "warmth": "light",
+          "rain_ok": true,
+          "purchased_at": "2026-03-05"
+        },
+        {
+          "id": "A004",
+          "item": "블랙 패딩",
+          "category": "outer",
+          "color": "블랙",
+          "style": "캐주얼",
+          "warmth": "heavy",
+          "rain_ok": false,
+          "purchased_at": "2025-12-02"
+        },
+        {
+          "id": "A005",
+          "item": "화이트 반팔 티셔츠",
+          "category": "top",
+          "color": "화이트",
+          "style": "캐주얼",
+          "warmth": "light",
+          "rain_ok": true,
+          "purchased_at": "2026-04-02"
+        },
+        {
+          "id": "A006",
+          "item": "블랙 캔버스 스니커즈",
+          "category": "shoes",
+          "color": "블랙",
+          "style": "스트릿",
+          "warmth": "all",
+          "rain_ok": false,
+          "purchased_at": "2026-01-18"
+        }
+      ],
+      "shopping_history_summary": {
+        "records": 6,
+        "source": "shopping_history.json",
+        "sample_items": [
+          "블랙 후드티",
+          "네이비 조거 팬츠",
+          "라이트 그레이 바람막이"
+        ]
+      },
+      "shopping_analysis": {
+        "total_items": 6,
+        "top_styles": [
+          "캐주얼",
+          "스트릿",
+          "스포티"
+        ],
+        "top_colors": [
+          "블랙",
+          "네이비",
+          "그레이"
+        ],
+        "top_categories": [
+          "top",
+          "outer",
+          "bottom"
+        ],
+        "favorite_items": [
+          "블랙 후드티",
+          "네이비 조거 팬츠",
+          "라이트 그레이 바람막이"
+        ],
+        "items_by_category": {
+          "top": [
+            {
+              "id": "A001",
+              "item": "블랙 후드티",
+              "category": "top",
+              "color": "블랙",
+              "style": "캐주얼",
+              "warmth": "medium",
+              "rain_ok": true,
+              "purchased_at": "2026-02-12"
+            },
+            {
+              "id": "A005",
+              "item": "화이트 반팔 티셔츠",
+              "category": "top",
+              "color": "화이트",
+              "style": "캐주얼",
+              "warmth": "light",
+              "rain_ok": true,
+              "purchased_at": "2026-04-02"
+            }
+          ],
+          "bottom": [
+            {
+              "id": "A002",
+              "item": "네이비 조거 팬츠",
+              "category": "bottom",
+              "color": "네이비",
+              "style": "스트릿",
+              "warmth": "medium",
+              "rain_ok": true,
+              "purchased_at": "2026-02-20"
+            }
+          ],
+          "outer": [
+            {
+              "id": "A003",
+              "item": "라이트 그레이 바람막이",
+              "category": "outer",
+              "color": "그레이",
+              "style": "스포티",
+              "warmth": "light",
+              "rain_ok": true,
+              "purchased_at": "2026-03-05"
+            },
+            {
+              "id": "A004",
+              "item": "블랙 패딩",
+              "category": "outer",
+              "color": "블랙",
+              "style": "캐주얼",
+              "warmth": "heavy",
+              "rain_ok": false,
+              "purchased_at": "2025-12-02"
+            }
+          ],
+          "shoes": [
+            {
+              "id": "A006",
+              "item": "블랙 캔버스 스니커즈",
+              "category": "shoes",
+              "color": "블랙",
+              "style": "스트릿",
+              "warmth": "all",
+              "rain_ok": false,
+              "purchased_at": "2026-01-18"
+            }
+          ]
+        }
+      },
+      "shopping_item_count": 6,
+      "styles_text": "캐주얼, 스트릿, 스포티",
+      "colors_text": "블랙, 네이비, 그레이",
+      "favorite_items_text": "블랙 후드티, 네이비 조거 팬츠, 라이트 그레이 바람막이",
+      "top_categories_text": "top, outer, bottom",
+      "user_name": "user_a",
+      "shopping_analysis_summary": {
+        "total_items": 6,
+        "top_styles": [
+          "캐주얼",
+          "스트릿",
+          "스포티"
+        ],
+        "top_colors": [
+          "블랙",
+          "네이비",
+          "그레이"
+        ],
+        "top_categories": [
+          "top",
+          "outer",
+          "bottom"
+        ],
+        "favorite_items": [
+          "블랙 후드티",
+          "네이비 조거 팬츠",
+          "라이트 그레이 바람막이"
+        ]
+      },
+      "avg_temp": 15.5,
+      "temp_min": 10.0,
+      "temp_max": 21.0,
+      "weather_date": "2026-09-23",
+      "weather_condition": "흐림",
+      "precipitation_probability": 20,
+      "matched_rule_name": "mild_outfit",
+      "recommendation": "일교차를 고려한 가벼운 레이어드가 적합합니다.",
+      "owned_recommended_items": [
+        "라이트 그레이 바람막이",
+        "블랙 후드티",
+        "네이비 조거 팬츠",
+        "블랙 캔버스 스니커즈"
+      ],
+      "owned_recommended_items_text": "1. 라이트 그레이 바람막이, 2. 블랙 후드티, 3. 네이비 조거 팬츠, 4. 블랙 캔버스 스니커즈",
+      "additional_items": [],
+      "additional_items_text": "",
+      "recommended_items": [
+        "라이트 그레이 바람막이",
+        "블랙 후드티",
+        "네이비 조거 팬츠",
+        "블랙 캔버스 스니커즈"
+      ],
+      "recommended_items_text": "1. 라이트 그레이 바람막이, 2. 블랙 후드티, 3. 네이비 조거 팬츠, 4. 블랙 캔버스 스니커즈",
+      "ranked_items": [
+        "1. 라이트 그레이 바람막이",
+        "2. 블랙 후드티",
+        "3. 네이비 조거 팬츠",
+        "4. 블랙 캔버스 스니커즈"
+      ],
+      "ranked_items_text": "1. 라이트 그레이 바람막이 | 2. 블랙 후드티 | 3. 네이비 조거 팬츠 | 4. 블랙 캔버스 스니커즈",
+      "extras": [],
+      "extras_text": "",
+      "final_answer": "[Personalized Outfit Agent]\n칭다오의 다음 주(2026-09-23) 날씨는 흐림, 평균 15.5°C, 강수확률 20%입니다.\n쇼핑 기록 분석: 총 6개 구매 기록에서 선호 스타일은 캐주얼, 스트릿, 스포티, 선호 색상은 블랙, 네이비, 그레이로 분석되었습니다.\n추천 방향: 일교차를 고려한 가벼운 레이어드가 적합합니다.\n추천 순위: 1. 라이트 그레이 바람막이 | 2. 블랙 후드티 | 3. 네이비 조거 팬츠 | 4. 블랙 캔버스 스니커즈\n보유 단품 기반 추천: 1. 라이트 그레이 바람막이, 2. 블랙 후드티, 3. 네이비 조거 팬츠, 4. 블랙 캔버스 스니커즈\n추가 추천: \n추가 조건: ",
+      "workflow_agents": [
+        {
+          "id": "request_parser",
+          "name": "Request Parser Node",
+          "role": "Extract city, date, user and intent from the user request.",
+          "builder_equivalent": "Start Node + Parser/Prompt Node"
+        },
+        {
+          "id": "question",
+          "name": "Question Node",
+          "role": "Detect missing context and ask a follow-up question before tool calls.",
+          "builder_equivalent": "Condition Node + User Input Node"
+        },
+        {
+          "id": "weather",
+          "name": "Weather Tool Node",
+          "role": "Call the weather tool and normalize weather data.",
+          "builder_equivalent": "HTTP/API Tool Node"
+        },
+        {
+          "id": "shopping_analysis",
+          "name": "Shopping History Analysis Node",
+          "role": "Load purchase history and analyze user style preferences.",
+          "builder_equivalent": "Data Loader Node + Analysis Node"
+        },
+        {
+          "id": "recommendation",
+          "name": "Recommendation Node",
+          "role": "Match weather and shopping analysis with recommendation rules.",
+          "builder_equivalent": "Rule/LLM Decision Node"
+        },
+        {
+          "id": "compose",
+          "name": "Compose Node",
+          "role": "Render the final answer with the configured output template.",
+          "builder_equivalent": "Output Template Node"
+        }
+      ],
+      "workflow_nodes": [
+        {
+          "id": "request_parser",
+          "type": "request_parser",
+          "name": "Request Parser Node",
+          "role": "Extract city, date, user and intent from the user request.",
+          "builder_equivalent": "Start Node + Parser/Prompt Node",
+          "inputs": {
+            "user_message": "context.query",
+            "user_id": "context.user_id"
+          },
+          "outputs": {
+            "agent_name": "context.agent_name",
+            "city_display": "context.city_display",
+            "city_query": "context.city_query",
+            "day_offset": "context.day_offset",
+            "date_label": "context.date_label",
+            "matched_keywords": "context.matched_keywords"
+          },
+          "required_inputs": [
+            "user_message",
+            "user_id"
+          ],
+          "config": {}
+        },
+        {
+          "id": "question",
+          "type": "question",
+          "name": "Question Node",
+          "role": "Detect missing context and ask a follow-up question before tool calls.",
+          "builder_equivalent": "Condition Node + User Input Node",
+          "inputs": {
+            "query": "context.query",
+            "city": "context.city_display",
+            "date": "context.date_label"
+          },
+          "outputs": {
+            "detected_purpose": "context.detected_purpose",
+            "detected_style": "context.detected_style",
+            "missing_fields": "context.missing_fields",
+            "next_question_field": "context.next_question_field",
+            "needs_clarification": "context.needs_clarification",
+            "clarification_message": "context.clarification_message"
+          },
+          "required_inputs": [
+            "query",
+            "city",
+            "date"
+          ],
+          "config": {}
+        },
+        {
+          "id": "weather",
+          "type": "weather",
+          "name": "Weather Tool Node",
+          "role": "Call the weather tool and normalize weather data.",
+          "builder_equivalent": "HTTP/API Tool Node",
+          "inputs": {
+            "city_query": "context.city_query",
+            "day_offset": "context.day_offset"
+          },
+          "outputs": {
+            "weather": "context.weather",
+            "weather_summary": "context.weather_summary"
+          },
+          "required_inputs": [
+            "city_query",
+            "day_offset"
+          ],
+          "config": {}
+        },
+        {
+          "id": "shopping_analysis",
+          "type": "shopping_analysis",
+          "name": "Shopping History Analysis Node",
+          "role": "Load purchase history and analyze user style preferences.",
+          "builder_equivalent": "Data Loader Node + Analysis Node",
+          "inputs": {
+            "user_id": "context.user_id"
+          },
+          "outputs": {
+            "shopping_history": "context.shopping_history",
+            "shopping_history_summary": "context.shopping_history_summary",
+            "shopping_analysis": "context.shopping_analysis",
+            "shopping_item_count": "context.shopping_item_count",
+            "styles_text": "context.styles_text",
+            "colors_text": "context.colors_text",
+            "favorite_items_text": "context.favorite_items_text",
+            "top_categories_text": "context.top_categories_text",
+            "user_name": "context.user_name",
+            "shopping_analysis_summary": "context.shopping_analysis_summary"
+          },
+          "required_inputs": [
+            "user_id"
+          ],
+          "config": {}
+        },
+        {
+          "id": "recommendation",
+          "type": "recommendation",
+          "name": "Recommendation Node",
+          "role": "Match weather and shopping analysis with recommendation rules.",
+          "builder_equivalent": "Rule/LLM Decision Node",
+          "inputs": {
+            "weather": "context.weather",
+            "shopping_analysis": "context.shopping_analysis"
+          },
+          "outputs": {
+            "avg_temp": "context.avg_temp",
+            "temp_min": "context.temp_min",
+            "temp_max": "context.temp_max",
+            "weather_date": "context.weather_date",
+            "weather_condition": "context.weather_condition",
+            "precipitation_probability": "context.precipitation_probability",
+            "matched_rule_name": "context.matched_rule_name",
+            "recommendation": "context.recommendation",
+            "owned_recommended_items": "context.owned_recommended_items",
+            "owned_recommended_items_text": "context.owned_recommended_items_text",
+            "additional_items": "context.additional_items",
+            "additional_items_text": "context.additional_items_text",
+            "recommended_items": "context.recommended_items",
+            "recommended_items_text": "context.recommended_items_text",
+            "ranked_items": "context.ranked_items",
+            "ranked_items_text": "context.ranked_items_text",
+            "extras": "context.extras",
+            "extras_text": "context.extras_text"
+          },
+          "required_inputs": [
+            "weather",
+            "shopping_analysis"
+          ],
+          "config": {}
+        },
+        {
+          "id": "compose",
+          "type": "compose",
+          "name": "Compose Node",
+          "role": "Render the final answer with the configured output template.",
+          "builder_equivalent": "Output Template Node",
+          "inputs": {
+            "recommendation": "context.recommendation",
+            "ranked_items": "context.ranked_items"
+          },
+          "outputs": {
+            "final_answer": "context.final_answer"
+          },
+          "required_inputs": [
+            "recommendation",
+            "ranked_items"
+          ],
+          "config": {}
+        }
+      ],
+      "workflow_execution": {
+        "type": "sequential",
+        "order": [
+          "request_parser",
+          "question",
+          "weather",
+          "shopping_analysis",
+          "recommendation",
+          "compose"
+        ],
+        "generated_by": "TemplateWorkflowBuilder"
+      }
+    }
+  },
+  "full_trace": [
+    {
+      "name": "Request Parser Node",
+      "detail": "city=칭다오, date=다음 주, user=user_a",
+      "data": {
+        "workflow": "C:\\Users\\lain\\AppData\\Local\\Temp\\baseline_outfit_01_hbemzh3f\\workflow.json",
+        "base_config": "D:\\综合设计\\configs\\outfit_agent.json",
+        "intent": "outfit_recommendation",
+        "matched_keywords": [
+          "옷",
+          "추천"
+        ]
+      },
+      "node_id": "request_parser",
+      "node_type": "request_parser",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.252874+00:00",
+      "finished_at": "2026-09-24T22:50:28.252918+00:00",
+      "duration_ms": 0.039,
+      "input": {
+        "user_message": "다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘",
+        "user_id": "user_a"
+      },
+      "output": {
+        "query": "다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘",
+        "agent_name": "Personalized Outfit Agent",
+        "user_id": "user_a",
+        "city_display": "칭다오",
+        "city_query": "Qingdao",
+        "day_offset": 7,
+        "date_label": "다음 주",
+        "matched_keywords": [
+          "옷",
+          "추천"
+        ],
+        "executed_tools": []
+      },
+      "error": null
+    },
+    {
+      "name": "Question Node",
+      "detail": "purpose=여행, 여행, style=캐주얼, 캐주얼 → 정보 충분",
+      "data": {
+        "detected_purpose": [
+          "여행",
+          "여행"
+        ],
+        "detected_style": [
+          "캐주얼",
+          "캐주얼"
+        ],
+        "missing_fields": [],
+        "next_question_field": "",
+        "needs_clarification": false,
+        "clarification_message": ""
+      },
+      "node_id": "question",
+      "node_type": "question",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.252991+00:00",
+      "finished_at": "2026-09-24T22:50:28.253025+00:00",
+      "duration_ms": 0.034,
+      "input": {
+        "query": "다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘",
+        "city": "칭다오",
+        "date": "다음 주"
+      },
+      "output": {
+        "detected_purpose": [
+          "여행",
+          "여행"
+        ],
+        "detected_style": [
+          "캐주얼",
+          "캐주얼"
+        ],
+        "missing_fields": [],
+        "next_question_field": "",
+        "needs_clarification": false,
+        "clarification_message": ""
+      },
+      "error": null
+    },
+    {
+      "name": "Weather Tool Node",
+      "detail": "칭다오 다음 주 weather loaded: 흐림",
+      "data": {
+        "date": "2026-09-23",
+        "condition": "흐림",
+        "temp_min": 10.0,
+        "temp_max": 21.0,
+        "precipitation_probability": 20
+      },
+      "node_id": "weather",
+      "node_type": "weather",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.253054+00:00",
+      "finished_at": "2026-09-24T22:50:28.253072+00:00",
+      "duration_ms": 0.018,
+      "input": {
+        "city_query": "Qingdao",
+        "day_offset": 7
+      },
+      "output": {
+        "weather": {
+          "city_name": "칭다오",
+          "country": "중국",
+          "date": "2026-09-23",
+          "condition": "흐림",
+          "weather_code": 3,
+          "temp_min": 10.0,
+          "temp_max": 21.0,
+          "precipitation_probability": 20,
+          "latitude": 36.0671,
+          "longitude": 120.3826
+        },
+        "weather_summary": {
+          "date": "2026-09-23",
+          "condition": "흐림",
+          "temp_min": 10.0,
+          "temp_max": 21.0,
+          "precipitation_probability": 20
+        }
+      },
+      "error": null
+    },
+    {
+      "name": "Shopping History Analysis Node",
+      "detail": "styles=캐주얼, 스트릿, 스포티, colors=블랙, 네이비, 그레이, records=6",
+      "data": {
+        "total_items": 6,
+        "top_styles": [
+          "캐주얼",
+          "스트릿",
+          "스포티"
+        ],
+        "top_colors": [
+          "블랙",
+          "네이비",
+          "그레이"
+        ],
+        "top_categories": [
+          "top",
+          "outer",
+          "bottom"
+        ],
+        "favorite_items": [
+          "블랙 후드티",
+          "네이비 조거 팬츠",
+          "라이트 그레이 바람막이"
+        ]
+      },
+      "node_id": "shopping_analysis",
+      "node_type": "shopping_analysis",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.253109+00:00",
+      "finished_at": "2026-09-24T22:50:28.253335+00:00",
+      "duration_ms": 0.228,
+      "input": {
+        "user_id": "user_a"
+      },
+      "output": {
+        "shopping_history": [
+          {
+            "id": "A001",
+            "item": "블랙 후드티",
+            "category": "top",
+            "color": "블랙",
+            "style": "캐주얼",
+            "warmth": "medium",
+            "rain_ok": true,
+            "purchased_at": "2026-02-12"
+          },
+          {
+            "id": "A002",
+            "item": "네이비 조거 팬츠",
+            "category": "bottom",
+            "color": "네이비",
+            "style": "스트릿",
+            "warmth": "medium",
+            "rain_ok": true,
+            "purchased_at": "2026-02-20"
+          },
+          {
+            "id": "A003",
+            "item": "라이트 그레이 바람막이",
+            "category": "outer",
+            "color": "그레이",
+            "style": "스포티",
+            "warmth": "light",
+            "rain_ok": true,
+            "purchased_at": "2026-03-05"
+          },
+          {
+            "id": "A004",
+            "item": "블랙 패딩",
+            "category": "outer",
+            "color": "블랙",
+            "style": "캐주얼",
+            "warmth": "heavy",
+            "rain_ok": false,
+            "purchased_at": "2025-12-02"
+          },
+          {
+            "id": "A005",
+            "item": "화이트 반팔 티셔츠",
+            "category": "top",
+            "color": "화이트",
+            "style": "캐주얼",
+            "warmth": "light",
+            "rain_ok": true,
+            "purchased_at": "2026-04-02"
+          },
+          {
+            "id": "A006",
+            "item": "블랙 캔버스 스니커즈",
+            "category": "shoes",
+            "color": "블랙",
+            "style": "스트릿",
+            "warmth": "all",
+            "rain_ok": false,
+            "purchased_at": "2026-01-18"
+          }
+        ],
+        "shopping_history_summary": {
+          "records": 6,
+          "source": "shopping_history.json",
+          "sample_items": [
+            "블랙 후드티",
+            "네이비 조거 팬츠",
+            "라이트 그레이 바람막이"
+          ]
+        },
+        "shopping_analysis": {
+          "total_items": 6,
+          "top_styles": [
+            "캐주얼",
+            "스트릿",
+            "스포티"
+          ],
+          "top_colors": [
+            "블랙",
+            "네이비",
+            "그레이"
+          ],
+          "top_categories": [
+            "top",
+            "outer",
+            "bottom"
+          ],
+          "favorite_items": [
+            "블랙 후드티",
+            "네이비 조거 팬츠",
+            "라이트 그레이 바람막이"
+          ],
+          "items_by_category": {
+            "top": [
+              {
+                "id": "A001",
+                "item": "블랙 후드티",
+                "category": "top",
+                "color": "블랙",
+                "style": "캐주얼",
+                "warmth": "medium",
+                "rain_ok": true,
+                "purchased_at": "2026-02-12"
+              },
+              {
+                "id": "A005",
+                "item": "화이트 반팔 티셔츠",
+                "category": "top",
+                "color": "화이트",
+                "style": "캐주얼",
+                "warmth": "light",
+                "rain_ok": true,
+                "purchased_at": "2026-04-02"
+              }
+            ],
+            "bottom": [
+              {
+                "id": "A002",
+                "item": "네이비 조거 팬츠",
+                "category": "bottom",
+                "color": "네이비",
+                "style": "스트릿",
+                "warmth": "medium",
+                "rain_ok": true,
+                "purchased_at": "2026-02-20"
+              }
+            ],
+            "outer": [
+              {
+                "id": "A003",
+                "item": "라이트 그레이 바람막이",
+                "category": "outer",
+                "color": "그레이",
+                "style": "스포티",
+                "warmth": "light",
+                "rain_ok": true,
+                "purchased_at": "2026-03-05"
+              },
+              {
+                "id": "A004",
+                "item": "블랙 패딩",
+                "category": "outer",
+                "color": "블랙",
+                "style": "캐주얼",
+                "warmth": "heavy",
+                "rain_ok": false,
+                "purchased_at": "2025-12-02"
+              }
+            ],
+            "shoes": [
+              {
+                "id": "A006",
+                "item": "블랙 캔버스 스니커즈",
+                "category": "shoes",
+                "color": "블랙",
+                "style": "스트릿",
+                "warmth": "all",
+                "rain_ok": false,
+                "purchased_at": "2026-01-18"
+              }
+            ]
+          }
+        },
+        "shopping_item_count": 6,
+        "styles_text": "캐주얼, 스트릿, 스포티",
+        "colors_text": "블랙, 네이비, 그레이",
+        "favorite_items_text": "블랙 후드티, 네이비 조거 팬츠, 라이트 그레이 바람막이",
+        "top_categories_text": "top, outer, bottom",
+        "user_name": "user_a",
+        "shopping_analysis_summary": {
+          "total_items": 6,
+          "top_styles": [
+            "캐주얼",
+            "스트릿",
+            "스포티"
+          ],
+          "top_colors": [
+            "블랙",
+            "네이비",
+            "그레이"
+          ],
+          "top_categories": [
+            "top",
+            "outer",
+            "bottom"
+          ],
+          "favorite_items": [
+            "블랙 후드티",
+            "네이비 조거 팬츠",
+            "라이트 그레이 바람막이"
+          ]
+        }
+      },
+      "error": null
+    },
+    {
+      "name": "Recommendation Node",
+      "detail": "rule=mild_outfit, items=4",
+      "data": {
+        "avg_temp": 15.5,
+        "recommended_items": [
+          "라이트 그레이 바람막이",
+          "블랙 후드티",
+          "네이비 조거 팬츠",
+          "블랙 캔버스 스니커즈"
+        ],
+        "ranked_items": [
+          "1. 라이트 그레이 바람막이",
+          "2. 블랙 후드티",
+          "3. 네이비 조거 팬츠",
+          "4. 블랙 캔버스 스니커즈"
+        ],
+        "extras": []
+      },
+      "node_id": "recommendation",
+      "node_type": "recommendation",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.253411+00:00",
+      "finished_at": "2026-09-24T22:50:28.253466+00:00",
+      "duration_ms": 0.055,
+      "input": {
+        "weather": {
+          "city_name": "칭다오",
+          "country": "중국",
+          "date": "2026-09-23",
+          "condition": "흐림",
+          "weather_code": 3,
+          "temp_min": 10.0,
+          "temp_max": 21.0,
+          "precipitation_probability": 20,
+          "latitude": 36.0671,
+          "longitude": 120.3826
+        },
+        "shopping_analysis": {
+          "total_items": 6,
+          "top_styles": [
+            "캐주얼",
+            "스트릿",
+            "스포티"
+          ],
+          "top_colors": [
+            "블랙",
+            "네이비",
+            "그레이"
+          ],
+          "top_categories": [
+            "top",
+            "outer",
+            "bottom"
+          ],
+          "favorite_items": [
+            "블랙 후드티",
+            "네이비 조거 팬츠",
+            "라이트 그레이 바람막이"
+          ],
+          "items_by_category": {
+            "top": [
+              {
+                "id": "A001",
+                "item": "블랙 후드티",
+                "category": "top",
+                "color": "블랙",
+                "style": "캐주얼",
+                "warmth": "medium",
+                "rain_ok": true,
+                "purchased_at": "2026-02-12"
+              },
+              {
+                "id": "A005",
+                "item": "화이트 반팔 티셔츠",
+                "category": "top",
+                "color": "화이트",
+                "style": "캐주얼",
+                "warmth": "light",
+                "rain_ok": true,
+                "purchased_at": "2026-04-02"
+              }
+            ],
+            "bottom": [
+              {
+                "id": "A002",
+                "item": "네이비 조거 팬츠",
+                "category": "bottom",
+                "color": "네이비",
+                "style": "스트릿",
+                "warmth": "medium",
+                "rain_ok": true,
+                "purchased_at": "2026-02-20"
+              }
+            ],
+            "outer": [
+              {
+                "id": "A003",
+                "item": "라이트 그레이 바람막이",
+                "category": "outer",
+                "color": "그레이",
+                "style": "스포티",
+                "warmth": "light",
+                "rain_ok": true,
+                "purchased_at": "2026-03-05"
+              },
+              {
+                "id": "A004",
+                "item": "블랙 패딩",
+                "category": "outer",
+                "color": "블랙",
+                "style": "캐주얼",
+                "warmth": "heavy",
+                "rain_ok": false,
+                "purchased_at": "2025-12-02"
+              }
+            ],
+            "shoes": [
+              {
+                "id": "A006",
+                "item": "블랙 캔버스 스니커즈",
+                "category": "shoes",
+                "color": "블랙",
+                "style": "스트릿",
+                "warmth": "all",
+                "rain_ok": false,
+                "purchased_at": "2026-01-18"
+              }
+            ]
+          }
+        }
+      },
+      "output": {
+        "avg_temp": 15.5,
+        "temp_min": 10.0,
+        "temp_max": 21.0,
+        "weather_date": "2026-09-23",
+        "weather_condition": "흐림",
+        "precipitation_probability": 20,
+        "matched_rule_name": "mild_outfit",
+        "recommendation": "일교차를 고려한 가벼운 레이어드가 적합합니다.",
+        "owned_recommended_items": [
+          "라이트 그레이 바람막이",
+          "블랙 후드티",
+          "네이비 조거 팬츠",
+          "블랙 캔버스 스니커즈"
+        ],
+        "owned_recommended_items_text": "1. 라이트 그레이 바람막이, 2. 블랙 후드티, 3. 네이비 조거 팬츠, 4. 블랙 캔버스 스니커즈",
+        "additional_items": [],
+        "additional_items_text": "",
+        "recommended_items": [
+          "라이트 그레이 바람막이",
+          "블랙 후드티",
+          "네이비 조거 팬츠",
+          "블랙 캔버스 스니커즈"
+        ],
+        "recommended_items_text": "1. 라이트 그레이 바람막이, 2. 블랙 후드티, 3. 네이비 조거 팬츠, 4. 블랙 캔버스 스니커즈",
+        "ranked_items": [
+          "1. 라이트 그레이 바람막이",
+          "2. 블랙 후드티",
+          "3. 네이비 조거 팬츠",
+          "4. 블랙 캔버스 스니커즈"
+        ],
+        "ranked_items_text": "1. 라이트 그레이 바람막이 | 2. 블랙 후드티 | 3. 네이비 조거 팬츠 | 4. 블랙 캔버스 스니커즈",
+        "extras": [],
+        "extras_text": ""
+      },
+      "error": null
+    },
+    {
+      "name": "Compose Node",
+      "detail": "final response rendered from output_template",
+      "data": {
+        "template_id": "outfit_agent_v1",
+        "workflow_id": "outfit_recommendation_workflow_v1"
+      },
+      "node_id": "compose",
+      "node_type": "compose",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.253527+00:00",
+      "finished_at": "2026-09-24T22:50:28.253546+00:00",
+      "duration_ms": 0.02,
+      "input": {
+        "recommendation": "일교차를 고려한 가벼운 레이어드가 적합합니다.",
+        "ranked_items": [
+          "1. 라이트 그레이 바람막이",
+          "2. 블랙 후드티",
+          "3. 네이비 조거 팬츠",
+          "4. 블랙 캔버스 스니커즈"
+        ]
+      },
+      "output": {
+        "final_answer": "[Personalized Outfit Agent]\n칭다오의 다음 주(2026-09-23) 날씨는 흐림, 평균 15.5°C, 강수확률 20%입니다.\n쇼핑 기록 분석: 총 6개 구매 기록에서 선호 스타일은 캐주얼, 스트릿, 스포티, 선호 색상은 블랙, 네이비, 그레이로 분석되었습니다.\n추천 방향: 일교차를 고려한 가벼운 레이어드가 적합합니다.\n추천 순위: 1. 라이트 그레이 바람막이 | 2. 블랙 후드티 | 3. 네이비 조거 팬츠 | 4. 블랙 캔버스 스니커즈\n보유 단품 기반 추천: 1. 라이트 그레이 바람막이, 2. 블랙 후드티, 3. 네이비 조거 팬츠, 4. 블랙 캔버스 스니커즈\n추가 추천: \n추가 조건: "
+      },
+      "error": null
+    }
+  ],
+  "duration_ms": 5.292,
+  "node_statuses": [
+    {
+      "node_id": "request_parser",
+      "node_type": "request_parser",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "question",
+      "node_type": "question",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "weather",
+      "node_type": "weather",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "shopping_analysis",
+      "node_type": "shopping_analysis",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "recommendation",
+      "node_type": "recommendation",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "compose",
+      "node_type": "compose",
+      "status": "SUCCESS"
+    }
+  ],
+  "errors": [],
+  "failure_mode": null
+}

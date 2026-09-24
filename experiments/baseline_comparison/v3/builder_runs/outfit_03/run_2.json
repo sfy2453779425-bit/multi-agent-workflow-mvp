@@ -1,0 +1,1235 @@
+{
+  "run_id": "builder_outfit_03_2",
+  "experiment_id": "builder_v3_threeway_20260925",
+  "builder_version": "current-runtime-v1.2-source-snapshot",
+  "case_id": "outfit_03",
+  "run": 2,
+  "system": "Builder",
+  "timestamp": "2026-09-24T22:50:28.294244+00:00",
+  "finished_at": "2026-09-24T22:50:28.297361+00:00",
+  "input": {
+    "query": "서울 내일 출근 포멀 옷 추천해줘",
+    "user_id": "user_b"
+  },
+  "fixture_version": "outfit-2026-09-16-v2-commute",
+  "fixture_sha256": "a169262507936026d7f615f16b1521a237c49e97a846ee42a6d09123de6a3776",
+  "prompt_version": "prompt-v1",
+  "workflow_json": {
+    "schema_version": 1,
+    "workflow_id": "commute_outfit_workflow_v1",
+    "workflow_name": "Commute Outfit Recommendation Workflow",
+    "description": "A builder template for assembling a commute/work outfit recommendation workflow from reusable nodes.",
+    "runtime_type": "outfit_recommendation",
+    "base_agent_config": "D:\\综合设计\\configs\\outfit_agent.json",
+    "data_file": null,
+    "data_dir": null,
+    "default_query": "서울 내일 출근 포멀 옷 추천해줘",
+    "default_user_id": "user_b",
+    "agents": [
+      {
+        "id": "request_parser",
+        "name": "Commute Request Parser Node",
+        "role": "Extract city, date, commute purpose, user and preferred style from the user request.",
+        "builder_equivalent": "Start Node + Parser/Prompt Node"
+      },
+      {
+        "id": "question",
+        "name": "Commute Question Node",
+        "role": "Ask for missing commute context such as destination city, date, dress code or style.",
+        "builder_equivalent": "Condition Node + User Input Node"
+      },
+      {
+        "id": "weather",
+        "name": "Weather Tool Node",
+        "role": "Call the weather tool and normalize weather data for the commute date.",
+        "builder_equivalent": "HTTP/API Tool Node"
+      },
+      {
+        "id": "shopping_analysis",
+        "name": "Wardrobe History Analysis Node",
+        "role": "Load purchase history and find work-friendly style preferences.",
+        "builder_equivalent": "Data Loader Node + Analysis Node"
+      },
+      {
+        "id": "recommendation",
+        "name": "Commute Recommendation Node",
+        "role": "Match weather, commute purpose and shopping analysis with outfit ranking rules.",
+        "builder_equivalent": "Rule/LLM Decision Node"
+      },
+      {
+        "id": "compose",
+        "name": "Commute Compose Node",
+        "role": "Render the final commute outfit recommendation answer.",
+        "builder_equivalent": "Output Template Node"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "request_parser",
+        "type": "request_parser",
+        "name": "Commute Request Parser Node",
+        "role": "Extract city, date, commute purpose, user and preferred style from the user request.",
+        "builder_equivalent": "Start Node + Parser/Prompt Node",
+        "inputs": {
+          "user_message": "context.query",
+          "user_id": "context.user_id"
+        },
+        "outputs": {
+          "agent_name": "context.agent_name",
+          "city_display": "context.city_display",
+          "city_query": "context.city_query",
+          "day_offset": "context.day_offset",
+          "date_label": "context.date_label",
+          "matched_keywords": "context.matched_keywords"
+        },
+        "required_inputs": [
+          "user_message",
+          "user_id"
+        ],
+        "config": {}
+      },
+      {
+        "id": "question",
+        "type": "question",
+        "name": "Commute Question Node",
+        "role": "Ask for missing commute context such as destination city, date, dress code or style.",
+        "builder_equivalent": "Condition Node + User Input Node",
+        "inputs": {
+          "query": "context.query",
+          "city": "context.city_display",
+          "date": "context.date_label"
+        },
+        "outputs": {
+          "detected_purpose": "context.detected_purpose",
+          "detected_style": "context.detected_style",
+          "missing_fields": "context.missing_fields",
+          "next_question_field": "context.next_question_field",
+          "needs_clarification": "context.needs_clarification",
+          "clarification_message": "context.clarification_message"
+        },
+        "required_inputs": [
+          "query",
+          "city",
+          "date"
+        ],
+        "config": {}
+      },
+      {
+        "id": "weather",
+        "type": "weather",
+        "name": "Weather Tool Node",
+        "role": "Call the weather tool and normalize weather data for the commute date.",
+        "builder_equivalent": "HTTP/API Tool Node",
+        "inputs": {
+          "city_query": "context.city_query",
+          "day_offset": "context.day_offset"
+        },
+        "outputs": {
+          "weather": "context.weather",
+          "weather_summary": "context.weather_summary"
+        },
+        "required_inputs": [
+          "city_query",
+          "day_offset"
+        ],
+        "config": {}
+      },
+      {
+        "id": "shopping_analysis",
+        "type": "shopping_analysis",
+        "name": "Wardrobe History Analysis Node",
+        "role": "Load purchase history and find work-friendly style preferences.",
+        "builder_equivalent": "Data Loader Node + Analysis Node",
+        "inputs": {
+          "user_id": "context.user_id"
+        },
+        "outputs": {
+          "shopping_history": "context.shopping_history",
+          "shopping_history_summary": "context.shopping_history_summary",
+          "shopping_analysis": "context.shopping_analysis",
+          "shopping_item_count": "context.shopping_item_count",
+          "styles_text": "context.styles_text",
+          "colors_text": "context.colors_text",
+          "favorite_items_text": "context.favorite_items_text",
+          "top_categories_text": "context.top_categories_text",
+          "user_name": "context.user_name",
+          "shopping_analysis_summary": "context.shopping_analysis_summary"
+        },
+        "required_inputs": [
+          "user_id"
+        ],
+        "config": {}
+      },
+      {
+        "id": "recommendation",
+        "type": "recommendation",
+        "name": "Commute Recommendation Node",
+        "role": "Match weather, commute purpose and shopping analysis with outfit ranking rules.",
+        "builder_equivalent": "Rule/LLM Decision Node",
+        "inputs": {
+          "weather": "context.weather",
+          "shopping_analysis": "context.shopping_analysis"
+        },
+        "outputs": {
+          "avg_temp": "context.avg_temp",
+          "temp_min": "context.temp_min",
+          "temp_max": "context.temp_max",
+          "weather_date": "context.weather_date",
+          "weather_condition": "context.weather_condition",
+          "precipitation_probability": "context.precipitation_probability",
+          "matched_rule_name": "context.matched_rule_name",
+          "recommendation": "context.recommendation",
+          "owned_recommended_items": "context.owned_recommended_items",
+          "owned_recommended_items_text": "context.owned_recommended_items_text",
+          "additional_items": "context.additional_items",
+          "additional_items_text": "context.additional_items_text",
+          "recommended_items": "context.recommended_items",
+          "recommended_items_text": "context.recommended_items_text",
+          "ranked_items": "context.ranked_items",
+          "ranked_items_text": "context.ranked_items_text",
+          "extras": "context.extras",
+          "extras_text": "context.extras_text"
+        },
+        "required_inputs": [
+          "weather",
+          "shopping_analysis"
+        ],
+        "config": {}
+      },
+      {
+        "id": "compose",
+        "type": "compose",
+        "name": "Commute Compose Node",
+        "role": "Render the final commute outfit recommendation answer.",
+        "builder_equivalent": "Output Template Node",
+        "inputs": {
+          "recommendation": "context.recommendation",
+          "ranked_items": "context.ranked_items"
+        },
+        "outputs": {
+          "final_answer": "context.final_answer"
+        },
+        "required_inputs": [
+          "recommendation",
+          "ranked_items"
+        ],
+        "config": {}
+      }
+    ],
+    "execution": {
+      "type": "sequential",
+      "order": [
+        "request_parser",
+        "question",
+        "weather",
+        "shopping_analysis",
+        "recommendation",
+        "compose"
+      ],
+      "generated_by": "TemplateWorkflowBuilder"
+    },
+    "question_agent": {
+      "purpose_keywords": [
+        "출근",
+        "통근",
+        "통학",
+        "회사",
+        "회의",
+        "면접",
+        "비즈니스",
+        "출장",
+        "학교"
+      ],
+      "style_keywords": [
+        "포멀",
+        "정장",
+        "미니멀",
+        "비즈니스",
+        "캐주얼",
+        "단정",
+        "오피스"
+      ],
+      "clarification_message": "출근/통근 상황 정보가 부족합니다. 도시, 날짜, 드레스코드나 선호 스타일을 알려주세요.",
+      "clarification_questions": {
+        "city": "어느 도시의 출근/통근 날씨를 기준으로 추천할까요? (예: 서울, 인천)",
+        "date": "언제 입을 출근복인가요? (예: 내일, 다음 주)",
+        "purpose_or_style": "출근/회의/면접 같은 상황이나 포멀/미니멀 같은 선호 스타일을 알려주세요."
+      }
+    },
+    "experiment_mode": {
+      "type": "frozen_fixture",
+      "fixture_version": "outfit-2026-09-16-v2-commute",
+      "fixture_sha256": "a169262507936026d7f615f16b1521a237c49e97a846ee42a6d09123de6a3776"
+    }
+  },
+  "workflow_sha256": "fe35f47ca94f817a7b728fd3ae7d7b333ca9fa057bd50d39d872adc0bc5da635",
+  "final_result": {
+    "answer": "[Personalized Outfit Agent]\n서울의 내일(2026-09-24) 날씨는 흐림, 평균 10.0°C, 강수확률 20%입니다.\n쇼핑 기록 분석: 총 4개 구매 기록에서 선호 스타일은 포멀, 선호 색상은 네이비, 그레이, 화이트로 분석되었습니다.\n추천 방향: 일교차를 고려한 가벼운 레이어드가 적합합니다.\n추천 순위: 1. 네이비 블레이저 | 2. 화이트 셔츠 | 3. 그레이 슬랙스 | 4. 블랙 로퍼\n보유 단품 기반 추천: 1. 네이비 블레이저, 2. 화이트 셔츠, 3. 그레이 슬랙스, 4. 블랙 로퍼\n추가 추천: \n추가 조건: ",
+    "context": {
+      "query": "서울 내일 출근 포멀 옷 추천해줘",
+      "user_id": "user_b",
+      "runtime_type": "outfit_recommendation",
+      "workflow_name": "Commute Outfit Recommendation Workflow",
+      "executed_agents": [
+        "request_parser",
+        "question",
+        "weather",
+        "shopping_analysis",
+        "recommendation",
+        "compose"
+      ],
+      "executed_tools": [
+        "weather",
+        "shopping_history"
+      ],
+      "agent_name": "Personalized Outfit Agent",
+      "city_display": "서울",
+      "city_query": "Seoul",
+      "day_offset": 1,
+      "date_label": "내일",
+      "matched_keywords": [
+        "옷",
+        "추천"
+      ],
+      "detected_purpose": [
+        "출근",
+        "출근"
+      ],
+      "detected_style": [
+        "포멀",
+        "포멀"
+      ],
+      "missing_fields": [],
+      "next_question_field": "",
+      "needs_clarification": false,
+      "clarification_message": "",
+      "weather": {
+        "city_name": "서울",
+        "country": "대한민국",
+        "date": "2026-09-24",
+        "condition": "흐림",
+        "weather_code": 3,
+        "temp_min": 6.0,
+        "temp_max": 14.0,
+        "precipitation_probability": 20,
+        "latitude": 37.5665,
+        "longitude": 126.978
+      },
+      "weather_summary": {
+        "date": "2026-09-24",
+        "condition": "흐림",
+        "temp_min": 6.0,
+        "temp_max": 14.0,
+        "precipitation_probability": 20
+      },
+      "shopping_history": [
+        {
+          "id": "B001",
+          "item": "네이비 블레이저",
+          "category": "outer",
+          "color": "네이비",
+          "style": "포멀",
+          "warmth": "medium",
+          "rain_ok": true,
+          "purchased_at": "2026-01-12"
+        },
+        {
+          "id": "B002",
+          "item": "그레이 슬랙스",
+          "category": "bottom",
+          "color": "그레이",
+          "style": "포멀",
+          "warmth": "medium",
+          "rain_ok": true,
+          "purchased_at": "2026-02-20"
+        },
+        {
+          "id": "B003",
+          "item": "화이트 셔츠",
+          "category": "top",
+          "color": "화이트",
+          "style": "포멀",
+          "warmth": "light",
+          "rain_ok": true,
+          "purchased_at": "2026-03-05"
+        },
+        {
+          "id": "B004",
+          "item": "블랙 로퍼",
+          "category": "shoes",
+          "color": "블랙",
+          "style": "포멀",
+          "warmth": "all",
+          "rain_ok": false,
+          "purchased_at": "2026-01-18"
+        }
+      ],
+      "shopping_history_summary": {
+        "records": 4,
+        "source": "shopping_history.json",
+        "sample_items": [
+          "네이비 블레이저",
+          "그레이 슬랙스",
+          "화이트 셔츠"
+        ]
+      },
+      "shopping_analysis": {
+        "total_items": 4,
+        "top_styles": [
+          "포멀"
+        ],
+        "top_colors": [
+          "네이비",
+          "그레이",
+          "화이트"
+        ],
+        "top_categories": [
+          "outer",
+          "bottom",
+          "top"
+        ],
+        "favorite_items": [
+          "네이비 블레이저",
+          "그레이 슬랙스",
+          "화이트 셔츠"
+        ],
+        "items_by_category": {
+          "outer": [
+            {
+              "id": "B001",
+              "item": "네이비 블레이저",
+              "category": "outer",
+              "color": "네이비",
+              "style": "포멀",
+              "warmth": "medium",
+              "rain_ok": true,
+              "purchased_at": "2026-01-12"
+            }
+          ],
+          "bottom": [
+            {
+              "id": "B002",
+              "item": "그레이 슬랙스",
+              "category": "bottom",
+              "color": "그레이",
+              "style": "포멀",
+              "warmth": "medium",
+              "rain_ok": true,
+              "purchased_at": "2026-02-20"
+            }
+          ],
+          "top": [
+            {
+              "id": "B003",
+              "item": "화이트 셔츠",
+              "category": "top",
+              "color": "화이트",
+              "style": "포멀",
+              "warmth": "light",
+              "rain_ok": true,
+              "purchased_at": "2026-03-05"
+            }
+          ],
+          "shoes": [
+            {
+              "id": "B004",
+              "item": "블랙 로퍼",
+              "category": "shoes",
+              "color": "블랙",
+              "style": "포멀",
+              "warmth": "all",
+              "rain_ok": false,
+              "purchased_at": "2026-01-18"
+            }
+          ]
+        }
+      },
+      "shopping_item_count": 4,
+      "styles_text": "포멀",
+      "colors_text": "네이비, 그레이, 화이트",
+      "favorite_items_text": "네이비 블레이저, 그레이 슬랙스, 화이트 셔츠",
+      "top_categories_text": "outer, bottom, top",
+      "user_name": "user_b",
+      "shopping_analysis_summary": {
+        "total_items": 4,
+        "top_styles": [
+          "포멀"
+        ],
+        "top_colors": [
+          "네이비",
+          "그레이",
+          "화이트"
+        ],
+        "top_categories": [
+          "outer",
+          "bottom",
+          "top"
+        ],
+        "favorite_items": [
+          "네이비 블레이저",
+          "그레이 슬랙스",
+          "화이트 셔츠"
+        ]
+      },
+      "avg_temp": 10.0,
+      "temp_min": 6.0,
+      "temp_max": 14.0,
+      "weather_date": "2026-09-24",
+      "weather_condition": "흐림",
+      "precipitation_probability": 20,
+      "matched_rule_name": "mild_outfit",
+      "recommendation": "일교차를 고려한 가벼운 레이어드가 적합합니다.",
+      "owned_recommended_items": [
+        "네이비 블레이저",
+        "화이트 셔츠",
+        "그레이 슬랙스",
+        "블랙 로퍼"
+      ],
+      "owned_recommended_items_text": "1. 네이비 블레이저, 2. 화이트 셔츠, 3. 그레이 슬랙스, 4. 블랙 로퍼",
+      "additional_items": [],
+      "additional_items_text": "",
+      "recommended_items": [
+        "네이비 블레이저",
+        "화이트 셔츠",
+        "그레이 슬랙스",
+        "블랙 로퍼"
+      ],
+      "recommended_items_text": "1. 네이비 블레이저, 2. 화이트 셔츠, 3. 그레이 슬랙스, 4. 블랙 로퍼",
+      "ranked_items": [
+        "1. 네이비 블레이저",
+        "2. 화이트 셔츠",
+        "3. 그레이 슬랙스",
+        "4. 블랙 로퍼"
+      ],
+      "ranked_items_text": "1. 네이비 블레이저 | 2. 화이트 셔츠 | 3. 그레이 슬랙스 | 4. 블랙 로퍼",
+      "extras": [],
+      "extras_text": "",
+      "final_answer": "[Personalized Outfit Agent]\n서울의 내일(2026-09-24) 날씨는 흐림, 평균 10.0°C, 강수확률 20%입니다.\n쇼핑 기록 분석: 총 4개 구매 기록에서 선호 스타일은 포멀, 선호 색상은 네이비, 그레이, 화이트로 분석되었습니다.\n추천 방향: 일교차를 고려한 가벼운 레이어드가 적합합니다.\n추천 순위: 1. 네이비 블레이저 | 2. 화이트 셔츠 | 3. 그레이 슬랙스 | 4. 블랙 로퍼\n보유 단품 기반 추천: 1. 네이비 블레이저, 2. 화이트 셔츠, 3. 그레이 슬랙스, 4. 블랙 로퍼\n추가 추천: \n추가 조건: ",
+      "workflow_agents": [
+        {
+          "id": "request_parser",
+          "name": "Commute Request Parser Node",
+          "role": "Extract city, date, commute purpose, user and preferred style from the user request.",
+          "builder_equivalent": "Start Node + Parser/Prompt Node"
+        },
+        {
+          "id": "question",
+          "name": "Commute Question Node",
+          "role": "Ask for missing commute context such as destination city, date, dress code or style.",
+          "builder_equivalent": "Condition Node + User Input Node"
+        },
+        {
+          "id": "weather",
+          "name": "Weather Tool Node",
+          "role": "Call the weather tool and normalize weather data for the commute date.",
+          "builder_equivalent": "HTTP/API Tool Node"
+        },
+        {
+          "id": "shopping_analysis",
+          "name": "Wardrobe History Analysis Node",
+          "role": "Load purchase history and find work-friendly style preferences.",
+          "builder_equivalent": "Data Loader Node + Analysis Node"
+        },
+        {
+          "id": "recommendation",
+          "name": "Commute Recommendation Node",
+          "role": "Match weather, commute purpose and shopping analysis with outfit ranking rules.",
+          "builder_equivalent": "Rule/LLM Decision Node"
+        },
+        {
+          "id": "compose",
+          "name": "Commute Compose Node",
+          "role": "Render the final commute outfit recommendation answer.",
+          "builder_equivalent": "Output Template Node"
+        }
+      ],
+      "workflow_nodes": [
+        {
+          "id": "request_parser",
+          "type": "request_parser",
+          "name": "Commute Request Parser Node",
+          "role": "Extract city, date, commute purpose, user and preferred style from the user request.",
+          "builder_equivalent": "Start Node + Parser/Prompt Node",
+          "inputs": {
+            "user_message": "context.query",
+            "user_id": "context.user_id"
+          },
+          "outputs": {
+            "agent_name": "context.agent_name",
+            "city_display": "context.city_display",
+            "city_query": "context.city_query",
+            "day_offset": "context.day_offset",
+            "date_label": "context.date_label",
+            "matched_keywords": "context.matched_keywords"
+          },
+          "required_inputs": [
+            "user_message",
+            "user_id"
+          ],
+          "config": {}
+        },
+        {
+          "id": "question",
+          "type": "question",
+          "name": "Commute Question Node",
+          "role": "Ask for missing commute context such as destination city, date, dress code or style.",
+          "builder_equivalent": "Condition Node + User Input Node",
+          "inputs": {
+            "query": "context.query",
+            "city": "context.city_display",
+            "date": "context.date_label"
+          },
+          "outputs": {
+            "detected_purpose": "context.detected_purpose",
+            "detected_style": "context.detected_style",
+            "missing_fields": "context.missing_fields",
+            "next_question_field": "context.next_question_field",
+            "needs_clarification": "context.needs_clarification",
+            "clarification_message": "context.clarification_message"
+          },
+          "required_inputs": [
+            "query",
+            "city",
+            "date"
+          ],
+          "config": {}
+        },
+        {
+          "id": "weather",
+          "type": "weather",
+          "name": "Weather Tool Node",
+          "role": "Call the weather tool and normalize weather data for the commute date.",
+          "builder_equivalent": "HTTP/API Tool Node",
+          "inputs": {
+            "city_query": "context.city_query",
+            "day_offset": "context.day_offset"
+          },
+          "outputs": {
+            "weather": "context.weather",
+            "weather_summary": "context.weather_summary"
+          },
+          "required_inputs": [
+            "city_query",
+            "day_offset"
+          ],
+          "config": {}
+        },
+        {
+          "id": "shopping_analysis",
+          "type": "shopping_analysis",
+          "name": "Wardrobe History Analysis Node",
+          "role": "Load purchase history and find work-friendly style preferences.",
+          "builder_equivalent": "Data Loader Node + Analysis Node",
+          "inputs": {
+            "user_id": "context.user_id"
+          },
+          "outputs": {
+            "shopping_history": "context.shopping_history",
+            "shopping_history_summary": "context.shopping_history_summary",
+            "shopping_analysis": "context.shopping_analysis",
+            "shopping_item_count": "context.shopping_item_count",
+            "styles_text": "context.styles_text",
+            "colors_text": "context.colors_text",
+            "favorite_items_text": "context.favorite_items_text",
+            "top_categories_text": "context.top_categories_text",
+            "user_name": "context.user_name",
+            "shopping_analysis_summary": "context.shopping_analysis_summary"
+          },
+          "required_inputs": [
+            "user_id"
+          ],
+          "config": {}
+        },
+        {
+          "id": "recommendation",
+          "type": "recommendation",
+          "name": "Commute Recommendation Node",
+          "role": "Match weather, commute purpose and shopping analysis with outfit ranking rules.",
+          "builder_equivalent": "Rule/LLM Decision Node",
+          "inputs": {
+            "weather": "context.weather",
+            "shopping_analysis": "context.shopping_analysis"
+          },
+          "outputs": {
+            "avg_temp": "context.avg_temp",
+            "temp_min": "context.temp_min",
+            "temp_max": "context.temp_max",
+            "weather_date": "context.weather_date",
+            "weather_condition": "context.weather_condition",
+            "precipitation_probability": "context.precipitation_probability",
+            "matched_rule_name": "context.matched_rule_name",
+            "recommendation": "context.recommendation",
+            "owned_recommended_items": "context.owned_recommended_items",
+            "owned_recommended_items_text": "context.owned_recommended_items_text",
+            "additional_items": "context.additional_items",
+            "additional_items_text": "context.additional_items_text",
+            "recommended_items": "context.recommended_items",
+            "recommended_items_text": "context.recommended_items_text",
+            "ranked_items": "context.ranked_items",
+            "ranked_items_text": "context.ranked_items_text",
+            "extras": "context.extras",
+            "extras_text": "context.extras_text"
+          },
+          "required_inputs": [
+            "weather",
+            "shopping_analysis"
+          ],
+          "config": {}
+        },
+        {
+          "id": "compose",
+          "type": "compose",
+          "name": "Commute Compose Node",
+          "role": "Render the final commute outfit recommendation answer.",
+          "builder_equivalent": "Output Template Node",
+          "inputs": {
+            "recommendation": "context.recommendation",
+            "ranked_items": "context.ranked_items"
+          },
+          "outputs": {
+            "final_answer": "context.final_answer"
+          },
+          "required_inputs": [
+            "recommendation",
+            "ranked_items"
+          ],
+          "config": {}
+        }
+      ],
+      "workflow_execution": {
+        "type": "sequential",
+        "order": [
+          "request_parser",
+          "question",
+          "weather",
+          "shopping_analysis",
+          "recommendation",
+          "compose"
+        ],
+        "generated_by": "TemplateWorkflowBuilder"
+      }
+    }
+  },
+  "full_trace": [
+    {
+      "name": "Commute Request Parser Node",
+      "detail": "city=서울, date=내일, user=user_b",
+      "data": {
+        "workflow": "C:\\Users\\lain\\AppData\\Local\\Temp\\baseline_outfit_03_4j7k69f3\\workflow.json",
+        "base_config": "D:\\综合设计\\configs\\outfit_agent.json",
+        "intent": "outfit_recommendation",
+        "matched_keywords": [
+          "옷",
+          "추천"
+        ]
+      },
+      "node_id": "request_parser",
+      "node_type": "request_parser",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.295998+00:00",
+      "finished_at": "2026-09-24T22:50:28.296028+00:00",
+      "duration_ms": 0.027,
+      "input": {
+        "user_message": "서울 내일 출근 포멀 옷 추천해줘",
+        "user_id": "user_b"
+      },
+      "output": {
+        "query": "서울 내일 출근 포멀 옷 추천해줘",
+        "agent_name": "Personalized Outfit Agent",
+        "user_id": "user_b",
+        "city_display": "서울",
+        "city_query": "Seoul",
+        "day_offset": 1,
+        "date_label": "내일",
+        "matched_keywords": [
+          "옷",
+          "추천"
+        ],
+        "executed_tools": []
+      },
+      "error": null
+    },
+    {
+      "name": "Commute Question Node",
+      "detail": "purpose=출근, 출근, style=포멀, 포멀 → 정보 충분",
+      "data": {
+        "detected_purpose": [
+          "출근",
+          "출근"
+        ],
+        "detected_style": [
+          "포멀",
+          "포멀"
+        ],
+        "missing_fields": [],
+        "next_question_field": "",
+        "needs_clarification": false,
+        "clarification_message": ""
+      },
+      "node_id": "question",
+      "node_type": "question",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.296053+00:00",
+      "finished_at": "2026-09-24T22:50:28.296075+00:00",
+      "duration_ms": 0.022,
+      "input": {
+        "query": "서울 내일 출근 포멀 옷 추천해줘",
+        "city": "서울",
+        "date": "내일"
+      },
+      "output": {
+        "detected_purpose": [
+          "출근",
+          "출근"
+        ],
+        "detected_style": [
+          "포멀",
+          "포멀"
+        ],
+        "missing_fields": [],
+        "next_question_field": "",
+        "needs_clarification": false,
+        "clarification_message": ""
+      },
+      "error": null
+    },
+    {
+      "name": "Weather Tool Node",
+      "detail": "서울 내일 weather loaded: 흐림",
+      "data": {
+        "date": "2026-09-24",
+        "condition": "흐림",
+        "temp_min": 6.0,
+        "temp_max": 14.0,
+        "precipitation_probability": 20
+      },
+      "node_id": "weather",
+      "node_type": "weather",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.296091+00:00",
+      "finished_at": "2026-09-24T22:50:28.296102+00:00",
+      "duration_ms": 0.012,
+      "input": {
+        "city_query": "Seoul",
+        "day_offset": 1
+      },
+      "output": {
+        "weather": {
+          "city_name": "서울",
+          "country": "대한민국",
+          "date": "2026-09-24",
+          "condition": "흐림",
+          "weather_code": 3,
+          "temp_min": 6.0,
+          "temp_max": 14.0,
+          "precipitation_probability": 20,
+          "latitude": 37.5665,
+          "longitude": 126.978
+        },
+        "weather_summary": {
+          "date": "2026-09-24",
+          "condition": "흐림",
+          "temp_min": 6.0,
+          "temp_max": 14.0,
+          "precipitation_probability": 20
+        }
+      },
+      "error": null
+    },
+    {
+      "name": "Wardrobe History Analysis Node",
+      "detail": "styles=포멀, colors=네이비, 그레이, 화이트, records=4",
+      "data": {
+        "total_items": 4,
+        "top_styles": [
+          "포멀"
+        ],
+        "top_colors": [
+          "네이비",
+          "그레이",
+          "화이트"
+        ],
+        "top_categories": [
+          "outer",
+          "bottom",
+          "top"
+        ],
+        "favorite_items": [
+          "네이비 블레이저",
+          "그레이 슬랙스",
+          "화이트 셔츠"
+        ]
+      },
+      "node_id": "shopping_analysis",
+      "node_type": "shopping_analysis",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.296124+00:00",
+      "finished_at": "2026-09-24T22:50:28.296305+00:00",
+      "duration_ms": 0.183,
+      "input": {
+        "user_id": "user_b"
+      },
+      "output": {
+        "shopping_history": [
+          {
+            "id": "B001",
+            "item": "네이비 블레이저",
+            "category": "outer",
+            "color": "네이비",
+            "style": "포멀",
+            "warmth": "medium",
+            "rain_ok": true,
+            "purchased_at": "2026-01-12"
+          },
+          {
+            "id": "B002",
+            "item": "그레이 슬랙스",
+            "category": "bottom",
+            "color": "그레이",
+            "style": "포멀",
+            "warmth": "medium",
+            "rain_ok": true,
+            "purchased_at": "2026-02-20"
+          },
+          {
+            "id": "B003",
+            "item": "화이트 셔츠",
+            "category": "top",
+            "color": "화이트",
+            "style": "포멀",
+            "warmth": "light",
+            "rain_ok": true,
+            "purchased_at": "2026-03-05"
+          },
+          {
+            "id": "B004",
+            "item": "블랙 로퍼",
+            "category": "shoes",
+            "color": "블랙",
+            "style": "포멀",
+            "warmth": "all",
+            "rain_ok": false,
+            "purchased_at": "2026-01-18"
+          }
+        ],
+        "shopping_history_summary": {
+          "records": 4,
+          "source": "shopping_history.json",
+          "sample_items": [
+            "네이비 블레이저",
+            "그레이 슬랙스",
+            "화이트 셔츠"
+          ]
+        },
+        "shopping_analysis": {
+          "total_items": 4,
+          "top_styles": [
+            "포멀"
+          ],
+          "top_colors": [
+            "네이비",
+            "그레이",
+            "화이트"
+          ],
+          "top_categories": [
+            "outer",
+            "bottom",
+            "top"
+          ],
+          "favorite_items": [
+            "네이비 블레이저",
+            "그레이 슬랙스",
+            "화이트 셔츠"
+          ],
+          "items_by_category": {
+            "outer": [
+              {
+                "id": "B001",
+                "item": "네이비 블레이저",
+                "category": "outer",
+                "color": "네이비",
+                "style": "포멀",
+                "warmth": "medium",
+                "rain_ok": true,
+                "purchased_at": "2026-01-12"
+              }
+            ],
+            "bottom": [
+              {
+                "id": "B002",
+                "item": "그레이 슬랙스",
+                "category": "bottom",
+                "color": "그레이",
+                "style": "포멀",
+                "warmth": "medium",
+                "rain_ok": true,
+                "purchased_at": "2026-02-20"
+              }
+            ],
+            "top": [
+              {
+                "id": "B003",
+                "item": "화이트 셔츠",
+                "category": "top",
+                "color": "화이트",
+                "style": "포멀",
+                "warmth": "light",
+                "rain_ok": true,
+                "purchased_at": "2026-03-05"
+              }
+            ],
+            "shoes": [
+              {
+                "id": "B004",
+                "item": "블랙 로퍼",
+                "category": "shoes",
+                "color": "블랙",
+                "style": "포멀",
+                "warmth": "all",
+                "rain_ok": false,
+                "purchased_at": "2026-01-18"
+              }
+            ]
+          }
+        },
+        "shopping_item_count": 4,
+        "styles_text": "포멀",
+        "colors_text": "네이비, 그레이, 화이트",
+        "favorite_items_text": "네이비 블레이저, 그레이 슬랙스, 화이트 셔츠",
+        "top_categories_text": "outer, bottom, top",
+        "user_name": "user_b",
+        "shopping_analysis_summary": {
+          "total_items": 4,
+          "top_styles": [
+            "포멀"
+          ],
+          "top_colors": [
+            "네이비",
+            "그레이",
+            "화이트"
+          ],
+          "top_categories": [
+            "outer",
+            "bottom",
+            "top"
+          ],
+          "favorite_items": [
+            "네이비 블레이저",
+            "그레이 슬랙스",
+            "화이트 셔츠"
+          ]
+        }
+      },
+      "error": null
+    },
+    {
+      "name": "Commute Recommendation Node",
+      "detail": "rule=mild_outfit, items=4",
+      "data": {
+        "avg_temp": 10.0,
+        "recommended_items": [
+          "네이비 블레이저",
+          "화이트 셔츠",
+          "그레이 슬랙스",
+          "블랙 로퍼"
+        ],
+        "ranked_items": [
+          "1. 네이비 블레이저",
+          "2. 화이트 셔츠",
+          "3. 그레이 슬랙스",
+          "4. 블랙 로퍼"
+        ],
+        "extras": []
+      },
+      "node_id": "recommendation",
+      "node_type": "recommendation",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.296366+00:00",
+      "finished_at": "2026-09-24T22:50:28.296405+00:00",
+      "duration_ms": 0.039,
+      "input": {
+        "weather": {
+          "city_name": "서울",
+          "country": "대한민국",
+          "date": "2026-09-24",
+          "condition": "흐림",
+          "weather_code": 3,
+          "temp_min": 6.0,
+          "temp_max": 14.0,
+          "precipitation_probability": 20,
+          "latitude": 37.5665,
+          "longitude": 126.978
+        },
+        "shopping_analysis": {
+          "total_items": 4,
+          "top_styles": [
+            "포멀"
+          ],
+          "top_colors": [
+            "네이비",
+            "그레이",
+            "화이트"
+          ],
+          "top_categories": [
+            "outer",
+            "bottom",
+            "top"
+          ],
+          "favorite_items": [
+            "네이비 블레이저",
+            "그레이 슬랙스",
+            "화이트 셔츠"
+          ],
+          "items_by_category": {
+            "outer": [
+              {
+                "id": "B001",
+                "item": "네이비 블레이저",
+                "category": "outer",
+                "color": "네이비",
+                "style": "포멀",
+                "warmth": "medium",
+                "rain_ok": true,
+                "purchased_at": "2026-01-12"
+              }
+            ],
+            "bottom": [
+              {
+                "id": "B002",
+                "item": "그레이 슬랙스",
+                "category": "bottom",
+                "color": "그레이",
+                "style": "포멀",
+                "warmth": "medium",
+                "rain_ok": true,
+                "purchased_at": "2026-02-20"
+              }
+            ],
+            "top": [
+              {
+                "id": "B003",
+                "item": "화이트 셔츠",
+                "category": "top",
+                "color": "화이트",
+                "style": "포멀",
+                "warmth": "light",
+                "rain_ok": true,
+                "purchased_at": "2026-03-05"
+              }
+            ],
+            "shoes": [
+              {
+                "id": "B004",
+                "item": "블랙 로퍼",
+                "category": "shoes",
+                "color": "블랙",
+                "style": "포멀",
+                "warmth": "all",
+                "rain_ok": false,
+                "purchased_at": "2026-01-18"
+              }
+            ]
+          }
+        }
+      },
+      "output": {
+        "avg_temp": 10.0,
+        "temp_min": 6.0,
+        "temp_max": 14.0,
+        "weather_date": "2026-09-24",
+        "weather_condition": "흐림",
+        "precipitation_probability": 20,
+        "matched_rule_name": "mild_outfit",
+        "recommendation": "일교차를 고려한 가벼운 레이어드가 적합합니다.",
+        "owned_recommended_items": [
+          "네이비 블레이저",
+          "화이트 셔츠",
+          "그레이 슬랙스",
+          "블랙 로퍼"
+        ],
+        "owned_recommended_items_text": "1. 네이비 블레이저, 2. 화이트 셔츠, 3. 그레이 슬랙스, 4. 블랙 로퍼",
+        "additional_items": [],
+        "additional_items_text": "",
+        "recommended_items": [
+          "네이비 블레이저",
+          "화이트 셔츠",
+          "그레이 슬랙스",
+          "블랙 로퍼"
+        ],
+        "recommended_items_text": "1. 네이비 블레이저, 2. 화이트 셔츠, 3. 그레이 슬랙스, 4. 블랙 로퍼",
+        "ranked_items": [
+          "1. 네이비 블레이저",
+          "2. 화이트 셔츠",
+          "3. 그레이 슬랙스",
+          "4. 블랙 로퍼"
+        ],
+        "ranked_items_text": "1. 네이비 블레이저 | 2. 화이트 셔츠 | 3. 그레이 슬랙스 | 4. 블랙 로퍼",
+        "extras": [],
+        "extras_text": ""
+      },
+      "error": null
+    },
+    {
+      "name": "Commute Compose Node",
+      "detail": "final response rendered from output_template",
+      "data": {
+        "template_id": "outfit_agent_v1",
+        "workflow_id": "commute_outfit_workflow_v1"
+      },
+      "node_id": "compose",
+      "node_type": "compose",
+      "status": "SUCCESS",
+      "started_at": "2026-09-24T22:50:28.296462+00:00",
+      "finished_at": "2026-09-24T22:50:28.296478+00:00",
+      "duration_ms": 0.016,
+      "input": {
+        "recommendation": "일교차를 고려한 가벼운 레이어드가 적합합니다.",
+        "ranked_items": [
+          "1. 네이비 블레이저",
+          "2. 화이트 셔츠",
+          "3. 그레이 슬랙스",
+          "4. 블랙 로퍼"
+        ]
+      },
+      "output": {
+        "final_answer": "[Personalized Outfit Agent]\n서울의 내일(2026-09-24) 날씨는 흐림, 평균 10.0°C, 강수확률 20%입니다.\n쇼핑 기록 분석: 총 4개 구매 기록에서 선호 스타일은 포멀, 선호 색상은 네이비, 그레이, 화이트로 분석되었습니다.\n추천 방향: 일교차를 고려한 가벼운 레이어드가 적합합니다.\n추천 순위: 1. 네이비 블레이저 | 2. 화이트 셔츠 | 3. 그레이 슬랙스 | 4. 블랙 로퍼\n보유 단품 기반 추천: 1. 네이비 블레이저, 2. 화이트 셔츠, 3. 그레이 슬랙스, 4. 블랙 로퍼\n추가 추천: \n추가 조건: "
+      },
+      "error": null
+    }
+  ],
+  "duration_ms": 3.117,
+  "node_statuses": [
+    {
+      "node_id": "request_parser",
+      "node_type": "request_parser",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "question",
+      "node_type": "question",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "weather",
+      "node_type": "weather",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "shopping_analysis",
+      "node_type": "shopping_analysis",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "recommendation",
+      "node_type": "recommendation",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "compose",
+      "node_type": "compose",
+      "status": "SUCCESS"
+    }
+  ],
+  "errors": [],
+  "failure_mode": null
+}

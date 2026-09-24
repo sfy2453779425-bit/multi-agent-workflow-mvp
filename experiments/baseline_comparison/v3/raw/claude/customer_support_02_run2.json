@@ -1,0 +1,94 @@
+{
+  "experiment_id": "builder_v3_threeway_20260925",
+  "experiment_status": "FORMAL",
+  "system": "Claude-CLI",
+  "case_id": "customer_support_02",
+  "case_type": "customer-support-2026-09-16-v2-refund",
+  "run": 2,
+  "run_id": "Claude-CLI_customer_support_02_run2",
+  "schedule_index": 50,
+  "model_requested": "claude-opus-5-5",
+  "model_returned": [
+    "claude-opus-5-5"
+  ],
+  "cli_version": "2.1.281 (Claude Code)",
+  "call_path": "claude -p --output-format json",
+  "prompt_text_hash": "b4fe1442b7fa86f86721f465453ec14b22b44e3f8da0a4cdbfc273786ad42377",
+  "fixture_hash": "614dc169a5f24bcb897851d7f81e85a61146c19e7c815ebce360dfe036516214",
+  "fixture_file_sha256": "5a8ca1b48a999eebb437f321860c2158cf5204ecc45dbdf1ad95e199b905a05a",
+  "timestamp_start_utc": "2026-09-24T22:59:14.958Z",
+  "timestamp_end_utc": "2026-09-24T22:59:25.193Z",
+  "latency_ms": 10235,
+  "finish_reason": "end_turn",
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 1119,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 755,
+    "output_tokens_details": {
+      "thinking_tokens": 53
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 1119,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 755,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 1119,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1119
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "output_tokens": 755,
+  "output_limit": "not set",
+  "reasoning_effort": "not applicable / CLI default",
+  "raw_stdout_path": "raw/claude/customer_support_02_run2.raw",
+  "raw_stdout_sha256": "768f3a431cadf52033e3c985eef4324280286e622e141cffc4102832548dbc09",
+  "raw_stdout_bytes": 3953,
+  "raw_text": "# Ticket Classification: Customer Support\n\n**User ID:** user_a\n**Query:** \"Customer requests a refund after being charged twice.\"\n**Fixture:** customer-support-2026-09-16-v2-refund\n\n## Classification\n\n| Field | Value |\n|---|---|\n| **category** | `refund` (Refund / Return) |\n| **owner_team** | Billing Support |\n| **priority** | P2 |\n| **sla** | 1 business day |\n\n**Why this category:** The query contains two keywords from the `refund` category, \"refund\" and \"charged\". The duplicate charge also relates to \"payment\". The keywords match directly, so the default category was not needed.\n\n## Routing Decision\n\nRoute to **Billing Support**, but only after eligibility and payment status are confirmed. The frozen policy says: *\"Check order eligibility and payment status. If eligible, route to billing support for refund processing.\"*\n\n## Policy Application\n\n1. **Check order eligibility.** This is pending because no order data was supplied.\n2. **Check payment status.** This is pending because no transaction records were supplied. We need to confirm whether two charges actually settled, or whether one was a pending or authorization hold.\n3. **If eligible, route to Billing Support for refund processing.** This step depends on steps 1 and 2.\n\n## Next Actions\n\n1. Check refund eligibility.\n2. Verify payment transaction status.\n3. Route to Billing Support if refund criteria are met.\n\n## Missing Information\n\nThe input does not include the following, so none of it is assumed:\n\n- **Order ID or account order history** for user_a. This is needed to check eligibility.\n- **Payment transaction records.** These are needed to confirm the duplicate charge. The relevant details are the transaction IDs, amounts, timestamps, and whether each charge is settled or pending.\n- **Charge amount(s) and payment method.**\n- **Refund eligibility criteria.** The policy says to \"check eligibility\" but gives no specific rules, such as time windows or conditions.\n- **Refund method or timeline** to tell the customer. The policy does not specify these.\n\nRefund eligibility cannot be confirmed until this information is obtained.",
+  "raw_text_sha256": "037f0148211bf79460b00fc0924ff1c07d0fb48ca219f242d855b0168d462b55",
+  "parse_status": "CLI_OUTPUT_PRESENT",
+  "parse_errors": [],
+  "attempts": [
+    {
+      "attempt_no": 1,
+      "exit_code": 0,
+      "timed_out": false,
+      "retryable_transport_error": false,
+      "error_message": null,
+      "raw_stdout_sha256": "768f3a431cadf52033e3c985eef4324280286e622e141cffc4102832548dbc09",
+      "raw_stdout_bytes": 3953,
+      "parse_status": "CLI_OUTPUT_PRESENT"
+    }
+  ],
+  "transport_failure": false,
+  "cli_exit_code": 0,
+  "fatal_auth_error": false,
+  "isolation": {
+    "model_requested": "claude-opus-5-5",
+    "cli": "claude.EXE",
+    "cli_version": "2.1.281 (Claude Code)",
+    "call_path": "claude -p --output-format json",
+    "system_prompt": "empty",
+    "tools": "none",
+    "setting_sources": "none",
+    "session_persistence": "disabled",
+    "output_limit": "not set",
+    "fresh_session": "one process and clean temporary workdir per call"
+  },
+  "sampling_parameters": "not explicitly set by this experiment"
+}

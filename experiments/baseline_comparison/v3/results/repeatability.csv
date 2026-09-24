@@ -1,0 +1,41 @@
+system,domain,case_id,run_count,structured_fields_match,compared_fields
+GPT-CLI,Outfit,outfit_01,3,False,ambiguous_items;excluded_items;mentioned_items;mentioned_only_items;parse_status;rain_unsafe_inventory_ids;selected_items;unknown_inventory_ids;unsupplied_recommendations;weather_used
+GPT-CLI,Outfit,outfit_02,3,False,ambiguous_items;excluded_items;mentioned_items;mentioned_only_items;parse_status;rain_unsafe_inventory_ids;selected_items;unknown_inventory_ids;unsupplied_recommendations;weather_used
+GPT-CLI,Outfit,outfit_03,3,True,ambiguous_items;excluded_items;mentioned_items;mentioned_only_items;parse_status;rain_unsafe_inventory_ids;selected_items;unknown_inventory_ids;unsupplied_recommendations;weather_used
+GPT-CLI,Presentation,presentation_01,3,True,duration_minutes;knowledge_used;outline_sections
+GPT-CLI,Presentation,presentation_02,3,True,duration_minutes;knowledge_used;outline_sections
+GPT-CLI,Customer Support,customer_support_01,3,True,category;priority;route;sla
+GPT-CLI,Customer Support,customer_support_02,3,True,category;priority;route;sla
+GPT-CLI,Customer Support,customer_support_03,3,True,category;priority;route;sla
+GPT-CLI,Customer Support,customer_support_04,3,True,category;priority;route;sla
+GPT-CLI,Customer Support,customer_support_05,3,True,category;priority;route;sla
+Claude-CLI,Outfit,outfit_01,3,False,ambiguous_items;excluded_items;mentioned_items;mentioned_only_items;parse_status;rain_unsafe_inventory_ids;selected_items;unknown_inventory_ids;unsupplied_recommendations;weather_used
+Claude-CLI,Outfit,outfit_02,3,True,ambiguous_items;excluded_items;mentioned_items;mentioned_only_items;parse_status;rain_unsafe_inventory_ids;selected_items;unknown_inventory_ids;unsupplied_recommendations;weather_used
+Claude-CLI,Outfit,outfit_03,3,False,ambiguous_items;excluded_items;mentioned_items;mentioned_only_items;parse_status;rain_unsafe_inventory_ids;selected_items;unknown_inventory_ids;unsupplied_recommendations;weather_used
+Claude-CLI,Presentation,presentation_01,3,True,duration_minutes;knowledge_used;outline_sections
+Claude-CLI,Presentation,presentation_02,3,True,duration_minutes;knowledge_used;outline_sections
+Claude-CLI,Customer Support,customer_support_01,3,True,category;priority;route;sla
+Claude-CLI,Customer Support,customer_support_02,3,True,category;priority;route;sla
+Claude-CLI,Customer Support,customer_support_03,3,True,category;priority;route;sla
+Claude-CLI,Customer Support,customer_support_04,3,True,category;priority;route;sla
+Claude-CLI,Customer Support,customer_support_05,3,True,category;priority;route;sla
+Builder,Outfit,outfit_01,3,True,ambiguous_items;excluded_items;mentioned_items;mentioned_only_items;parse_status;rain_unsafe_inventory_ids;selected_items;unknown_inventory_ids;unsupplied_recommendations;weather_used
+Builder,Outfit,outfit_02,3,True,ambiguous_items;excluded_items;mentioned_items;mentioned_only_items;parse_status;rain_unsafe_inventory_ids;selected_items;unknown_inventory_ids;unsupplied_recommendations;weather_used
+Builder,Outfit,outfit_03,3,True,ambiguous_items;excluded_items;mentioned_items;mentioned_only_items;parse_status;rain_unsafe_inventory_ids;selected_items;unknown_inventory_ids;unsupplied_recommendations;weather_used
+Builder,Presentation,presentation_01,3,True,duration_minutes;knowledge_used;outline_sections
+Builder,Presentation,presentation_02,3,True,duration_minutes;knowledge_used;outline_sections
+Builder,Customer Support,customer_support_01,3,True,category;priority;route;sla
+Builder,Customer Support,customer_support_02,3,True,category;priority;route;sla
+Builder,Customer Support,customer_support_03,3,True,category;priority;route;sla
+Builder,Customer Support,customer_support_04,3,True,category;priority;route;sla
+Builder,Customer Support,customer_support_05,3,True,category;priority;route;sla
+ChatGPT-web-0916,Outfit,outfit_01,3,False,ambiguous_items;excluded_items;mentioned_items;mentioned_only_items;parse_status;rain_unsafe_inventory_ids;selected_items;unknown_inventory_ids;unsupplied_recommendations;weather_used
+ChatGPT-web-0916,Outfit,outfit_02,3,False,ambiguous_items;excluded_items;mentioned_items;mentioned_only_items;parse_status;rain_unsafe_inventory_ids;selected_items;unknown_inventory_ids;unsupplied_recommendations;weather_used
+ChatGPT-web-0916,Outfit,outfit_03,3,False,ambiguous_items;excluded_items;mentioned_items;mentioned_only_items;parse_status;rain_unsafe_inventory_ids;selected_items;unknown_inventory_ids;unsupplied_recommendations;weather_used
+ChatGPT-web-0916,Presentation,presentation_01,3,True,duration_minutes;knowledge_used;outline_sections
+ChatGPT-web-0916,Presentation,presentation_02,3,True,duration_minutes;knowledge_used;outline_sections
+ChatGPT-web-0916,Customer Support,customer_support_01,3,True,category;priority;route;sla
+ChatGPT-web-0916,Customer Support,customer_support_02,3,True,category;priority;route;sla
+ChatGPT-web-0916,Customer Support,customer_support_03,3,True,category;priority;route;sla
+ChatGPT-web-0916,Customer Support,customer_support_04,3,True,category;priority;route;sla
+ChatGPT-web-0916,Customer Support,customer_support_05,3,True,category;priority;route;sla

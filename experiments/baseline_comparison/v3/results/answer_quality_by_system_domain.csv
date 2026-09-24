@@ -1,0 +1,13 @@
+system,domain,runs,parse_ok,parse_empty_or_error,required_fields_present,context_usage,constraint_satisfaction,completeness,ground_truth_correctness,runs_with_unsupported_facts,unsupported_fact_flag_count
+GPT-CLI,Customer Support,15,15,0,15,12,15,15,15,0,0
+GPT-CLI,Outfit,9,9,0,9,9,8,8,not_applicable,1,1
+GPT-CLI,Presentation,6,6,0,6,6,6,6,not_applicable,0,0
+Claude-CLI,Customer Support,15,15,0,15,15,15,15,15,0,0
+Claude-CLI,Outfit,9,9,0,9,9,8,8,not_applicable,1,1
+Claude-CLI,Presentation,6,6,0,6,6,6,6,not_applicable,0,0
+Builder,Customer Support,15,15,0,15,15,15,15,15,0,0
+Builder,Outfit,9,9,0,9,9,9,9,not_applicable,0,0
+Builder,Presentation,6,6,0,6,6,6,6,not_applicable,0,0
+ChatGPT-web-0916,Customer Support,15,15,0,15,15,15,15,15,0,0
+ChatGPT-web-0916,Outfit,9,9,0,2,9,9,2,not_applicable,0,0
+ChatGPT-web-0916,Presentation,6,6,0,6,6,6,6,not_applicable,0,0

@@ -1,0 +1,13 @@
+system,domain,cases,repeatable_cases,repeatability_denominator,execution_record,execution_trace_records,pre_execution_validation,validation_pass_records,failure_localization,failure_localization_evidence
+GPT-CLI,Customer Support,5,5,5,不提供,不提供,不提供,不提供,不提供,no comparable workflow-runtime artifacts
+GPT-CLI,Outfit,3,1,3,不提供,不提供,不提供,不提供,不提供,no comparable workflow-runtime artifacts
+GPT-CLI,Presentation,2,2,2,不提供,不提供,不提供,不提供,不提供,no comparable workflow-runtime artifacts
+Claude-CLI,Customer Support,5,5,5,不提供,不提供,不提供,不提供,不提供,no comparable workflow-runtime artifacts
+Claude-CLI,Outfit,3,1,3,不提供,不提供,不提供,不提供,不提供,no comparable workflow-runtime artifacts
+Claude-CLI,Presentation,2,2,2,不提供,不提供,不提供,不提供,不提供,no comparable workflow-runtime artifacts
+Builder,Customer Support,5,5,5,有,15/15,有,15/15,有,node-level trace/error fields; no forced failure in the 30 answer-quality runs
+Builder,Outfit,3,3,3,有,9/9,有,9/9,有,node-level trace/error fields; no forced failure in the 30 answer-quality runs
+Builder,Presentation,2,2,2,有,6/6,有,6/6,有,node-level trace/error fields; no forced failure in the 30 answer-quality runs
+ChatGPT-web-0916,Customer Support,5,5,5,不提供,不提供,不提供,不提供,不提供,no comparable workflow-runtime artifacts
+ChatGPT-web-0916,Outfit,3,0,3,不提供,不提供,不提供,不提供,不提供,no comparable workflow-runtime artifacts
+ChatGPT-web-0916,Presentation,2,2,2,不提供,不提供,不提供,不提供,不提供,no comparable workflow-runtime artifacts

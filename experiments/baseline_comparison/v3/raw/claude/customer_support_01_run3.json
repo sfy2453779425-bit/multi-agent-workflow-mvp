@@ -1,0 +1,94 @@
+{
+  "experiment_id": "builder_v3_threeway_20260925",
+  "experiment_status": "FORMAL",
+  "system": "Claude-CLI",
+  "case_id": "customer_support_01",
+  "case_type": "customer-support-2026-09-16-v1",
+  "run": 3,
+  "run_id": "Claude-CLI_customer_support_01_run3",
+  "schedule_index": 77,
+  "model_requested": "claude-opus-5-5",
+  "model_returned": [
+    "claude-opus-5-5"
+  ],
+  "cli_version": "2.1.281 (Claude Code)",
+  "call_path": "claude -p --output-format json",
+  "prompt_text_hash": "5a5bc084fec6b225d8f369b804c7900ff34db52969d0e45ee25af1b8a09a7b1a",
+  "fixture_hash": "19b5bbc3f56d9f049b2a93a7406cb0403a00bd5355f336f62fe448c0d0e33bb4",
+  "fixture_file_sha256": "2dfac20495a3453f37c2ebb90d3705e2d1e79b432296ea74d6c9475ba2c4fdba",
+  "timestamp_start_utc": "2026-09-24T23:03:49.980Z",
+  "timestamp_end_utc": "2026-09-24T23:04:03.672Z",
+  "latency_ms": 13693,
+  "finish_reason": "end_turn",
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 1760,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 1202,
+    "output_tokens_details": {
+      "thinking_tokens": 147
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 1760,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 1202,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 1760,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1760
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "output_tokens": 1202,
+  "output_limit": "not set",
+  "reasoning_effort": "not applicable / CLI default",
+  "raw_stdout_path": "raw/claude/customer_support_01_run3.raw",
+  "raw_stdout_sha256": "fbd5e1b0a54addcdfd5b045b8fb6563e435a84fd0eb05237796fddb4fce6d428",
+  "raw_stdout_bytes": 4973,
+  "raw_text": "# Ticket Classification: Customer Support\n\n**Input:** \"Customer says the delivery is late and asks whether the order can be refunded.\" (user_a)\n**Fixture:** customer-support-2026-09-16-v1\n\n## Category decision\n\nThe query matches keywords from two categories:\n\n| Category | Matched keywords | Count |\n|---|---|---|\n| `delivery` (Delivery / Shipping) | \"delivery\", \"late\" | 2 |\n| `refund` (Refund / Return) | \"refund\" | 1 |\n| `account` | none | 0 |\n| `technical` | none | 0 |\n\n- **Primary category:** `delivery`, Delivery / Shipping. It has the most keyword matches, and the late delivery is the underlying issue.\n- **Secondary category:** `refund`, Refund / Return. The customer asks about a refund explicitly, so this needs a conditional follow-up.\n- The default category (`technical`) does not apply because relevant keywords matched.\n\n## Routing decision\n\n| Field | Value |\n|---|---|\n| **category** | `delivery` (Delivery / Shipping) |\n| **owner_team** | Logistics Support |\n| **priority** | P2 |\n| **sla** | 1 business day |\n| **Conditional secondary route** | Billing Support (P2, 1 business day), only if refund eligibility is confirmed |\n\nBoth categories have the same priority (P2) and SLA (1 business day), so the dual match does not create a priority or SLA conflict.\n\n## Policy application\n\n1. **Delivery policy (primary):** Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer a status follow-up.\n2. **Refund policy (secondary):** Check order eligibility and payment status. If the order is eligible, route it to Billing Support for refund processing.\n\nThe customer should not be promised a refund. The supplied policy makes a refund depend on an eligibility check, and the data does not show whether this order is eligible.\n\n## next_actions\n\n1. Confirm the order number and tracking status.\n2. Compare the tracking status with the promised delivery window. If the delivery is delayed beyond that window, open a logistics investigation ticket.\n3. Send the customer a delivery status response and offer a status follow-up.\n4. Check refund eligibility for the order.\n5. Verify the payment transaction status.\n6. If the refund criteria are met, route the ticket to Billing Support for refund processing. If they are not met, tell the customer and continue the delivery follow-up.\n\n## Missing information (not invented)\n\n- Order number\n- Current tracking status\n- Promised delivery window, which is needed to confirm the order is delayed \"beyond the promised window\"\n- Payment transaction status\n- The specific refund eligibility criteria, which the frozen policy does not define\n- Any customer history or context (`shared_context` is empty)\n\n## Suggested customer response (draft)\n\n> Thank you for reaching out, and sorry that your delivery is running late. Please share your order number so we can check the current tracking status. If the delivery has gone past the promised window, we'll open an investigation with our logistics team and keep you updated. We'll also check whether your order is eligible for a refund and let you know the outcome.",
+  "raw_text_sha256": "5128caca65862ccbb5a53f14662517e5ff400f333918a69f26aeced85020ab5d",
+  "parse_status": "CLI_OUTPUT_PRESENT",
+  "parse_errors": [],
+  "attempts": [
+    {
+      "attempt_no": 1,
+      "exit_code": 0,
+      "timed_out": false,
+      "retryable_transport_error": false,
+      "error_message": null,
+      "raw_stdout_sha256": "fbd5e1b0a54addcdfd5b045b8fb6563e435a84fd0eb05237796fddb4fce6d428",
+      "raw_stdout_bytes": 4973,
+      "parse_status": "CLI_OUTPUT_PRESENT"
+    }
+  ],
+  "transport_failure": false,
+  "cli_exit_code": 0,
+  "fatal_auth_error": false,
+  "isolation": {
+    "model_requested": "claude-opus-5-5",
+    "cli": "claude.EXE",
+    "cli_version": "2.1.281 (Claude Code)",
+    "call_path": "claude -p --output-format json",
+    "system_prompt": "empty",
+    "tools": "none",
+    "setting_sources": "none",
+    "session_persistence": "disabled",
+    "output_limit": "not set",
+    "fresh_session": "one process and clean temporary workdir per call"
+  },
+  "sampling_parameters": "not explicitly set by this experiment"
+}

@@ -1,0 +1,94 @@
+{
+  "experiment_id": "builder_v3_threeway_20260925",
+  "experiment_status": "FORMAL",
+  "system": "Claude-CLI",
+  "case_id": "customer_support_05",
+  "case_type": "customer-support-2026-09-16-v2-mixed-precedence",
+  "run": 3,
+  "run_id": "Claude-CLI_customer_support_05_run3",
+  "schedule_index": 89,
+  "model_requested": "claude-opus-5-5",
+  "model_returned": [
+    "claude-opus-5-5"
+  ],
+  "cli_version": "2.1.281 (Claude Code)",
+  "call_path": "claude -p --output-format json",
+  "prompt_text_hash": "8e050c2633a484914b4a3fd157a35a5be9ade3f90873ed6e61e42b6a5da39931",
+  "fixture_hash": "08d49825911ae9be8a2594ad38bc123f4ead5b10b486519a31ee2fc01c7b9a59",
+  "fixture_file_sha256": "1bb916d6e1b502cbff052d093b1143313e2d762f92f6b63e03185470afa7c4c7",
+  "timestamp_start_utc": "2026-09-24T23:05:19.872Z",
+  "timestamp_end_utc": "2026-09-24T23:05:32.147Z",
+  "latency_ms": 12276,
+  "finish_reason": "end_turn",
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 1401,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 885,
+    "output_tokens_details": {
+      "thinking_tokens": 155
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 1401,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 885,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 1401,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1401
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "output_tokens": 885,
+  "output_limit": "not set",
+  "reasoning_effort": "not applicable / CLI default",
+  "raw_stdout_path": "raw/claude/customer_support_05_run3.raw",
+  "raw_stdout_sha256": "68a7bfd3ad2613f307ac48952da3129b0523930e9c931560df65761284396578",
+  "raw_stdout_bytes": 4037,
+  "raw_text": "# Ticket Classification and Routing\n\n**Query:** \"The delivery is late and I want a refund for the parcel.\"\n**User:** user_a\n\n## Classification\n\n| Field | Value |\n|---|---|\n| **category** | `delivery` (Delivery / Shipping) |\n| **owner_team** | Logistics Support |\n| **priority** | P2 |\n| **sla** | 1 business day |\n\n## Why this category\n\nThe query matches both categories:\n- **Delivery keywords:** \"delivery\", \"late\", \"parcel\"\n- **Refund keywords:** \"refund\"\n\nThe constraint `mixed_intent_precedence: [\"delivery\", \"refund\"]` gives delivery precedence. The primary category is therefore **delivery**, and the ticket goes to **Logistics Support**. The refund request is recorded as a secondary intent, and the ticket is not routed to Billing Support now.\n\n## How the delivery policy applies\n\nThe frozen delivery policy says: *\"Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.\"*\n\n- Tracking status must be checked before anything else.\n- We can't yet confirm that the delay goes past the promised window, because we don't have the tracking status or the promised delivery window.\n- If tracking shows the delay does go past the promised window, open a logistics investigation ticket and offer the customer a status follow-up.\n\n## next_actions\n\n1. Confirm the order number and tracking status.\n2. Open a logistics investigation ticket.\n3. Send the customer a delivery status response.\n\n## Secondary intent: refund (not routed yet)\n\nThe customer asked for a refund, but under the precedence rule it is not the primary route. The refund policy requires checking order eligibility and payment status first. The only step that can be taken now is to record the request so it can be reviewed after the logistics check. Nothing supplied says whether a late delivery qualifies for a refund, so no refund outcome should be promised.\n\n## Missing information\n\n- Order number\n- Tracking number and current tracking status\n- Promised delivery window, and whether it has passed\n- Payment transaction status and refund eligibility for this order\n- Any policy on whether a delivery delay alone makes a parcel eligible for a refund",
+  "raw_text_sha256": "63928a5ba042b4bc38bba76824aae5a8fe5c4578075a008019589750c04e3677",
+  "parse_status": "CLI_OUTPUT_PRESENT",
+  "parse_errors": [],
+  "attempts": [
+    {
+      "attempt_no": 1,
+      "exit_code": 0,
+      "timed_out": false,
+      "retryable_transport_error": false,
+      "error_message": null,
+      "raw_stdout_sha256": "68a7bfd3ad2613f307ac48952da3129b0523930e9c931560df65761284396578",
+      "raw_stdout_bytes": 4037,
+      "parse_status": "CLI_OUTPUT_PRESENT"
+    }
+  ],
+  "transport_failure": false,
+  "cli_exit_code": 0,
+  "fatal_auth_error": false,
+  "isolation": {
+    "model_requested": "claude-opus-5-5",
+    "cli": "claude.EXE",
+    "cli_version": "2.1.281 (Claude Code)",
+    "call_path": "claude -p --output-format json",
+    "system_prompt": "empty",
+    "tools": "none",
+    "setting_sources": "none",
+    "session_persistence": "disabled",
+    "output_limit": "not set",
+    "fresh_session": "one process and clean temporary workdir per call"
+  },
+  "sampling_parameters": "not explicitly set by this experiment"
+}

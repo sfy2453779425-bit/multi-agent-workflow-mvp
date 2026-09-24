@@ -1,0 +1,94 @@
+{
+  "experiment_id": "builder_v3_threeway_20260925",
+  "experiment_status": "FORMAL",
+  "system": "Claude-CLI",
+  "case_id": "customer_support_04",
+  "case_type": "customer-support-2026-09-16-v2-technical",
+  "run": 1,
+  "run_id": "Claude-CLI_customer_support_04_run1",
+  "schedule_index": 26,
+  "model_requested": "claude-opus-5-5",
+  "model_returned": [
+    "claude-opus-5-5"
+  ],
+  "cli_version": "2.1.281 (Claude Code)",
+  "call_path": "claude -p --output-format json",
+  "prompt_text_hash": "ae16d373c6e787239834cb6164ce6afd54c04e4221e3e358b86a472f396d2690",
+  "fixture_hash": "0cf815ee0ece6249587845067c566974a87345d83519eb743c09374dabb8f001",
+  "fixture_file_sha256": "ea5fd4f75017eb841a655d237712a8b1d845d316c120c625bb708dee75c264d0",
+  "timestamp_start_utc": "2026-09-24T22:55:02.979Z",
+  "timestamp_end_utc": "2026-09-24T22:55:13.630Z",
+  "latency_ms": 10651,
+  "finish_reason": "end_turn",
+  "usage": {
+    "input_tokens": 2,
+    "cache_creation_input_tokens": 1117,
+    "cache_read_input_tokens": 0,
+    "output_tokens": 799,
+    "output_tokens_details": {
+      "thinking_tokens": 34
+    },
+    "server_tool_use": {
+      "web_search_requests": 0,
+      "web_fetch_requests": 0
+    },
+    "service_tier": "standard",
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 1117,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "inference_geo": "not_available",
+    "iterations": [
+      {
+        "input_tokens": 2,
+        "output_tokens": 799,
+        "cache_read_input_tokens": 0,
+        "cache_creation_input_tokens": 1117,
+        "cache_creation": {
+          "ephemeral_5m_input_tokens": 0,
+          "ephemeral_1h_input_tokens": 1117
+        },
+        "type": "message"
+      }
+    ],
+    "speed": "standard"
+  },
+  "output_tokens": 799,
+  "output_limit": "not set",
+  "reasoning_effort": "not applicable / CLI default",
+  "raw_stdout_path": "raw/claude/customer_support_04_run1.raw",
+  "raw_stdout_sha256": "37e44189e21a3e88d23552cdf8c7c2262a618fec3aeca5368a7fabbf7e6a6d06",
+  "raw_stdout_bytes": 4107,
+  "raw_text": "# Ticket Classification and Routing\n\n**Ticket input**\n- **User ID:** user_a\n- **Query:** \"The mobile app crashes with an error and is not working after the update.\"\n\n## Classification\n\n| Field | Value |\n|---|---|\n| **category** | `technical` (Technical Issue) |\n| **owner_team** | Technical Support |\n| **priority** | P2 |\n| **sla** | 1 business day |\n\n## Decisions\n\n**1. Category: `technical`**\nThe query matches these keywords from the `technical` category: **\"app\"**, **\"crash\"** (in \"crashes\"), **\"error\"**, **\"not working\"** and **\"update\"**. This is also the configured `default_category`. It is the only category defined, so no other category competes.\n\n**2. Route: Technical Support**\nThe ticket goes to the `owner_team` defined for the `technical` category.\n\n**3. Priority: P2**\nThis is the priority set for the category. Nothing in the frozen data allows escalating or lowering it.\n\n**4. SLA: 1 business day**\nThis is the SLA set for the category.\n\n**5. Policy application**\nThe frozen policy says: *\"Collect reproduction steps and device information, then route to technical support for diagnosis.\"*\n- The ticket gives the symptoms (a crash with an error) and the trigger (after an update).\n- It does not include the reproduction steps or device information the policy requires. These must be collected, and the ticket then routes to Technical Support.\n\n## Next Actions\n1. **Collect reproduction steps.** Ask what the user does just before the crash, and whether it happens on launch or during a specific action.\n2. **Ask for the device and app version.** Ask for the device model, the OS version, and the app version installed after the update.\n3. **Route to Technical Support with logs if available.** Include the exact error message text or a screenshot, and any crash logs.\n\n## Missing Information\nThe ticket and frozen data do not include:\n- The exact error message text\n- The device model and OS (iOS or Android, and version)\n- The app version, and which update was installed\n- Reproduction steps\n- Logs or crash reports\n- Whether other users are affected (no incident data is supplied)\n\nNone of these have been assumed or invented. They should be gathered under the policy above.\n\n---\n*Fixture: customer-support-2026-09-16-v2-technical (SHA256 0cf815ee…b8f001)*",
+  "raw_text_sha256": "d0a2aa8de46d22836ba3e84ad4d5adf99238e5bc0057fdd0ec9df04678b662b0",
+  "parse_status": "CLI_OUTPUT_PRESENT",
+  "parse_errors": [],
+  "attempts": [
+    {
+      "attempt_no": 1,
+      "exit_code": 0,
+      "timed_out": false,
+      "retryable_transport_error": false,
+      "error_message": null,
+      "raw_stdout_sha256": "37e44189e21a3e88d23552cdf8c7c2262a618fec3aeca5368a7fabbf7e6a6d06",
+      "raw_stdout_bytes": 4107,
+      "parse_status": "CLI_OUTPUT_PRESENT"
+    }
+  ],
+  "transport_failure": false,
+  "cli_exit_code": 0,
+  "fatal_auth_error": false,
+  "isolation": {
+    "model_requested": "claude-opus-5-5",
+    "cli": "claude.EXE",
+    "cli_version": "2.1.281 (Claude Code)",
+    "call_path": "claude -p --output-format json",
+    "system_prompt": "empty",
+    "tools": "none",
+    "setting_sources": "none",
+    "session_persistence": "disabled",
+    "output_limit": "not set",
+    "fresh_session": "one process and clean temporary workdir per call"
+  },
+  "sampling_parameters": "not explicitly set by this experiment"
+}
