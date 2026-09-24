@@ -25,11 +25,12 @@ V4_PROMPT_HASHES_PATH = V4 / "prompt_hashes_v1.json"
 EQUALITY_RESULTS_PATH = EQ_DIR / "equality_results.csv"
 
 EXPERIMENT_ID = "ac_formal_3model_6case_20260924_v2"
+COLLECTION_FREEZE_TAG = "ac-formal-v2-collect-freeze-r2"
 SEED = 20260924
 CASE_IDS = ("CS01", "CS04", "CS06", "CS08", "CS10", "CS12")
 PROVIDERS = (
     ("deepseek", "deepseek-v4-pro"),
-    ("gpt", "gpt-5.6"),
+    ("gpt", "gpt-6-astra"),
     ("claude", "claude-opus-5-5"),
 )
 
@@ -178,6 +179,10 @@ def _tool_hashes() -> dict[str, str]:
         BASE / "collect.py",
         BASE / "replay.py",
         BASE / "tests" / "test_tools.py",
+        BASE / "tests" / "test_cli_tools.py",
+        BASE / "cli_gpt" / "run_gpt_cli.py",
+        BASE / "import_cli.py",
+        BASE / "cli_claude" / "run_claude_cli.py",
         BASE / "README.md",
         BASE / "DEVIATIONS.md",
     )
@@ -300,20 +305,29 @@ def prepare() -> dict[str, Any]:
                 "sampling_parameters": "not_set_provider_default",
             },
             "gpt": {
-                "api_format": "responses",
-                "model": "gpt-5.6",
-                "reasoning_effort": "none",
+                "api_format": "codex_cli_exec",
+                "call_path": "codex_cli_exec",
+                "provider_config_version": "codex-cli-gpt6-isolated-v1",
+                "model": "gpt-6-astra",
+                "reasoning_effort": "low",
                 "max_output_tokens": 1024,
                 "sampling_parameters": "not_set_provider_default",
-                "credential_env": "OPENAI_API_KEY",
+                "fresh_session_per_call": True,
+                "sandbox": "read-only",
+                "model_instructions": "codex_cli_default_unmodified",
+                "tools": "disabled",
             },
             "claude": {
-                "api_format": "messages",
+                "api_format": "claude_code_cli",
+                "call_path": "claude_code_cli_print",
+                "provider_config_version": "claude-code-cli-v1",
                 "model": "claude-opus-5-5",
                 "max_tokens": 1024,
+                "max_tokens_enforced_by_current_runner": False,
+                "max_tokens_note": "cli_claude runner does not pass a token limit",
                 "extended_thinking": "not_enabled",
                 "sampling_parameters": "not_set_provider_default",
-                "credential_env": "ANTHROPIC_API_KEY",
+                "fresh_session_per_call": True,
             },
         },
         "runtime_version": WORKFLOW_RUNTIME_VERSION,
@@ -487,6 +501,21 @@ def assert_frozen_source_hashes(manifest: dict[str, Any]) -> None:
         path = ROOT / Path(relative)
         if not path.is_file() or sha256_file(path) != expected:
             raise RuntimeError(f"FREEZE_VIOLATION: frozen artifact changed: {relative}")
+
+
+def assert_collection_freeze_tag() -> None:
+    tag = f"refs/tags/{COLLECTION_FREEZE_TAG}"
+    exists = subprocess.run(
+        ["git", "-C", str(ROOT), "rev-parse", "-q", "--verify", tag],
+        capture_output=True, text=True, check=False,
+    )
+    if exists.returncode != 0:
+        raise RuntimeError(f"formal collection requires tag {COLLECTION_FREEZE_TAG}")
+    path = "experiments/ac_formal_v2/"
+    for diff_args in (("diff", "--quiet", tag, "--", path), ("diff", "--cached", "--quiet", tag, "--", path)):
+        result = subprocess.run(["git", "-C", str(ROOT), *diff_args], capture_output=True, check=False)
+        if result.returncode != 0:
+            raise RuntimeError(f"FREEZE_VIOLATION: {path} differs from {COLLECTION_FREEZE_TAG}")
 
 
 def redact_secret_text(text: str) -> str:
