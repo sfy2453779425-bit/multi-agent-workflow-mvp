@@ -1,0 +1,62 @@
+{
+  "outfit_01": {
+    "prompt_version": "prompt-v1",
+    "sha256": "81e6e0b7a3369a911d83c3cadf025045ef382bcf82f55a94a79c131bf90f89c4",
+    "source_manifest_sha256": "81e6e0b7a3369a911d83c3cadf025045ef382bcf82f55a94a79c131bf90f89c4",
+    "source_file": "prompts/chatgpt/outfit_01.md"
+  },
+  "outfit_02": {
+    "prompt_version": "prompt-v1",
+    "sha256": "b292435426064654c8bb863f9983003f2006f2c189c2c77ad3b76a0104574648",
+    "source_manifest_sha256": "b292435426064654c8bb863f9983003f2006f2c189c2c77ad3b76a0104574648",
+    "source_file": "prompts/chatgpt/outfit_02.md"
+  },
+  "outfit_03": {
+    "prompt_version": "prompt-v1",
+    "sha256": "cee1b96f6765e7e9d8b12b3b771aa7b975748cf351f0f57ac8b3325b39cfcde7",
+    "source_manifest_sha256": "cee1b96f6765e7e9d8b12b3b771aa7b975748cf351f0f57ac8b3325b39cfcde7",
+    "source_file": "prompts/chatgpt/outfit_03.md"
+  },
+  "presentation_01": {
+    "prompt_version": "prompt-v1",
+    "sha256": "d338d253b192dd3d8024754620592e1bef14c87588067d7d0253b8005b79c715",
+    "source_manifest_sha256": "d338d253b192dd3d8024754620592e1bef14c87588067d7d0253b8005b79c715",
+    "source_file": "prompts/chatgpt/presentation_01.md"
+  },
+  "presentation_02": {
+    "prompt_version": "prompt-v1",
+    "sha256": "d53a037756873ebe892222921d8b905c04670b8ccb5a4dfcb1dca8373c20a2c8",
+    "source_manifest_sha256": "d53a037756873ebe892222921d8b905c04670b8ccb5a4dfcb1dca8373c20a2c8",
+    "source_file": "prompts/chatgpt/presentation_02.md"
+  },
+  "customer_support_01": {
+    "prompt_version": "prompt-v1",
+    "sha256": "5a5bc084fec6b225d8f369b804c7900ff34db52969d0e45ee25af1b8a09a7b1a",
+    "source_manifest_sha256": "5a5bc084fec6b225d8f369b804c7900ff34db52969d0e45ee25af1b8a09a7b1a",
+    "source_file": "prompts/chatgpt/customer_support_01.md"
+  },
+  "customer_support_02": {
+    "prompt_version": "prompt-v1",
+    "sha256": "b4fe1442b7fa86f86721f465453ec14b22b44e3f8da0a4cdbfc273786ad42377",
+    "source_manifest_sha256": "b4fe1442b7fa86f86721f465453ec14b22b44e3f8da0a4cdbfc273786ad42377",
+    "source_file": "prompts/chatgpt/customer_support_02.md"
+  },
+  "customer_support_03": {
+    "prompt_version": "prompt-v1",
+    "sha256": "461d37b24935604ba52853868f6f7cd442a9ef5f705437687cf55ec283e69c86",
+    "source_manifest_sha256": "461d37b24935604ba52853868f6f7cd442a9ef5f705437687cf55ec283e69c86",
+    "source_file": "prompts/chatgpt/customer_support_03.md"
+  },
+  "customer_support_04": {
+    "prompt_version": "prompt-v1",
+    "sha256": "ae16d373c6e787239834cb6164ce6afd54c04e4221e3e358b86a472f396d2690",
+    "source_manifest_sha256": "ae16d373c6e787239834cb6164ce6afd54c04e4221e3e358b86a472f396d2690",
+    "source_file": "prompts/chatgpt/customer_support_04.md"
+  },
+  "customer_support_05": {
+    "prompt_version": "prompt-v1",
+    "sha256": "8e050c2633a484914b4a3fd157a35a5be9ade3f90873ed6e61e42b6a5da39931",
+    "source_manifest_sha256": "8e050c2633a484914b4a3fd157a35a5be9ade3f90873ed6e61e42b6a5da39931",
+    "source_file": "prompts/chatgpt/customer_support_05.md"
+  }
+}

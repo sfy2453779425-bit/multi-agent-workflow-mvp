@@ -1,0 +1,545 @@
+{
+  "calls": [
+    {
+      "schedule_index": 1,
+      "case_id": "outfit_01",
+      "run": 1,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 2,
+      "case_id": "outfit_01",
+      "run": 1,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 3,
+      "case_id": "outfit_01",
+      "run": 1,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 4,
+      "case_id": "outfit_02",
+      "run": 1,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 5,
+      "case_id": "outfit_02",
+      "run": 1,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 6,
+      "case_id": "outfit_02",
+      "run": 1,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 7,
+      "case_id": "outfit_03",
+      "run": 1,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 8,
+      "case_id": "outfit_03",
+      "run": 1,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 9,
+      "case_id": "outfit_03",
+      "run": 1,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 10,
+      "case_id": "presentation_01",
+      "run": 1,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 11,
+      "case_id": "presentation_01",
+      "run": 1,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 12,
+      "case_id": "presentation_01",
+      "run": 1,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 13,
+      "case_id": "presentation_02",
+      "run": 1,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 14,
+      "case_id": "presentation_02",
+      "run": 1,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 15,
+      "case_id": "presentation_02",
+      "run": 1,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 16,
+      "case_id": "customer_support_01",
+      "run": 1,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 17,
+      "case_id": "customer_support_01",
+      "run": 1,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 18,
+      "case_id": "customer_support_01",
+      "run": 1,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 19,
+      "case_id": "customer_support_02",
+      "run": 1,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 20,
+      "case_id": "customer_support_02",
+      "run": 1,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 21,
+      "case_id": "customer_support_02",
+      "run": 1,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 22,
+      "case_id": "customer_support_03",
+      "run": 1,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 23,
+      "case_id": "customer_support_03",
+      "run": 1,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 24,
+      "case_id": "customer_support_03",
+      "run": 1,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 25,
+      "case_id": "customer_support_04",
+      "run": 1,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 26,
+      "case_id": "customer_support_04",
+      "run": 1,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 27,
+      "case_id": "customer_support_04",
+      "run": 1,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 28,
+      "case_id": "customer_support_05",
+      "run": 1,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 29,
+      "case_id": "customer_support_05",
+      "run": 1,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 30,
+      "case_id": "customer_support_05",
+      "run": 1,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 31,
+      "case_id": "outfit_01",
+      "run": 2,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 32,
+      "case_id": "outfit_01",
+      "run": 2,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 33,
+      "case_id": "outfit_01",
+      "run": 2,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 34,
+      "case_id": "outfit_02",
+      "run": 2,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 35,
+      "case_id": "outfit_02",
+      "run": 2,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 36,
+      "case_id": "outfit_02",
+      "run": 2,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 37,
+      "case_id": "outfit_03",
+      "run": 2,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 38,
+      "case_id": "outfit_03",
+      "run": 2,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 39,
+      "case_id": "outfit_03",
+      "run": 2,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 40,
+      "case_id": "presentation_01",
+      "run": 2,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 41,
+      "case_id": "presentation_01",
+      "run": 2,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 42,
+      "case_id": "presentation_01",
+      "run": 2,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 43,
+      "case_id": "presentation_02",
+      "run": 2,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 44,
+      "case_id": "presentation_02",
+      "run": 2,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 45,
+      "case_id": "presentation_02",
+      "run": 2,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 46,
+      "case_id": "customer_support_01",
+      "run": 2,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 47,
+      "case_id": "customer_support_01",
+      "run": 2,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 48,
+      "case_id": "customer_support_01",
+      "run": 2,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 49,
+      "case_id": "customer_support_02",
+      "run": 2,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 50,
+      "case_id": "customer_support_02",
+      "run": 2,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 51,
+      "case_id": "customer_support_02",
+      "run": 2,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 52,
+      "case_id": "customer_support_03",
+      "run": 2,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 53,
+      "case_id": "customer_support_03",
+      "run": 2,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 54,
+      "case_id": "customer_support_03",
+      "run": 2,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 55,
+      "case_id": "customer_support_04",
+      "run": 2,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 56,
+      "case_id": "customer_support_04",
+      "run": 2,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 57,
+      "case_id": "customer_support_04",
+      "run": 2,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 58,
+      "case_id": "customer_support_05",
+      "run": 2,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 59,
+      "case_id": "customer_support_05",
+      "run": 2,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 60,
+      "case_id": "customer_support_05",
+      "run": 2,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 61,
+      "case_id": "outfit_01",
+      "run": 3,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 62,
+      "case_id": "outfit_01",
+      "run": 3,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 63,
+      "case_id": "outfit_01",
+      "run": 3,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 64,
+      "case_id": "outfit_02",
+      "run": 3,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 65,
+      "case_id": "outfit_02",
+      "run": 3,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 66,
+      "case_id": "outfit_02",
+      "run": 3,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 67,
+      "case_id": "outfit_03",
+      "run": 3,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 68,
+      "case_id": "outfit_03",
+      "run": 3,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 69,
+      "case_id": "outfit_03",
+      "run": 3,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 70,
+      "case_id": "presentation_01",
+      "run": 3,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 71,
+      "case_id": "presentation_01",
+      "run": 3,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 72,
+      "case_id": "presentation_01",
+      "run": 3,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 73,
+      "case_id": "presentation_02",
+      "run": 3,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 74,
+      "case_id": "presentation_02",
+      "run": 3,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 75,
+      "case_id": "presentation_02",
+      "run": 3,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 76,
+      "case_id": "customer_support_01",
+      "run": 3,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 77,
+      "case_id": "customer_support_01",
+      "run": 3,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 78,
+      "case_id": "customer_support_01",
+      "run": 3,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 79,
+      "case_id": "customer_support_02",
+      "run": 3,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 80,
+      "case_id": "customer_support_02",
+      "run": 3,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 81,
+      "case_id": "customer_support_02",
+      "run": 3,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 82,
+      "case_id": "customer_support_03",
+      "run": 3,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 83,
+      "case_id": "customer_support_03",
+      "run": 3,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 84,
+      "case_id": "customer_support_03",
+      "run": 3,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 85,
+      "case_id": "customer_support_04",
+      "run": 3,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 86,
+      "case_id": "customer_support_04",
+      "run": 3,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 87,
+      "case_id": "customer_support_04",
+      "run": 3,
+      "system": "Builder"
+    },
+    {
+      "schedule_index": 88,
+      "case_id": "customer_support_05",
+      "run": 3,
+      "system": "GPT-CLI"
+    },
+    {
+      "schedule_index": 89,
+      "case_id": "customer_support_05",
+      "run": 3,
+      "system": "Claude-CLI"
+    },
+    {
+      "schedule_index": 90,
+      "case_id": "customer_support_05",
+      "run": 3,
+      "system": "Builder"
+    }
+  ],
+  "sha256": "695b632a997328330a5b8134737a6081b86de7289e008f93c2a355b4e5d7bb05"
+}

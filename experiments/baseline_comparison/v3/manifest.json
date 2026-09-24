@@ -1,0 +1,424 @@
+{
+  "experiment_id": "builder_v3_threeway_20260925",
+  "phase": "three-way pilot v3",
+  "created_at_utc": "2026-09-24T22:49:13.739Z",
+  "scope": "10 frozen cases x 3 runs x GPT-CLI / Claude-CLI / Builder; historical ChatGPT web results are separately labeled.",
+  "v2_reference": {
+    "experiment_id": "builder_v2_pilot_20260916",
+    "manifest_path": "../v2/manifest.json",
+    "v2_archive_commit": "29fceee28f941b68c55be9d779fdd63fbb022919"
+  },
+  "cases": [
+    "outfit_01",
+    "outfit_02",
+    "outfit_03",
+    "presentation_01",
+    "presentation_02",
+    "customer_support_01",
+    "customer_support_02",
+    "customer_support_03",
+    "customer_support_04",
+    "customer_support_05"
+  ],
+  "runs_per_case": 3,
+  "builder_version": "current-runtime-v1.2-source-snapshot",
+  "fixture_versions": {
+    "outfit_01": {
+      "version": "outfit-2026-09-16-v1",
+      "sha256": "3e3b3417dce7482094d73e04368f2c1420c3548bb89e3d3bab0ac46c6b521678"
+    },
+    "outfit_02": {
+      "version": "outfit-2026-09-16-v2-high-precipitation",
+      "sha256": "7da0f4d9502976d46b07237d5eac999db5555d94048f73a3b00b01e6a7b9eec9"
+    },
+    "outfit_03": {
+      "version": "outfit-2026-09-16-v2-commute",
+      "sha256": "a169262507936026d7f615f16b1521a237c49e97a846ee42a6d09123de6a3776"
+    },
+    "presentation_01": {
+      "version": "presentation-2026-09-16-v1",
+      "sha256": "4d8bb302d1ea4dd207a13d02414e03069c7714406b8e85b85cb1bc8a32928aef"
+    },
+    "presentation_02": {
+      "version": "presentation-2026-09-16-v2-10-minute",
+      "sha256": "bc3f34cd62224a68fd5d9d04fcbc06469c6426ca0d6af913f9576e62ff077295"
+    },
+    "customer_support_01": {
+      "version": "customer-support-2026-09-16-v1",
+      "sha256": "19b5bbc3f56d9f049b2a93a7406cb0403a00bd5355f336f62fe448c0d0e33bb4"
+    },
+    "customer_support_02": {
+      "version": "customer-support-2026-09-16-v2-refund",
+      "sha256": "614dc169a5f24bcb897851d7f81e85a61146c19e7c815ebce360dfe036516214"
+    },
+    "customer_support_03": {
+      "version": "customer-support-2026-09-16-v2-account",
+      "sha256": "83a6225518b919e292a47d4f5a81d95d7d4fd2d3ad38eb3b8b8095b3b1451861"
+    },
+    "customer_support_04": {
+      "version": "customer-support-2026-09-16-v2-technical",
+      "sha256": "0cf815ee0ece6249587845067c566974a87345d83519eb743c09374dabb8f001"
+    },
+    "customer_support_05": {
+      "version": "customer-support-2026-09-16-v2-mixed-precedence",
+      "sha256": "08d49825911ae9be8a2594ad38bc123f4ead5b10b486519a31ee2fc01c7b9a59"
+    }
+  },
+  "prompt_versions": {
+    "outfit_01": {
+      "version": "prompt-v1",
+      "sha256": "81e6e0b7a3369a911d83c3cadf025045ef382bcf82f55a94a79c131bf90f89c4"
+    },
+    "outfit_02": {
+      "version": "prompt-v1",
+      "sha256": "b292435426064654c8bb863f9983003f2006f2c189c2c77ad3b76a0104574648"
+    },
+    "outfit_03": {
+      "version": "prompt-v1",
+      "sha256": "cee1b96f6765e7e9d8b12b3b771aa7b975748cf351f0f57ac8b3325b39cfcde7"
+    },
+    "presentation_01": {
+      "version": "prompt-v1",
+      "sha256": "d338d253b192dd3d8024754620592e1bef14c87588067d7d0253b8005b79c715"
+    },
+    "presentation_02": {
+      "version": "prompt-v1",
+      "sha256": "d53a037756873ebe892222921d8b905c04670b8ccb5a4dfcb1dca8373c20a2c8"
+    },
+    "customer_support_01": {
+      "version": "prompt-v1",
+      "sha256": "5a5bc084fec6b225d8f369b804c7900ff34db52969d0e45ee25af1b8a09a7b1a"
+    },
+    "customer_support_02": {
+      "version": "prompt-v1",
+      "sha256": "b4fe1442b7fa86f86721f465453ec14b22b44e3f8da0a4cdbfc273786ad42377"
+    },
+    "customer_support_03": {
+      "version": "prompt-v1",
+      "sha256": "461d37b24935604ba52853868f6f7cd442a9ef5f705437687cf55ec283e69c86"
+    },
+    "customer_support_04": {
+      "version": "prompt-v1",
+      "sha256": "ae16d373c6e787239834cb6164ce6afd54c04e4221e3e358b86a472f396d2690"
+    },
+    "customer_support_05": {
+      "version": "prompt-v1",
+      "sha256": "8e050c2633a484914b4a3fd157a35a5be9ade3f90873ed6e61e42b6a5da39931"
+    }
+  },
+  "fixture_files": {
+    "outfit_01": "frozen/cases/outfit_01.json",
+    "outfit_02": "frozen/cases/outfit_02.json",
+    "outfit_03": "frozen/cases/outfit_03.json",
+    "presentation_01": "frozen/cases/presentation_01.json",
+    "presentation_02": "frozen/cases/presentation_02.json",
+    "customer_support_01": "frozen/cases/customer_support_01.json",
+    "customer_support_02": "frozen/cases/customer_support_02.json",
+    "customer_support_03": "frozen/cases/customer_support_03.json",
+    "customer_support_04": "frozen/cases/customer_support_04.json",
+    "customer_support_05": "frozen/cases/customer_support_05.json"
+  },
+  "prompt_files": {
+    "gpt-cli": {
+      "outfit_01": "frozen/prompts/outfit_01.md",
+      "outfit_02": "frozen/prompts/outfit_02.md",
+      "outfit_03": "frozen/prompts/outfit_03.md",
+      "presentation_01": "frozen/prompts/presentation_01.md",
+      "presentation_02": "frozen/prompts/presentation_02.md",
+      "customer_support_01": "frozen/prompts/customer_support_01.md",
+      "customer_support_02": "frozen/prompts/customer_support_02.md",
+      "customer_support_03": "frozen/prompts/customer_support_03.md",
+      "customer_support_04": "frozen/prompts/customer_support_04.md",
+      "customer_support_05": "frozen/prompts/customer_support_05.md"
+    },
+    "claude-cli": {
+      "outfit_01": "frozen/prompts/outfit_01.md",
+      "outfit_02": "frozen/prompts/outfit_02.md",
+      "outfit_03": "frozen/prompts/outfit_03.md",
+      "presentation_01": "frozen/prompts/presentation_01.md",
+      "presentation_02": "frozen/prompts/presentation_02.md",
+      "customer_support_01": "frozen/prompts/customer_support_01.md",
+      "customer_support_02": "frozen/prompts/customer_support_02.md",
+      "customer_support_03": "frozen/prompts/customer_support_03.md",
+      "customer_support_04": "frozen/prompts/customer_support_04.md",
+      "customer_support_05": "frozen/prompts/customer_support_05.md"
+    }
+  },
+  "systems": [
+    "GPT-CLI",
+    "Claude-CLI",
+    "Builder",
+    "ChatGPT-web-0916"
+  ],
+  "fixture_hashes": {
+    "outfit_01": {
+      "fixture_version": "outfit-2026-09-16-v1",
+      "canonical_sha256": "3e3b3417dce7482094d73e04368f2c1420c3548bb89e3d3bab0ac46c6b521678",
+      "raw_file_sha256": "a3d78ec1e6818ccd2071a99a453f9e58ce8143c056b4ec444592ecf3379c2e6e",
+      "source_manifest_sha256": "3e3b3417dce7482094d73e04368f2c1420c3548bb89e3d3bab0ac46c6b521678"
+    },
+    "outfit_02": {
+      "fixture_version": "outfit-2026-09-16-v2-high-precipitation",
+      "canonical_sha256": "7da0f4d9502976d46b07237d5eac999db5555d94048f73a3b00b01e6a7b9eec9",
+      "raw_file_sha256": "6719ff6aba1eb8132ad96566e57aff655a3443a454fdb357a2b7421c3a400e74",
+      "source_manifest_sha256": "7da0f4d9502976d46b07237d5eac999db5555d94048f73a3b00b01e6a7b9eec9"
+    },
+    "outfit_03": {
+      "fixture_version": "outfit-2026-09-16-v2-commute",
+      "canonical_sha256": "a169262507936026d7f615f16b1521a237c49e97a846ee42a6d09123de6a3776",
+      "raw_file_sha256": "ce109c197b2f6e30c14e087f6766cdb8f580c9e323c312c7ac3df908e77b516f",
+      "source_manifest_sha256": "a169262507936026d7f615f16b1521a237c49e97a846ee42a6d09123de6a3776"
+    },
+    "presentation_01": {
+      "fixture_version": "presentation-2026-09-16-v1",
+      "canonical_sha256": "4d8bb302d1ea4dd207a13d02414e03069c7714406b8e85b85cb1bc8a32928aef",
+      "raw_file_sha256": "b1060d4572b1683617f307dd1a914614d5d43c91fb6e4a5d203ce4da1df9ee4e",
+      "source_manifest_sha256": "4d8bb302d1ea4dd207a13d02414e03069c7714406b8e85b85cb1bc8a32928aef"
+    },
+    "presentation_02": {
+      "fixture_version": "presentation-2026-09-16-v2-10-minute",
+      "canonical_sha256": "bc3f34cd62224a68fd5d9d04fcbc06469c6426ca0d6af913f9576e62ff077295",
+      "raw_file_sha256": "3fc90ad4370fdbaa4139afbf12a07703584f1cb34c8a6b8ae205406a4d634628",
+      "source_manifest_sha256": "bc3f34cd62224a68fd5d9d04fcbc06469c6426ca0d6af913f9576e62ff077295"
+    },
+    "customer_support_01": {
+      "fixture_version": "customer-support-2026-09-16-v1",
+      "canonical_sha256": "19b5bbc3f56d9f049b2a93a7406cb0403a00bd5355f336f62fe448c0d0e33bb4",
+      "raw_file_sha256": "2dfac20495a3453f37c2ebb90d3705e2d1e79b432296ea74d6c9475ba2c4fdba",
+      "source_manifest_sha256": "19b5bbc3f56d9f049b2a93a7406cb0403a00bd5355f336f62fe448c0d0e33bb4"
+    },
+    "customer_support_02": {
+      "fixture_version": "customer-support-2026-09-16-v2-refund",
+      "canonical_sha256": "614dc169a5f24bcb897851d7f81e85a61146c19e7c815ebce360dfe036516214",
+      "raw_file_sha256": "5a8ca1b48a999eebb437f321860c2158cf5204ecc45dbdf1ad95e199b905a05a",
+      "source_manifest_sha256": "614dc169a5f24bcb897851d7f81e85a61146c19e7c815ebce360dfe036516214"
+    },
+    "customer_support_03": {
+      "fixture_version": "customer-support-2026-09-16-v2-account",
+      "canonical_sha256": "83a6225518b919e292a47d4f5a81d95d7d4fd2d3ad38eb3b8b8095b3b1451861",
+      "raw_file_sha256": "96886458c31a306d3fa45f15df5c7502b7bfe0126911a2eaeaaa377453a03ec0",
+      "source_manifest_sha256": "83a6225518b919e292a47d4f5a81d95d7d4fd2d3ad38eb3b8b8095b3b1451861"
+    },
+    "customer_support_04": {
+      "fixture_version": "customer-support-2026-09-16-v2-technical",
+      "canonical_sha256": "0cf815ee0ece6249587845067c566974a87345d83519eb743c09374dabb8f001",
+      "raw_file_sha256": "ea5fd4f75017eb841a655d237712a8b1d845d316c120c625bb708dee75c264d0",
+      "source_manifest_sha256": "0cf815ee0ece6249587845067c566974a87345d83519eb743c09374dabb8f001"
+    },
+    "customer_support_05": {
+      "fixture_version": "customer-support-2026-09-16-v2-mixed-precedence",
+      "canonical_sha256": "08d49825911ae9be8a2594ad38bc123f4ead5b10b486519a31ee2fc01c7b9a59",
+      "raw_file_sha256": "1bb916d6e1b502cbff052d093b1143313e2d762f92f6b63e03185470afa7c4c7",
+      "source_manifest_sha256": "08d49825911ae9be8a2594ad38bc123f4ead5b10b486519a31ee2fc01c7b9a59"
+    }
+  },
+  "prompt_hashes": {
+    "outfit_01": {
+      "prompt_version": "prompt-v1",
+      "sha256": "81e6e0b7a3369a911d83c3cadf025045ef382bcf82f55a94a79c131bf90f89c4",
+      "source_manifest_sha256": "81e6e0b7a3369a911d83c3cadf025045ef382bcf82f55a94a79c131bf90f89c4",
+      "source_file": "prompts/chatgpt/outfit_01.md"
+    },
+    "outfit_02": {
+      "prompt_version": "prompt-v1",
+      "sha256": "b292435426064654c8bb863f9983003f2006f2c189c2c77ad3b76a0104574648",
+      "source_manifest_sha256": "b292435426064654c8bb863f9983003f2006f2c189c2c77ad3b76a0104574648",
+      "source_file": "prompts/chatgpt/outfit_02.md"
+    },
+    "outfit_03": {
+      "prompt_version": "prompt-v1",
+      "sha256": "cee1b96f6765e7e9d8b12b3b771aa7b975748cf351f0f57ac8b3325b39cfcde7",
+      "source_manifest_sha256": "cee1b96f6765e7e9d8b12b3b771aa7b975748cf351f0f57ac8b3325b39cfcde7",
+      "source_file": "prompts/chatgpt/outfit_03.md"
+    },
+    "presentation_01": {
+      "prompt_version": "prompt-v1",
+      "sha256": "d338d253b192dd3d8024754620592e1bef14c87588067d7d0253b8005b79c715",
+      "source_manifest_sha256": "d338d253b192dd3d8024754620592e1bef14c87588067d7d0253b8005b79c715",
+      "source_file": "prompts/chatgpt/presentation_01.md"
+    },
+    "presentation_02": {
+      "prompt_version": "prompt-v1",
+      "sha256": "d53a037756873ebe892222921d8b905c04670b8ccb5a4dfcb1dca8373c20a2c8",
+      "source_manifest_sha256": "d53a037756873ebe892222921d8b905c04670b8ccb5a4dfcb1dca8373c20a2c8",
+      "source_file": "prompts/chatgpt/presentation_02.md"
+    },
+    "customer_support_01": {
+      "prompt_version": "prompt-v1",
+      "sha256": "5a5bc084fec6b225d8f369b804c7900ff34db52969d0e45ee25af1b8a09a7b1a",
+      "source_manifest_sha256": "5a5bc084fec6b225d8f369b804c7900ff34db52969d0e45ee25af1b8a09a7b1a",
+      "source_file": "prompts/chatgpt/customer_support_01.md"
+    },
+    "customer_support_02": {
+      "prompt_version": "prompt-v1",
+      "sha256": "b4fe1442b7fa86f86721f465453ec14b22b44e3f8da0a4cdbfc273786ad42377",
+      "source_manifest_sha256": "b4fe1442b7fa86f86721f465453ec14b22b44e3f8da0a4cdbfc273786ad42377",
+      "source_file": "prompts/chatgpt/customer_support_02.md"
+    },
+    "customer_support_03": {
+      "prompt_version": "prompt-v1",
+      "sha256": "461d37b24935604ba52853868f6f7cd442a9ef5f705437687cf55ec283e69c86",
+      "source_manifest_sha256": "461d37b24935604ba52853868f6f7cd442a9ef5f705437687cf55ec283e69c86",
+      "source_file": "prompts/chatgpt/customer_support_03.md"
+    },
+    "customer_support_04": {
+      "prompt_version": "prompt-v1",
+      "sha256": "ae16d373c6e787239834cb6164ce6afd54c04e4221e3e358b86a472f396d2690",
+      "source_manifest_sha256": "ae16d373c6e787239834cb6164ce6afd54c04e4221e3e358b86a472f396d2690",
+      "source_file": "prompts/chatgpt/customer_support_04.md"
+    },
+    "customer_support_05": {
+      "prompt_version": "prompt-v1",
+      "sha256": "8e050c2633a484914b4a3fd157a35a5be9ade3f90873ed6e61e42b6a5da39931",
+      "source_manifest_sha256": "8e050c2633a484914b4a3fd157a35a5be9ade3f90873ed6e61e42b6a5da39931",
+      "source_file": "prompts/chatgpt/customer_support_05.md"
+    }
+  },
+  "schedule_hash": "695b632a997328330a5b8134737a6081b86de7289e008f93c2a355b4e5d7bb05",
+  "builder": {
+    "version_label": "current source from runtime-v1.2 checkout (dirty snapshot)",
+    "source_root": "D:\\综合设计",
+    "git_branch": "runtime-v1.2",
+    "git_commit": "dc09d0f4d7844c7862c47d5dbff625563e10a94e",
+    "git_status_at_freeze": [
+      "## runtime-v1.2...origin/runtime-v1.2",
+      " M .gitignore",
+      " M README.md",
+      " M configs/outfit_agent.json",
+      " M configs/outfit_workflow.json",
+      " M deliverables/forms/form2_requirements.txt",
+      " M deliverables/forms/form3_completed.txt",
+      " M deliverables/forms/form3_uiux.txt",
+      " M deliverables/forms/form4_completed.txt",
+      " M deliverables/forms/form4_detaildesign.txt",
+      " M deliverables/forms/form5_completed.txt",
+      " M deliverables/forms/sw3_plan.txt",
+      " M experiments/harness_comparison.py",
+      " M tools/dev/run_harness_comparison.cmd",
+      " M verify_project.py",
+      " M web_app.py",
+      "?? .codex-audio-transcribe/",
+      "?? .codex-finalizer/",
+      "?? .codex-presentation-build/",
+      "?? .playwright-mcp/",
+      "?? _share/",
+      "?? deliverables/audio_transcripts/",
+      "?? deliverables/forms/hwp_handoff/",
+      "?? deliverables/forms/patent_idea_summary_kr.txt",
+      "?? deliverables/forms/patent_specification_draft_kr.txt",
+      "?? deliverables/forms/patent_specification_submission.docx",
+      "?? deliverables/forms/revised_docs/",
+      "?? deliverables/generic_vs_domain_scope_comparison_zh.md",
+      "?? deliverables/nene_agent_builder_poster_panel_preview.png",
+      "?? deliverables/poster_assets/",
+      "?? deliverables/poster_panel_content_draft_kr.md",
+      "?? deliverables/poster_required_confirmation_zh.md",
+      "?? deliverables/presentation_submission/",
+      "?? experiments/baseline_comparison/",
+      "?? paper/",
+      "?? tests/test_authoritative_contract_experiment.py",
+      "?? tests/test_authoritative_contract_pilot.py",
+      "?? tests/test_baseline_experiment.py",
+      "?? tests/test_builder_v2.py",
+      "?? tests/test_evaluation_parser_v2.py",
+      "?? tests/test_generative_provider.py",
+      "?? tests/test_provider_adapter_diagnostics.py",
+      "?? tests/test_responses_provider_adapter.py",
+      "?? tests/test_workflow_runtime.py"
+    ],
+    "source_hashes": {
+      "experiments/baseline_comparison/runner.py": "e366ff1c25a6732a032e15af7ebba38e182775fd77030d006973014596db69ed",
+      "experiments/baseline_comparison/v2_runner.py": "eb7f34293bafe93f92c934adbf28dd94afbbe30f4f1a41aeeaa13d211e03098a",
+      "src/agent_builder/__init__.py": "0b8efd39b62e521f90d010900f8b760ce04ea89f70eb237d97c3eedd0f0a2491",
+      "src/agent_builder/engine.py": "812a8ff43d573f2f3eed4ff7833344959dac14c044bb01259501e043e3226b57",
+      "src/agent_builder/local_llm.py": "e8d39181885faa2011d0435e33062f6e893dafde80a9a27b20b7998704170f5f",
+      "src/agent_builder/node_registry.py": "0b9be8f03ec68103b44d4c4b71a2c87d9feb35f302d443c482c58bc1bebca229",
+      "src/agent_builder/shopping.py": "02b692e43221696ecb7e75302ec5cf162cbc2d2cfcc206b51a4fc889506ba712",
+      "src/agent_builder/template_builder.py": "cbce1eb38bbe16184f509acb4773237877f3f9d5905396f4bbf1d852bdab7560",
+      "src/agent_builder/workflow.py": "5dbef1a41003ab51c9a26ad3849cd8d1588a91d23ad7296a032d5934904fde9e",
+      "src/agent_builder/workflow_runtime.py": "c89eb6fd6d1bbe72e0156c691e8efd780fb1519fc9b48da9d42a2a75ad3f22a4",
+      "src/agent_builder/workflow_schema.py": "eee8feb3e9d5f4ca659eb32392c17893323fd7d00f7236229e43fa6b493de660",
+      "src/weather_agent/__init__.py": "0e28ea655a543958ebb343f4ae04dfb7c12e39480c6d43bb0117a06071a44631",
+      "src/weather_agent/agent.py": "1ae32cbbfed9daec0546abf5f650df230187c81e00dfb4a8b4d9cc8e33355a45",
+      "src/weather_agent/models.py": "ee0a1911e9cd47b2a6ea394e42a70f2b746b85323b1281f4f9356ace798ce86e",
+      "src/weather_agent/tools.py": "f6c69a0a82e5a9c1736ef0252c5c22b478f4c877027aab50fb7a0da2100bf7b9",
+      "configs/outfit_agent.json": "1babeea582d2c3d7c3b36f201961df8b5875359b387b4887a92da8d742cdd6c4",
+      "configs/builder_templates/commute_outfit_template.json": "da064661d95c8e104cfe535f5f2f15196094a642eee36336f29cbe7023b1a667",
+      "configs/builder_templates/customer_support_ticket_template.json": "71467e82b03ef261351a88f16503e97cef1969454f5de3c7524c648ad5e7f04f",
+      "configs/builder_templates/outfit_recommendation_template.json": "0bf77f1a065bd14904c94b98a087614f274ca9fa28b8bdb8d22ce7208e4c0242",
+      "configs/builder_templates/presentation_planning_template.json": "519e4261f75362885c52584e161fc4109f42f5fc30996157b3113f01c93b01e2",
+      "data/presentation_knowledge.json": "f0ff603b5d8e5cdee8333ffbe00df25c5008c3a56bed0a0bfda896d167e2c5fc",
+      "data/shopping_history.json": "941bccd3f393d2acee1cb9605da65a680f8594c4e23397fb89c6ccdba50ff9b3",
+      "data/support_policy.json": "3af8fec18df7121497982365e3d899433b9c4e91832381c08a239a39cbf59660",
+      "experiments/baseline_comparison/fixtures/outfit/outfit_01.json": "a3d78ec1e6818ccd2071a99a453f9e58ce8143c056b4ec444592ecf3379c2e6e",
+      "experiments/baseline_comparison/fixtures/outfit/outfit_02.json": "6719ff6aba1eb8132ad96566e57aff655a3443a454fdb357a2b7421c3a400e74",
+      "experiments/baseline_comparison/fixtures/outfit/outfit_03.json": "ce109c197b2f6e30c14e087f6766cdb8f580c9e323c312c7ac3df908e77b516f",
+      "experiments/baseline_comparison/fixtures/presentation/presentation_01.json": "b1060d4572b1683617f307dd1a914614d5d43c91fb6e4a5d203ce4da1df9ee4e",
+      "experiments/baseline_comparison/fixtures/presentation/presentation_02.json": "3fc90ad4370fdbaa4139afbf12a07703584f1cb34c8a6b8ae205406a4d634628",
+      "experiments/baseline_comparison/fixtures/customer_support/customer_support_01.json": "2dfac20495a3453f37c2ebb90d3705e2d1e79b432296ea74d6c9475ba2c4fdba",
+      "experiments/baseline_comparison/fixtures/customer_support/customer_support_02.json": "5a8ca1b48a999eebb437f321860c2158cf5204ecc45dbdf1ad95e199b905a05a",
+      "experiments/baseline_comparison/fixtures/customer_support/customer_support_03.json": "96886458c31a306d3fa45f15df5c7502b7bfe0126911a2eaeaaa377453a03ec0",
+      "experiments/baseline_comparison/fixtures/customer_support/customer_support_04.json": "ea5fd4f75017eb841a655d237712a8b1d845d316c120c625bb708dee75c264d0",
+      "experiments/baseline_comparison/fixtures/customer_support/customer_support_05.json": "1bb916d6e1b502cbff052d093b1143313e2d762f92f6b63e03185470afa7c4c7"
+    },
+    "calls_model": false
+  },
+  "providers": {
+    "GPT-CLI": {
+      "model_requested": "gpt-6-astra",
+      "cli": "codex.EXE",
+      "cli_version": "codex-cli 0.155.0-alpha.16.4",
+      "call_path": "codex exec",
+      "reasoning": "CLI default; no effort override",
+      "output_limit": "not set",
+      "model_returned_recorded": true,
+      "system_instructions": "Codex CLI defaults retained; project rules ignored in isolated temp workdir",
+      "sandbox": "read-only",
+      "shell_tools": "disabled",
+      "web_search": "disabled",
+      "fresh_session": "one ephemeral process and empty temporary CODEX_HOME/workdir per call"
+    },
+    "Claude-CLI": {
+      "model_requested": "claude-opus-5-5",
+      "cli": "claude.EXE",
+      "cli_version": "2.1.281 (Claude Code)",
+      "call_path": "claude -p --output-format json",
+      "system_prompt": "empty",
+      "tools": "none",
+      "setting_sources": "none",
+      "session_persistence": "disabled",
+      "output_limit": "not set",
+      "fresh_session": "one process and clean temporary workdir per call"
+    },
+    "Builder": {
+      "execution": "local frozen-fixture workflow run",
+      "calls_model": false
+    },
+    "ChatGPT-web-0916": {
+      "source": "v2 historical 30 records",
+      "model": "GPT-5.6 Sol",
+      "interface": "ChatGPT web",
+      "sampling_parameters": "unavailable",
+      "exact_backend_revision": "unavailable"
+    }
+  },
+  "evaluation": {
+    "version": "evaluation-v2",
+    "source_hashes": {
+      "experiments/baseline_comparison/evaluation/scoring.py": "21c39cc7a0d90541535c903490e149cb48abf412457ce779bb7e5ae2db672556",
+      "experiments/baseline_comparison/evaluation/versioned_analysis.py": "1bf44e6383ea6dde1fd3319e57632c91b719d3183d77848c63d72c613bdc54cf"
+    },
+    "metrics_and_parser_modified": false
+  },
+  "collection_tool_hashes": {
+    "experiment.py": "69c547f46b636748549b8defecb27ddfb38f5d75b9d60f3f2feba53a1959d911",
+    "test_experiment.py": "97bdcbc17aa1861b4c76b40b5fdb636c592228d3970f31806cce5f5111b3d9af",
+    "README.md": "1f6828cf311521f3d94d27ee6523797c2811777aff5a56137a89c9050643273d"
+  },
+  "limitations": [
+    "Codex CLI includes its default system instructions and is not identical to ChatGPT web.",
+    "Claude Code CLI is not identical to the Claude web product.",
+    "No human evaluation was conducted; language naturalness and user preference are not measured.",
+    "Configuration cost is not measured in this experiment and is supplemented by the workflow reuse test."
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "outfit_01": {
+    "fixture_version": "outfit-2026-09-16-v1",
+    "canonical_sha256": "3e3b3417dce7482094d73e04368f2c1420c3548bb89e3d3bab0ac46c6b521678",
+    "raw_file_sha256": "a3d78ec1e6818ccd2071a99a453f9e58ce8143c056b4ec444592ecf3379c2e6e",
+    "source_manifest_sha256": "3e3b3417dce7482094d73e04368f2c1420c3548bb89e3d3bab0ac46c6b521678"
+  },
+  "outfit_02": {
+    "fixture_version": "outfit-2026-09-16-v2-high-precipitation",
+    "canonical_sha256": "7da0f4d9502976d46b07237d5eac999db5555d94048f73a3b00b01e6a7b9eec9",
+    "raw_file_sha256": "6719ff6aba1eb8132ad96566e57aff655a3443a454fdb357a2b7421c3a400e74",
+    "source_manifest_sha256": "7da0f4d9502976d46b07237d5eac999db5555d94048f73a3b00b01e6a7b9eec9"
+  },
+  "outfit_03": {
+    "fixture_version": "outfit-2026-09-16-v2-commute",
+    "canonical_sha256": "a169262507936026d7f615f16b1521a237c49e97a846ee42a6d09123de6a3776",
+    "raw_file_sha256": "ce109c197b2f6e30c14e087f6766cdb8f580c9e323c312c7ac3df908e77b516f",
+    "source_manifest_sha256": "a169262507936026d7f615f16b1521a237c49e97a846ee42a6d09123de6a3776"
+  },
+  "presentation_01": {
+    "fixture_version": "presentation-2026-09-16-v1",
+    "canonical_sha256": "4d8bb302d1ea4dd207a13d02414e03069c7714406b8e85b85cb1bc8a32928aef",
+    "raw_file_sha256": "b1060d4572b1683617f307dd1a914614d5d43c91fb6e4a5d203ce4da1df9ee4e",
+    "source_manifest_sha256": "4d8bb302d1ea4dd207a13d02414e03069c7714406b8e85b85cb1bc8a32928aef"
+  },
+  "presentation_02": {
+    "fixture_version": "presentation-2026-09-16-v2-10-minute",
+    "canonical_sha256": "bc3f34cd62224a68fd5d9d04fcbc06469c6426ca0d6af913f9576e62ff077295",
+    "raw_file_sha256": "3fc90ad4370fdbaa4139afbf12a07703584f1cb34c8a6b8ae205406a4d634628",
+    "source_manifest_sha256": "bc3f34cd62224a68fd5d9d04fcbc06469c6426ca0d6af913f9576e62ff077295"
+  },
+  "customer_support_01": {
+    "fixture_version": "customer-support-2026-09-16-v1",
+    "canonical_sha256": "19b5bbc3f56d9f049b2a93a7406cb0403a00bd5355f336f62fe448c0d0e33bb4",
+    "raw_file_sha256": "2dfac20495a3453f37c2ebb90d3705e2d1e79b432296ea74d6c9475ba2c4fdba",
+    "source_manifest_sha256": "19b5bbc3f56d9f049b2a93a7406cb0403a00bd5355f336f62fe448c0d0e33bb4"
+  },
+  "customer_support_02": {
+    "fixture_version": "customer-support-2026-09-16-v2-refund",
+    "canonical_sha256": "614dc169a5f24bcb897851d7f81e85a61146c19e7c815ebce360dfe036516214",
+    "raw_file_sha256": "5a8ca1b48a999eebb437f321860c2158cf5204ecc45dbdf1ad95e199b905a05a",
+    "source_manifest_sha256": "614dc169a5f24bcb897851d7f81e85a61146c19e7c815ebce360dfe036516214"
+  },
+  "customer_support_03": {
+    "fixture_version": "customer-support-2026-09-16-v2-account",
+    "canonical_sha256": "83a6225518b919e292a47d4f5a81d95d7d4fd2d3ad38eb3b8b8095b3b1451861",
+    "raw_file_sha256": "96886458c31a306d3fa45f15df5c7502b7bfe0126911a2eaeaaa377453a03ec0",
+    "source_manifest_sha256": "83a6225518b919e292a47d4f5a81d95d7d4fd2d3ad38eb3b8b8095b3b1451861"
+  },
+  "customer_support_04": {
+    "fixture_version": "customer-support-2026-09-16-v2-technical",
+    "canonical_sha256": "0cf815ee0ece6249587845067c566974a87345d83519eb743c09374dabb8f001",
+    "raw_file_sha256": "ea5fd4f75017eb841a655d237712a8b1d845d316c120c625bb708dee75c264d0",
+    "source_manifest_sha256": "0cf815ee0ece6249587845067c566974a87345d83519eb743c09374dabb8f001"
+  },
+  "customer_support_05": {
+    "fixture_version": "customer-support-2026-09-16-v2-mixed-precedence",
+    "canonical_sha256": "08d49825911ae9be8a2594ad38bc123f4ead5b10b486519a31ee2fc01c7b9a59",
+    "raw_file_sha256": "1bb916d6e1b502cbff052d093b1143313e2d762f92f6b63e03185470afa7c4c7",
+    "source_manifest_sha256": "08d49825911ae9be8a2594ad38bc123f4ead5b10b486519a31ee2fc01c7b9a59"
+  }
+}

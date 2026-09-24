@@ -1,0 +1,15 @@
+{
+  "case_id": "customer_support_02",
+  "fixture_version": "customer-support-2026-09-16-v2-refund",
+  "domain": "customer_support",
+  "input": {"query": "Customer requests a refund after being charged twice.", "user_id": "user_a"},
+  "shared_context": {},
+  "business_data": {
+    "default_category": "refund",
+    "categories": [{"id": "refund", "label": "Refund / Return", "keywords": ["refund", "return", "cancel", "chargeback", "money back", "payment", "charged"], "owner_team": "Billing Support", "priority": "P2", "sla": "1 business day", "policy": "Check order eligibility and payment status. If eligible, route to billing support for refund processing.", "next_actions": ["Check refund eligibility.", "Verify payment transaction status.", "Route to billing support if refund criteria are met."]}]
+  },
+  "constraints": {"apply_frozen_policy": true, "do_not_invent_facts": true, "required_decisions": ["category", "route", "priority", "sla", "policy_application"], "language": "English"},
+  "output_requirements": {"required_fields": ["category", "owner_team", "priority", "sla", "next_actions"], "format": "ticket classification, routing decision, SLA, and next actions"},
+  "ground_truth": {"derivation": "select the frozen policy category with the greatest number of query keyword matches; keep the first category on a tie", "builder_output_is_not_ground_truth": true},
+  "builder": {"template": "configs/builder_templates/customer_support_ticket_template.json", "data_file": "support_policy.json"}
+}
