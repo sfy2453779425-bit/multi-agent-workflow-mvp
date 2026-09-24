@@ -1,9 +1,10 @@
 # E3 预注册草案（DRAFT，未冻结）
 
-状态：草案。在以下三件事完成前**不得运行任何模型调用**：
-1. Saltware 确认场景；
-2. case 冻结；
-3. Runtime v1.2 与 evaluator v1.1 冻结。
+状态：草案。在以下两件事完成前**不得运行任何模型调用**：
+1. case 冻结；
+2. Runtime v1.2 与 evaluator v1.1 冻结。
+
+Saltware 对场景的确认不阻塞实验，但必须在按第 8 节下结论之前完成。
 
 冻结时把本文件改名为 `E3_PREREGISTRATION.md` 并打 tag。阈值可以在冻结前调整，冻结后不得修改。
 
@@ -17,7 +18,7 @@
 - 强模型的正确回答几乎不被误拒；
 - 以明显低于商业模型的成本，接近商业模型的有效回复率。
 
-**前提**：Saltware 确认其客户确实存在上述约束。如果不成立，本研究问题不成立，直接转向 Builder 主线（第 8 节 NO-GO）。
+**前提**：Saltware 确认其客户确实存在上述约束，在下结论前完成。如果不成立，本研究问题不成立，转向 Builder 主线（第 8 节 NO-GO）。
 
 ## 2. 模型
 
@@ -90,7 +91,7 @@ prompt 沿用 E2 的 canonical prompt，字段名 `customer_message` 不改，�
 
 | 角色 | 负责 |
 |---|---|
-| 组长 | 联系 Saltware 确认场景；审核 case；冻结签字 |
+| 组长 | 审核 case；冻结签字；下结论前向 Saltware 确认场景 |
 | Codex（电脑 A） | Runtime v1.2；接入学校 GPU 上的 Qwen；采集 |
 | B | 起草 E3 case（不看 validator 代码）；evaluator v1.1；组织盲评 |
 | Claude Code | 审阅设计和 case；计算成本；核对结果；写发表稿 |
@@ -98,4 +99,4 @@ prompt 沿用 E2 的 canonical prompt，字段名 `customer_message` 不改，�
 
 ## 10. 顺序
 
-Saltware 确认 → B 起草 case、组长审核 → Runtime v1.2 与 evaluator v1.1 开发完成 → 冻结（case、prompt、两个版本、阈值，打 tag）→ 采集 → 独立判分 → 按第 8 节判定。
+B 起草 case、组长审核 → Runtime v1.2 与 evaluator v1.1 开发完成 → 冻结（case、prompt、两个版本、阈值，打 tag）→ 采集 → 独立判分 → 向 Saltware 确认场景 → 按第 8 节判定。
