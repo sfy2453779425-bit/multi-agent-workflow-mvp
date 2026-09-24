@@ -5,12 +5,14 @@ from __future__ import annotations
 from copy import deepcopy
 from dataclasses import asdict, dataclass, is_dataclass
 from datetime import datetime, timezone
+from difflib import SequenceMatcher
 import hashlib
 import json
 from pathlib import Path
 import re
 from time import perf_counter
 from typing import Any
+import unicodedata
 from collections.abc import Mapping
 from types import MappingProxyType
 
@@ -30,6 +32,10 @@ from agent_builder.workflow_schema import (
 
 
 WORKFLOW_RUNTIME_VERSION = "authoritative-contract-v1.1"
+CONSISTENCY_VALIDATOR_V1_1 = "consistency-validator-v1.1"
+CONSISTENCY_VALIDATOR_V1_2 = "consistency-validator-v1.2"
+RUNTIME_V1_2_VERSION = "authoritative-contract-v1.2"
+ECHO_SIMILARITY_THRESHOLD = 0.85
 
 
 class WorkflowValidationError(ValueError):
@@ -199,6 +205,378 @@ def _aggregate_consistency(results: dict[str, dict[str, Any]]) -> dict[str, Any]
     return {**results, "overall": overall}
 
 
+_NUMBER_WORDS = {
+    "zero": 0, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+    "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+    "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14,
+    "fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18,
+    "nineteen": 19, "twenty": 20, "thirty": 30, "forty": 40,
+    "fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80,
+    "ninety": 90, "a": 1, "an": 1,
+}
+_DURATION_RE = re.compile(
+    r"(?<!\w)(?P<number>\d+(?:\.\d+)?|(?:zero|one|two|three|four|five|six|seven|"
+    r"eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|"
+    r"eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|a|an)"
+    r"(?:[- ](?:one|two|three|four|five|six|seven|eight|nine))?)"
+    r"[- ]+(?:(?P<business>business)[- ]+)?(?P<unit>minutes?|mins?|hours?|hrs?|days?)\b",
+    re.IGNORECASE,
+)
+_QUOTED_RE = re.compile(r"“[^”]*”|‘[^’]*’|\"[^\"]*\"|(?<!\w)'[^']*'(?!\w)")
+_CLAUSE_BREAK_RE = re.compile(
+    r"[,;]|\b(?:but|however|although|whereas)\b|\band\s+(?=(?:we|i|our|it|the|this)\b)",
+    re.IGNORECASE,
+)
+_ATTRIBUTION_RE = re.compile(
+    r"\b(?:you\s+(?:asked|requested|mentioned|said|wanted)|your\s+request\s+for|"
+    r"you(?:'d|\s+would)\s+like|(?:was|were|has\s+been)\s+requested)\b",
+    re.IGNORECASE,
+)
+_NEGATION_RE = re.compile(
+    r"\b(?:cannot|can't|can’t|unable\s+to|won't|won’t|will\s+not|would\s+not|"
+    r"do\s+not|don't|don’t|does\s+not|doesn't|doesn’t|not|never)\b",
+    re.IGNORECASE,
+)
+_CONTRAST_RE = re.compile(
+    r"\b(?:rather\s+than|instead\s+of|unlike|other\s+than|sooner\s+than|faster\s+than)\b",
+    re.IGNORECASE,
+)
+
+
+def _normalize_echo(text: str) -> str:
+    normalized = unicodedata.normalize("NFKC", text).casefold()
+    return "".join(character for character in normalized if character.isalnum())
+
+
+def _quoted_request_with_reply(text: str, user_input: str) -> bool:
+    request = _normalize_echo(user_input)
+    if not request:
+        return False
+    for match in _QUOTED_RE.finditer(text):
+        if _normalize_echo(match.group()) == request:
+            outside = _normalize_echo(text[: match.start()] + text[match.end() :])
+            if len(outside) >= 20:
+                return True
+    return False
+
+
+def _echo_similarity(text: str, user_input: str) -> float | None:
+    response = _normalize_echo(text)
+    request = _normalize_echo(user_input)
+    if not response or not request:
+        return None
+    if response == request:
+        return 1.0
+    if _quoted_request_with_reply(text, user_input):
+        return None
+    if min(len(response), len(request)) < 20:
+        return None
+    # ponytail: character similarity misses paraphrases; add deterministic token overlap only if validated.
+    return SequenceMatcher(None, response, request, autojunk=False).ratio()
+
+
+def _sentence_spans(text: str) -> list[tuple[int, int, str]]:
+    spans = []
+    start = 0
+    for match in re.finditer(r"[.!?]+\s+", text):
+        end = match.start() + len(match.group().rstrip())
+        sentence = text[start:end].strip()
+        if sentence:
+            left = text.find(sentence, start, end)
+            spans.append((left, left + len(sentence), sentence))
+        start = match.end()
+    tail = text[start:].strip()
+    if tail:
+        left = text.find(tail, start)
+        spans.append((left, left + len(tail), tail))
+    return spans
+
+
+def _clause_for_offset(sentence: str, local_offset: int) -> tuple[str, int]:
+    start = 0
+    for match in _CLAUSE_BREAK_RE.finditer(sentence):
+        if local_offset < match.start():
+            break
+        start = match.end()
+    end_match = _CLAUSE_BREAK_RE.search(sentence, start)
+    end = end_match.start() if end_match else len(sentence)
+    clause = sentence[start:end].strip()
+    clause_start = sentence.find(clause, start, end) if clause else start
+    return clause, clause_start
+
+
+def _number_value(value: str) -> float | None:
+    value = value.casefold().replace("-", " ").strip()
+    if re.fullmatch(r"\d+(?:\.\d+)?", value):
+        return float(value)
+    words = value.split()
+    if not words:
+        return None
+    total = 0
+    for word in words:
+        number = _NUMBER_WORDS.get(word)
+        if number is None:
+            return None
+        total += number
+    return float(total)
+
+
+def _normalize_duration(value: str) -> str:
+    match = _DURATION_RE.search(str(value))
+    if not match:
+        return re.sub(r"\s+", " ", str(value).casefold()).strip()
+    number = _number_value(match.group("number"))
+    if number is None:
+        return re.sub(r"\s+", " ", str(value).casefold()).strip()
+    unit = match.group("unit").casefold()
+    if unit.startswith("min"):
+        unit = "minute" if number == 1 else "minutes"
+    elif unit.startswith("hour") or unit.startswith("hr"):
+        unit = "hour" if number == 1 else "hours"
+    else:
+        unit = "day" if number == 1 else "days"
+    amount = str(int(number)) if number.is_integer() else str(number)
+    prefix = "business " if match.group("business") else ""
+    return f"{amount} {prefix}{unit}"
+
+
+def _duration_claims(text: str) -> list[tuple[int, int, str, str]]:
+    claims = []
+    for match in _DURATION_RE.finditer(text):
+        value = match.group()
+        claims.append((match.start(), match.end(), value, _normalize_duration(value)))
+    return claims
+
+
+def _team_claims(text: str, known_teams: list[str]) -> list[tuple[int, int, str, str]]:
+    claims: list[tuple[int, int, str, str]] = []
+    occupied: list[tuple[int, int]] = []
+    for team in sorted(set(known_teams), key=len, reverse=True):
+        core = re.sub(r"\s+(?:support|team|department)$", "", team, flags=re.IGNORECASE).strip()
+        variants = {team}
+        if core:
+            variants.update({f"{core} team", f"{core} department", f"{core} support"})
+        pattern = re.compile(
+            r"(?<!\w)(?:" + "|".join(re.escape(v) for v in sorted(variants, key=len, reverse=True)) + r")(?!\w)",
+            re.IGNORECASE,
+        )
+        for match in pattern.finditer(text):
+            if any(match.start() < end and match.end() > start for start, end in occupied):
+                continue
+            claims.append((match.start(), match.end(), match.group(), team))
+            occupied.append((match.start(), match.end()))
+    known_by_core = {
+        re.sub(r"\s+(?:support|team|department)$", "", team, flags=re.IGNORECASE).casefold(): team
+        for team in known_teams
+    }
+    generic_stopwords = {
+        "a", "an", "our", "your", "their", "the", "this", "that", "these", "those", "my", "we",
+        "they", "he", "she", "it", "and", "but", "or", "to", "of", "for", "with", "as",
+        "is", "are", "was", "were", "be", "been", "being", "has", "have", "had", "will",
+        "can", "could", "would", "should", "do", "does", "did", "not", "responsible", "assigned",
+        "available", "support", "help", "part", "handled",
+    }
+    tokens = list(re.finditer(r"[A-Za-z][\w&’'-]*", text))
+    for suffix in re.finditer(r"\b(?:team|department)\b", text, re.IGNORECASE):
+        preceding = [token for token in tokens if token.end() <= suffix.start()][-3:]
+        for index, first in enumerate(preceding):
+            if first.group().casefold() in generic_stopwords:
+                continue
+            if any(token.group().casefold() in generic_stopwords for token in preceding[index:]):
+                continue
+            start = first.start()
+            if any(start < end and suffix.end() > occupied_start for occupied_start, end in occupied):
+                continue
+            surface = text[start : suffix.end()]
+            core = re.sub(r"\s+(?:team|department)$", "", surface, flags=re.IGNORECASE).casefold()
+            canonical = known_by_core.get(core, surface)
+            claims.append((start, suffix.end(), surface, canonical))
+            occupied.append((start, suffix.end()))
+            break
+    return sorted(claims)
+
+
+def _is_asserted_value(
+    sentence: str,
+    claim_start: int,
+    claim_end: int,
+    field: str,
+) -> bool:
+    for quoted in _QUOTED_RE.finditer(sentence):
+        if quoted.start() <= claim_start and claim_end <= quoted.end():
+            return False
+    clause, clause_start = _clause_for_offset(sentence, claim_start)
+    local_start = claim_start - clause_start
+    local_end = claim_end - clause_start
+    before, after = clause[:local_start], clause[local_end:]
+    if _ATTRIBUTION_RE.search(before) or re.search(
+        r"\b(?:was|were|has\s+been)\s+requested\b", after[:60], re.IGNORECASE
+    ):
+        return False
+    if _NEGATION_RE.search(before[-90:]) or re.match(
+        r"\s*(?:is|was|has been|will be)?\s*(?:not|never|unavailable|incorrect)\b",
+        after,
+        re.IGNORECASE,
+    ):
+        return False
+    contrast = _CONTRAST_RE.search(clause)
+    if contrast and claim_start - clause_start >= contrast.end():
+        return False
+    if re.match(r"\s*(?:if|when|unless|provided that)\b", clause, re.IGNORECASE):
+        return False
+    if re.match(
+        r"\s*(?:please\s+)?(?:route|forward|refer|send|contact|check|confirm|open|ask|collect|verify)\b",
+        clause,
+        re.IGNORECASE,
+    ):
+        return False
+
+    context = clause[max(0, local_start - 90) : min(len(clause), local_end + 55)]
+    if field == "priority":
+        return bool(
+            re.search(
+                r"\b(?:priority|classified|classify|marked|mark|set|changed|change|updated|update|"
+                r"raised|lowered|escalated)\b",
+                context,
+                re.IGNORECASE,
+            )
+        )
+    if field == "sla":
+        return bool(
+            re.search(
+                r"\b(?:response|reply|respond|hear\s+from|get\s+back|turnaround|SLA|target|"
+                r"promise|promised|expect|commit|committed)\b",
+                context,
+                re.IGNORECASE,
+            )
+        )
+    if field == "owner_team":
+        return bool(
+            _CONTRAST_RE.search(after[:55])
+            or re.search(
+                r"\b(?:assign(?:ed|ment)?|rout(?:e|ed|ing)|forward(?:ed)?|transfer(?:red)?|"
+                r"send|sent|manage[ds]?|handle[ds]?|own(?:s|er|ership)?|responsible|"
+                r"queue|team|department|stay(?:s|ed)?|remain(?:s|ed)?)\b",
+                context,
+                re.IGNORECASE,
+            )
+        )
+    return False
+
+
+def _v12_field_consistency(
+    text: str,
+    field: str,
+    expected: Any,
+    claims: list[tuple[int, int, str, str]],
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    expected_normalized = (
+        _normalize_duration(str(expected)) if field == "sla" else str(expected).casefold()
+    )
+    asserted: list[tuple[str, str, str]] = []
+    for start, end, surface, normalized in claims:
+        for sentence_start, sentence_end, sentence in _sentence_spans(text):
+            if sentence_start <= start and end <= sentence_end:
+                if _is_asserted_value(
+                    sentence,
+                    start - sentence_start,
+                    end - sentence_start,
+                    field,
+                ):
+                    asserted.append((surface, normalized, sentence))
+                break
+    unique: list[tuple[str, str, str]] = []
+    for item in asserted:
+        if item[1] not in [previous[1] for previous in unique]:
+            unique.append(item)
+    conflicts = [item for item in unique if item[1].casefold() != expected_normalized.casefold()]
+    status = "CONFLICT" if conflicts else "PASS" if unique else "UNRESOLVED"
+    reasons = [
+        {
+            "field": field,
+            "claimed_value": surface,
+            "authoritative_value": expected,
+            "trigger_sentence": sentence,
+            "rule_type": "assertion_conflict",
+        }
+        for surface, _normalized, sentence in conflicts
+    ]
+    return (
+        _consistency_result(
+            field,
+            status,
+            [surface for surface, _normalized, _sentence in unique],
+            [surface for surface, _normalized, _sentence in conflicts],
+            "asserted values conflict with authoritative value"
+            if conflicts
+            else "asserted values match authoritative value"
+            if unique
+            else "no asserted value found",
+        ),
+        reasons,
+    )
+
+
+def _v12_consistency(
+    text: str,
+    expected: Mapping[str, Any],
+    known_teams: list[str],
+    user_input: str,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    if not text.strip():
+        reason = {
+            "field": "customer_message",
+            "claimed_value": None,
+            "authoritative_value": None,
+            "trigger_sentence": text,
+            "rule_type": "non_reply_empty",
+        }
+        return (
+            {"overall": "CONFLICT", "non_reply": {"status": "CONFLICT", "rule_type": "non_reply_empty"}},
+            [reason],
+        )
+    similarity = _echo_similarity(text, user_input)
+    if similarity is not None and (similarity == 1.0 or similarity >= ECHO_SIMILARITY_THRESHOLD):
+        reason = {
+            "field": "customer_message",
+            "claimed_value": None,
+            "authoritative_value": None,
+            "trigger_sentence": text,
+            "rule_type": "non_reply_echo",
+            "similarity": round(similarity, 6),
+        }
+        return (
+            {
+                "overall": "CONFLICT",
+                "non_reply": {
+                    "status": "CONFLICT",
+                    "rule_type": "non_reply_echo",
+                    "similarity": round(similarity, 6),
+                },
+            },
+            [reason],
+        )
+
+    priority_claims = [
+        (match.start(), match.end(), match.group().upper(), match.group().upper())
+        for match in re.finditer(r"(?<![A-Za-z0-9])P[0-4](?![A-Za-z0-9])", text, re.IGNORECASE)
+    ]
+    sla_claims = _duration_claims(text)
+    owner_claims = _team_claims(text, list(dict.fromkeys([*known_teams, str(expected.get("owner_team", ""))])))
+    results: dict[str, dict[str, Any]] = {}
+    reasons: list[dict[str, Any]] = []
+    for field, claims in (
+        ("priority", priority_claims),
+        ("sla", sla_claims),
+        ("owner_team", owner_claims),
+    ):
+        result, codes = _v12_field_consistency(text, field, expected.get(field), claims)
+        results[field] = result
+        reasons.extend(codes)
+    consistency = _aggregate_consistency(results)
+    return consistency, reasons
+
+
 def _matches_contract_type(value: Any, type_name: Any) -> bool:
     normalized = str(type_name or "any").lower()
     if normalized in {"any", "json"}:
@@ -218,13 +596,33 @@ def _matches_contract_type(value: Any, type_name: Any) -> bool:
     return False
 
 
-def _deterministic_fallback(snapshot: AuthoritativeSnapshot) -> str:
+def _deterministic_fallback(
+    snapshot: AuthoritativeSnapshot,
+    next_actions: list[str] | None = None,
+) -> str:
     fields = snapshot.fields
-    return (
+    fallback = (
         f"Your request has been assigned to {fields.get('owner_team')}. "
         f"Priority: {fields.get('priority')}. "
         f"Expected response time: {fields.get('sla')}."
     )
+    actions = [str(action).strip() for action in (next_actions or []) if str(action).strip()]
+    if actions:
+        fallback += "\nNext steps:\n" + "\n".join(f"- {action}" for action in actions)
+    return fallback
+
+
+def _category_next_actions(context: Mapping[str, Any]) -> list[str]:
+    policy = context.get("support_policy")
+    category_id = context.get("ticket_category")
+    if not isinstance(policy, Mapping) or not isinstance(category_id, str):
+        return []
+    for category in policy.get("categories", []):
+        if isinstance(category, Mapping) and category.get("id") == category_id:
+            actions = category.get("next_actions", [])
+            if isinstance(actions, list):
+                return [str(action) for action in actions if isinstance(action, str) and action.strip()]
+    return []
 
 
 class _UnavailableNodeHandler:
@@ -238,9 +636,34 @@ class _UnavailableNodeHandler:
 class WorkflowRuntime:
     """Execute the nodes and order declared by a Workflow JSON config."""
 
-    def __init__(self, workflow_config: dict[str, Any], registry: NodeRegistry):
+    def __init__(
+        self,
+        workflow_config: dict[str, Any],
+        registry: NodeRegistry,
+        *,
+        validator_version: str | None = None,
+    ):
         self.workflow_config = upgrade_workflow_config(workflow_config)
         self.registry = registry
+        selected_validator = validator_version
+        if selected_validator is None:
+            selected_validator = self.workflow_config.get("validator_version")
+        if selected_validator is None:
+            selected_validator = CONSISTENCY_VALIDATOR_V1_1
+        if not isinstance(selected_validator, str):
+            raise WorkflowValidationError("validator_version must be a string")
+        selected_validator = {
+            "v1.1": CONSISTENCY_VALIDATOR_V1_1,
+            "v1.2": CONSISTENCY_VALIDATOR_V1_2,
+        }.get(selected_validator, selected_validator)
+        if selected_validator not in {CONSISTENCY_VALIDATOR_V1_1, CONSISTENCY_VALIDATOR_V1_2}:
+            raise WorkflowValidationError(f"unsupported validator version: {selected_validator}")
+        self.validator_version = selected_validator
+        self.runtime_version = (
+            RUNTIME_V1_2_VERSION
+            if selected_validator == CONSISTENCY_VALIDATOR_V1_2
+            else WORKFLOW_RUNTIME_VERSION
+        )
         self.nodes = self._build_nodes()
         self._nodes_by_id = {node.node_id: node for node in self.nodes}
 
@@ -359,6 +782,8 @@ class WorkflowRuntime:
             context.setdefault("consistency_results", {})
             context.setdefault("fallback_used", False)
             context.setdefault("raw_responses", {})
+            if self.validator_version == CONSISTENCY_VALIDATOR_V1_2:
+                context.setdefault("reject_reason_codes", [])
         self.validate(context)
 
         trace: list[TraceStep] = []
@@ -382,6 +807,12 @@ class WorkflowRuntime:
                     self._write_outputs(node, result.outputs, context)
                 context["executed_agents"].append(node.node_id)
                 finished_at = _timestamp()
+                trace_data = result.data or result.outputs
+                if self.validator_version == CONSISTENCY_VALIDATOR_V1_2 and node.mode == "generative":
+                    trace_data = dict(trace_data) if isinstance(trace_data, Mapping) else {"result": trace_data}
+                    trace_data["reject_reason_codes"] = _safe_value(
+                        context.get("reject_reason_codes", [])
+                    )
                 trace.append(
                     self._trace(
                         node,
@@ -392,7 +823,7 @@ class WorkflowRuntime:
                         inputs=_trace_inputs(node, inputs, context),
                         outputs=result.outputs,
                         detail=result.detail or f"{node.node_type} executed",
-                        data=result.data or result.outputs,
+                        data=trace_data,
                     )
                 )
                 if result.halt:
@@ -710,23 +1141,33 @@ class WorkflowRuntime:
         if not isinstance(snapshot, AuthoritativeSnapshot):
             raise WorkflowValidationError("consistency validation requires an authoritative snapshot")
         message = raw_candidate.get("customer_message") if isinstance(raw_candidate, Mapping) else None
-        consistency = _aggregate_consistency(
-            {
-                "priority": _priority_consistency(
-                    message if isinstance(message, str) else "",
-                    snapshot.fields.get("priority"),
-                ),
-                "sla": _sla_consistency(
-                    message if isinstance(message, str) else "",
-                    snapshot.fields.get("sla"),
-                ),
-                "owner_team": _owner_team_consistency(
-                    message if isinstance(message, str) else "",
-                    snapshot.fields.get("owner_team"),
-                    _policy_owner_teams(context.get("support_policy")),
-                ),
-            }
-        )
+        message_text = message if isinstance(message, str) else ""
+        if self.validator_version == CONSISTENCY_VALIDATOR_V1_2:
+            consistency, reason_codes = _v12_consistency(
+                message_text,
+                snapshot.fields,
+                _policy_owner_teams(context.get("support_policy")),
+                str(context.get("user_input") or ""),
+            )
+        else:
+            consistency = _aggregate_consistency(
+                {
+                    "priority": _priority_consistency(
+                        message_text,
+                        snapshot.fields.get("priority"),
+                    ),
+                    "sla": _sla_consistency(
+                        message_text,
+                        snapshot.fields.get("sla"),
+                    ),
+                    "owner_team": _owner_team_consistency(
+                        message_text,
+                        snapshot.fields.get("owner_team"),
+                        _policy_owner_teams(context.get("support_policy")),
+                    ),
+                }
+            )
+            reason_codes = []
         context["consistency_results"][node.node_id] = consistency
         rejected = bool(
             not isinstance(raw_candidate, Mapping)
@@ -736,6 +1177,41 @@ class WorkflowRuntime:
             or parse_rejected
             or consistency.get("overall") == "CONFLICT"
         )
+        if self.validator_version == CONSISTENCY_VALIDATOR_V1_2:
+            structured_codes = list(reason_codes)
+            if parse_rejected:
+                structured_codes.append(
+                    {
+                        "field": "customer_message",
+                        "claimed_value": parse_status,
+                        "authoritative_value": "PARSE_OK",
+                        "trigger_sentence": message_text,
+                        "rule_type": "parse_failure",
+                    }
+                )
+            for field_name, reason in reasons.items():
+                structured_codes.append(
+                    {
+                        "field": field_name,
+                        "claimed_value": None,
+                        "authoritative_value": None,
+                        "trigger_sentence": message_text,
+                        "rule_type": "output_contract_violation",
+                        "detail": reason,
+                    }
+                )
+            if rejected and not structured_codes:
+                structured_codes.append(
+                    {
+                        "field": "customer_message",
+                        "claimed_value": None,
+                        "authoritative_value": None,
+                        "trigger_sentence": message_text,
+                        "rule_type": "output_contract_violation",
+                        "detail": "candidate rejected by the output contract",
+                    }
+                )
+            context["reject_reason_codes"] = structured_codes
         grounding_fields, grounding_hash = self._grounding_metadata(node, contract, context)
         fallback = False
         if rejected and self._fallback_is_available(contract, node.node_id):
@@ -744,12 +1220,22 @@ class WorkflowRuntime:
                 raise WorkflowValidationError("fallback requires an authoritative snapshot")
             write_binding(
                 contract.fields["customer_message"].binding,
-                _deterministic_fallback(snapshot),
+                _deterministic_fallback(
+                    snapshot,
+                    _category_next_actions(context)
+                    if self.validator_version == CONSISTENCY_VALIDATOR_V1_2
+                    else None,
+                ),
                 context,
             )
             context["fallback_used"] = True
-            context["fallback_reason"] = self._candidate_rejection_reason(
-                reasons, consistency.get("overall") == "CONFLICT"
+            context["fallback_reason"] = (
+                context["reject_reason_codes"][0]["rule_type"]
+                if self.validator_version == CONSISTENCY_VALIDATOR_V1_2
+                and context.get("reject_reason_codes")
+                else self._candidate_rejection_reason(
+                    reasons, consistency.get("overall") == "CONFLICT"
+                )
             )
             fallback = True
 
