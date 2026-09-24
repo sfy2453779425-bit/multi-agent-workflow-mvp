@@ -53,3 +53,5 @@ Claude 正式采集中断与续跑：run_claude_cli.py --formal 于 2026-09-24T1
 ## GPT CLI output-limit observation
 
 - All 18 formal Codex CLI records reported that `model_max_output_tokens` was ignored. The configured 1,024-token ceiling therefore was not enforceable through this CLI setting. The largest observed GPT output was 77 tokens; no formal GPT output exceeded 1,024 tokens, and all calls completed. No calls were repeated or altered because of this observation.
+
+- cli_raw 原始 CLI 文件在数据提交后补交，哈希见 SHA256SUMS_cli_raw；与 calls.jsonl 中的 raw_response_hash 一致（Claude 已核对 18/18）。

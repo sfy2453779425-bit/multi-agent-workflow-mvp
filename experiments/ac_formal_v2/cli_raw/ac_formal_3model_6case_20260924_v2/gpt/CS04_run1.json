@@ -1,0 +1,134 @@
+{
+  "experiment_id": "ac_formal_3model_6case_20260924_v2",
+  "experiment_status": "FORMAL",
+  "case_id": "CS04",
+  "case_type": "Priority Conflict",
+  "run_id": 1,
+  "schedule_index": 17,
+  "schedule_seed": 20260924,
+  "provider": "gpt",
+  "call_path": "codex_cli_exec",
+  "runner_version": "codex-cli-runner-v1",
+  "cli_version": "codex-cli 0.155.0-alpha.16.4",
+  "model_requested": "gpt-6-astra",
+  "provider_config_version": "codex-cli-gpt6-isolated-v1",
+  "model_returned": "not_available_cli",
+  "response_id": "not_available_cli",
+  "thread_id": "01a0d466-95a3-7cb0-93ff-3b17f3c5146c",
+  "prompt_text_hash": "496106832b2ac4edc7417a57583503807e2837d98963b8806a7598d2e4802032",
+  "case_hash": "58c98c59b5dc9d70c1a39d3da3c078222a990e7dd767c59272c38b6893cfd3c0",
+  "fixture_hash": "2a1f5b649d45e280eb997b655f4b7b4630951b589046631929ec3b0f6c43e7d8",
+  "policy_hash": "b90ecb8d3c2cc50dc9929f3b7b0a567b3f25e12ac30d650e15e42bc8b0ac515d",
+  "timestamp_start_utc": "2026-09-24T17:11:27.325Z",
+  "timestamp_end_utc": "2026-09-24T17:11:34.447Z",
+  "latency_ms": 7122,
+  "finish_reason": "completed",
+  "usage": {
+    "input_tokens": 11777,
+    "cached_input_tokens": 0,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 70,
+    "reasoning_output_tokens": 0
+  },
+  "raw_response": "{\"type\":\"thread.started\",\"thread_id\":\"01a0d466-95a3-7cb0-93ff-3b17f3c5146c\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"error\",\"message\":\"Codex is ignoring 1 unrecognized configuration setting. Check for typos or deprecated settings.\\n  user (C:\\\\Users\\\\lain\\\\AppData\\\\Local\\\\Temp\\\\acv2_codex_g15k1cr8\\\\codex_home\\\\config.toml): `model_max_output_tokens` is ignored.\"}}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_1\",\"type\":\"error\",\"message\":\"Codex is ignoring 1 unrecognized configuration setting. Check for typos or deprecated settings.\\n  user (C:\\\\Users\\\\lain\\\\AppData\\\\Local\\\\Temp\\\\acv2_codex_g15k1cr8\\\\codex_home\\\\config.toml): `model_max_output_tokens` is ignored.\"}}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_2\",\"type\":\"agent_message\",\"text\":\"{\\\"customer_message\\\":\\\"Your delayed package is assigned to Logistics Support with priority P1 and an SLA of 4 hours. Please provide your order number and current tracking status so we can check the delivery. If it is delayed beyond the promised window, we will open a logistics investigation ticket and follow up with a delivery status update.\\\"}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":11777,\"cached_input_tokens\":0,\"cache_write_input_tokens\":0,\"output_tokens\":70,\"reasoning_output_tokens\":0}}\n",
+  "raw_response_hash": "afc765ad3de413e0f94ba6d68de96bdc0f459e95062282e59a08c06b14782eef",
+  "raw_text": "{\"customer_message\":\"Your delayed package is assigned to Logistics Support with priority P1 and an SLA of 4 hours. Please provide your order number and current tracking status so we can check the delivery. If it is delayed beyond the promised window, we will open a logistics investigation ticket and follow up with a delivery status update.\"}",
+  "raw_text_hash": "616b5890082076e2b6ba301281b4d58d05031ac1bbcf542bec7eb71bc22c84b3",
+  "parse_status": "CLI_OUTPUT_PRESENT",
+  "parse_errors": [],
+  "events": [
+    {
+      "type": "thread.started",
+      "thread_id": "01a0d466-95a3-7cb0-93ff-3b17f3c5146c"
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item_0",
+        "type": "error",
+        "message": "Codex is ignoring 1 unrecognized configuration setting. Check for typos or deprecated settings.\n  user (C:\\Users\\lain\\AppData\\Local\\Temp\\acv2_codex_g15k1cr8\\codex_home\\config.toml): `model_max_output_tokens` is ignored."
+      }
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item_1",
+        "type": "error",
+        "message": "Codex is ignoring 1 unrecognized configuration setting. Check for typos or deprecated settings.\n  user (C:\\Users\\lain\\AppData\\Local\\Temp\\acv2_codex_g15k1cr8\\codex_home\\config.toml): `model_max_output_tokens` is ignored."
+      }
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item_2",
+        "type": "agent_message",
+        "text": "{\"customer_message\":\"Your delayed package is assigned to Logistics Support with priority P1 and an SLA of 4 hours. Please provide your order number and current tracking status so we can check the delivery. If it is delayed beyond the promised window, we will open a logistics investigation ticket and follow up with a delivery status update.\"}"
+      }
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 11777,
+        "cached_input_tokens": 0,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 70,
+        "reasoning_output_tokens": 0
+      }
+    }
+  ],
+  "cli_exit_code": 0,
+  "attempts": [
+    {
+      "attempt_no": 1,
+      "exit_code": 0,
+      "timed_out": false,
+      "retryable_transport_error": false,
+      "error_message": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"C:\\\\Users\\\\lain\\\\AppData\\\\Local\\\\Temp\\\\\" (codex_home: AbsolutePathBuf(\"C:\\\\Users\\\\lain\\\\AppData\\\\Local\\\\Temp\\\\acv2_codex_g15k1cr8\\\\codex_home\"))\n",
+      "raw_stdout": "{\"type\":\"thread.started\",\"thread_id\":\"01a0d466-95a3-7cb0-93ff-3b17f3c5146c\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_0\",\"type\":\"error\",\"message\":\"Codex is ignoring 1 unrecognized configuration setting. Check for typos or deprecated settings.\\n  user (C:\\\\Users\\\\lain\\\\AppData\\\\Local\\\\Temp\\\\acv2_codex_g15k1cr8\\\\codex_home\\\\config.toml): `model_max_output_tokens` is ignored.\"}}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_1\",\"type\":\"error\",\"message\":\"Codex is ignoring 1 unrecognized configuration setting. Check for typos or deprecated settings.\\n  user (C:\\\\Users\\\\lain\\\\AppData\\\\Local\\\\Temp\\\\acv2_codex_g15k1cr8\\\\codex_home\\\\config.toml): `model_max_output_tokens` is ignored.\"}}\n{\"type\":\"turn.started\"}\n{\"type\":\"item.completed\",\"item\":{\"id\":\"item_2\",\"type\":\"agent_message\",\"text\":\"{\\\"customer_message\\\":\\\"Your delayed package is assigned to Logistics Support with priority P1 and an SLA of 4 hours. Please provide your order number and current tracking status so we can check the delivery. If it is delayed beyond the promised window, we will open a logistics investigation ticket and follow up with a delivery status update.\\\"}\"}}\n{\"type\":\"turn.completed\",\"usage\":{\"input_tokens\":11777,\"cached_input_tokens\":0,\"cache_write_input_tokens\":0,\"output_tokens\":70,\"reasoning_output_tokens\":0}}\n",
+      "raw_stdout_hash": "afc765ad3de413e0f94ba6d68de96bdc0f459e95062282e59a08c06b14782eef",
+      "parse_status": "CLI_OUTPUT_PRESENT"
+    }
+  ],
+  "transport_failure": false,
+  "cli_command": [
+    "C:\\Users\\lain\\AppData\\Local\\OpenAI\\Codex\\bin\\13995fba801849b0\\codex.EXE",
+    "--no-daemon",
+    "--ask-for-approval",
+    "never",
+    "exec",
+    "--model",
+    "gpt-6-astra",
+    "--sandbox",
+    "read-only",
+    "--ephemeral",
+    "--skip-git-repo-check",
+    "--ignore-rules",
+    "--json",
+    "--cd",
+    "C:\\Users\\lain\\AppData\\Local\\Temp\\acv2_codex_g15k1cr8\\empty_workdir",
+    "-"
+  ],
+  "isolation": {
+    "fresh_process": true,
+    "fresh_empty_workdir": true,
+    "fresh_codex_home": true,
+    "empty_default_instructions_override": false,
+    "system_instructions": "codex_cli_default_unmodified",
+    "sandbox": "read-only",
+    "shell_tool": false,
+    "web_search": false,
+    "mcp_config": "absent"
+  },
+  "reasoning_effort": "low",
+  "max_output_tokens": 1024,
+  "sampling_parameters": "not_set_provider_default",
+  "temperature": "not_set_provider_default",
+  "top_p": "not_set_provider_default",
+  "seed": "not_set_provider_default",
+  "provider_adapter_version": "codex-cli-runner-v1",
+  "fatal_cli_error": false,
+  "git_commit": "dcbe80442be1621bf1f3924e8f1884cdcb3d97f1"
+}
