@@ -172,6 +172,14 @@ ROUND3_RESPONSE_DEADLINE_REJECT = (
     "We'll follow up about your refund within 30 minutes.",
 )
 
+ROUND3_EXPLICIT_SLA_WITH_PROCESS_CONTEXT = (
+    "The delivery ticket has a 4-hour SLA while tracking is reviewed.",
+    "This shipment case carries a four-hour service-level target.",
+    "The parcel inquiry remains under an SLA of 4 hours during transit checks.",
+    "Our delivery request has a service level of four hours.",
+    "The package issue is tracked against a 4-hour SLA despite the carrier delay.",
+)
+
 
 class RuntimeV12Test(unittest.TestCase):
     def run_version(
@@ -580,6 +588,17 @@ class RuntimeV12Test(unittest.TestCase):
                 self.assertTrue(result.context["fallback_used"])
                 self.assertEqual(
                     "CONFLICT",
+                    result.context["consistency_results"]["response_generation"]["sla"]["status"],
+                )
+
+    def test_round3_explicit_sla_is_not_misclassified_as_other_process_duration(self):
+        self.assertGreaterEqual(len(ROUND3_EXPLICIT_SLA_WITH_PROCESS_CONTEXT), 5)
+        for message in ROUND3_EXPLICIT_SLA_WITH_PROCESS_CONTEXT:
+            with self.subTest(message=message):
+                result = self.run_v12(message)
+                self.assertFalse(result.context["fallback_used"])
+                self.assertEqual(
+                    "PASS",
                     result.context["consistency_results"]["response_generation"]["sla"]["status"],
                 )
 
