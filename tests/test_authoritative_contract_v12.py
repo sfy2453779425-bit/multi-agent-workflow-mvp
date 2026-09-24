@@ -115,6 +115,63 @@ MUST_ACCEPT = (
     ("Because P2 is not active, the file remains at P1.", {}),
 )
 
+ROUND3_ATTRIBUTED_FULFILLMENT_REJECT = (
+    ("priority", "The customer's message asked for P2, and that level was approved.", {}),
+    ("priority", "You wanted P2, so I've updated it.", {}),
+    ("priority", "Your email requested P3. That level was selected.", {}),
+    ("priority", "The customer asked for P4; we approved that classification.", {}),
+    ("priority", "You asked for P3. We switched the active level.", {}),
+    ("owner_team", "You asked for Billing Support, and we've taken care of that.", {}),
+    ("owner_team", "The customer requested Account Support. We routed the case there.", {}),
+    ("owner_team", "Your message wanted Technical Support; that group now owns the case.", {}),
+    ("owner_team", "The email asked for Billing Support, so we moved the case to that queue.", {}),
+    ("sla", "You requested a response after two days; we set that interval.", {}),
+    ("sla", "Your note asked for six hours. We now guarantee that timing.", {}),
+    ("sla", "The customer wanted a one-day reply, and we changed the target.", {}),
+    ("sla", "Your message requested 30 minutes, then we approved that window.", {}),
+    ("sla", "The email sought three days for a response; that schedule is now in place.", {}),
+)
+
+ROUND3_NEGATED_FULFILLMENT_SAFE = (
+    "You asked for P2, but we're unable to change the priority entry.",
+    "Your email requested Billing Support; we cannot route the case there.",
+    "The note asked for a one-day response, but we won't change the service target.",
+    "You wanted P3. That adjustment wasn't approved.",
+    "The customer asked for Account Support, though we haven't moved ownership.",
+)
+
+ROUND3_AUTHORITATIVE_RESTATEMENT_SAFE = (
+    "You asked to label this P2, but the active priority remains P1.",
+    "Your message requested Billing Support; Logistics Support remains responsible.",
+    "You sought a one-day turnaround, but our response target is four hours.",
+    "Your email asked for Technical Support; the case stays with Logistics Support.",
+    "The customer requested P4, but we confirmed that P1 remains active.",
+)
+
+ROUND3_OTHER_OBJECT_SAFE = (
+    "You requested P2, and we added your comment to the case file.",
+    "The customer asked for Billing Support; we approved the attached invoice.",
+    "Your message requested P3. We updated the spreadsheet for audit purposes.",
+    "You wanted a two-day response, and we sorted the shipment photographs.",
+    "The note asked for Technical Support; we completed the carrier summary.",
+)
+
+ROUND3_OTHER_PROCESS_DURATION_SAFE = (
+    "The card refund usually appears in five business days.",
+    "A bank deposit can take two days to post.",
+    "Reimbursement funds may reach the account within 48 hours.",
+    "The returned payment should clear after three business days.",
+    "Bank processing for a charge reversal can last six hours.",
+)
+
+ROUND3_RESPONSE_DEADLINE_REJECT = (
+    "We'll reply about the refund within one business day.",
+    "Our agent will respond about the bank deposit in three hours.",
+    "We will get back to you about the reimbursement within two days.",
+    "A support response regarding the card credit should reach you after six hours.",
+    "We'll follow up about your refund within 30 minutes.",
+)
+
 
 class RuntimeV12Test(unittest.TestCase):
     def run_version(
@@ -458,6 +515,73 @@ class RuntimeV12Test(unittest.TestCase):
         )
         self.assertEqual("authoritative-contract-v1.2", generation_trace.data["runtime_version"])
         self.assertEqual(CONSISTENCY_VALIDATOR_V1_2, generation_trace.data["validator_version"])
+
+    def test_round3_restores_two_replaced_regression_samples(self):
+        reject = self.run_v12(
+            "The customer's message asked for P2, and that level was approved."
+        )
+        self.assertTrue(reject.context["fallback_used"])
+        self.assertEqual(
+            "CONFLICT",
+            reject.context["consistency_results"]["response_generation"]["priority"]["status"],
+        )
+
+        accept = self.run_v12("A one-day reply is not the promised interval.")
+        self.assertFalse(accept.context["fallback_used"])
+        self.assertEqual("A one-day reply is not the promised interval.", accept.context["customer_message"])
+
+    def test_round3_attributed_values_followed_by_fulfillment_are_conflicts(self):
+        self.assertGreaterEqual(len(ROUND3_ATTRIBUTED_FULFILLMENT_REJECT), 5)
+        for field, message, kwargs in ROUND3_ATTRIBUTED_FULFILLMENT_REJECT:
+            with self.subTest(field=field, message=message):
+                result = self.run_v12(message, **kwargs)
+                self.assertTrue(result.context["fallback_used"])
+                self.assertEqual(
+                    "CONFLICT",
+                    result.context["consistency_results"]["response_generation"][field]["status"],
+                )
+
+    def test_round3_negated_followthrough_does_not_cancel_attribution_exemption(self):
+        self.assertGreaterEqual(len(ROUND3_NEGATED_FULFILLMENT_SAFE), 5)
+        for message in ROUND3_NEGATED_FULFILLMENT_SAFE:
+            with self.subTest(message=message):
+                result = self.run_v12(message)
+                self.assertFalse(result.context["fallback_used"])
+
+    def test_round3_authoritative_restatement_preserves_attribution_exemption(self):
+        self.assertGreaterEqual(len(ROUND3_AUTHORITATIVE_RESTATEMENT_SAFE), 5)
+        for message in ROUND3_AUTHORITATIVE_RESTATEMENT_SAFE:
+            with self.subTest(message=message):
+                result = self.run_v12(message)
+                self.assertFalse(result.context["fallback_used"])
+
+    def test_round3_followthrough_about_a_different_object_preserves_attribution(self):
+        self.assertGreaterEqual(len(ROUND3_OTHER_OBJECT_SAFE), 5)
+        for message in ROUND3_OTHER_OBJECT_SAFE:
+            with self.subTest(message=message):
+                result = self.run_v12(message)
+                self.assertFalse(result.context["fallback_used"])
+
+    def test_round3_refund_and_bank_processing_durations_are_not_sla_claims(self):
+        safe_messages = ROUND3_OTHER_PROCESS_DURATION_SAFE + (
+            "A one-day reply is not the promised interval.",
+        )
+        self.assertGreaterEqual(len(safe_messages), 5)
+        for message in safe_messages:
+            with self.subTest(message=message):
+                result = self.run_v12(message)
+                self.assertFalse(result.context["fallback_used"])
+
+    def test_round3_reply_deadlines_about_financial_processes_remain_sla_claims(self):
+        self.assertGreaterEqual(len(ROUND3_RESPONSE_DEADLINE_REJECT), 5)
+        for message in ROUND3_RESPONSE_DEADLINE_REJECT:
+            with self.subTest(message=message):
+                result = self.run_v12(message)
+                self.assertTrue(result.context["fallback_used"])
+                self.assertEqual(
+                    "CONFLICT",
+                    result.context["consistency_results"]["response_generation"]["sla"]["status"],
+                )
 
 
 if __name__ == "__main__":
