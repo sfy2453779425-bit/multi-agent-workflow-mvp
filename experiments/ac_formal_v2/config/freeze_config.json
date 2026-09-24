@@ -14,7 +14,7 @@
   "schedule_seed": 20260924,
   "models": {
     "deepseek": "deepseek-v4-pro",
-    "gpt": "gpt-5.6",
+    "gpt": "gpt-6-astra",
     "claude": "claude-opus-5-5"
   },
   "provider": {
@@ -28,20 +28,40 @@
       "sampling_parameters": "not_set_provider_default"
     },
     "gpt": {
-      "api_format": "responses",
-      "model": "gpt-5.6",
-      "reasoning_effort": "none",
+      "api_format": "codex_cli_exec",
+      "call_path": "codex_cli_exec",
+      "provider_config_version": "codex-cli-gpt6-isolated-v1",
+      "model": "gpt-6-astra",
+      "reasoning_effort": "low",
       "max_output_tokens": 1024,
       "sampling_parameters": "not_set_provider_default",
-      "credential_env": "OPENAI_API_KEY"
+      "fresh_session_per_call": true,
+      "sandbox": "read-only",
+      "model_instructions": "codex_cli_default_unmodified",
+      "neutral_override_probe": {
+        "accepted": true,
+        "default_instruction_probe_input_tokens": 11533,
+        "neutral_instruction_probe_input_tokens": 7405,
+        "input_token_reduction_percent": 35.8,
+        "adopted": false,
+        "decision_threshold": "at least 50% input-token reduction",
+        "decision": "retain_codex_cli_default_instructions"
+      },
+      "additional_context_note": "Default-instruction probe used approximately 11.5k total input tokens; Codex did not expose an instruction-only token count.",
+      "tools": "disabled"
     },
     "claude": {
-      "api_format": "messages",
+      "api_format": "claude_code_cli",
+      "call_path": "claude_code_cli_print",
+      "provider_config_version": "claude-code-cli-v1",
       "model": "claude-opus-5-5",
-      "max_tokens": 1024,
+      "max_tokens": "not_enforceable_cli",
+      "output_token_reference": 1024,
+      "output_tokens_over_reference_logged": true,
+      "max_tokens_note": "Claude Code CLI has no effective output-token limit; outputs above the 1024-token reference are flagged, not truncated.",
       "extended_thinking": "not_enabled",
       "sampling_parameters": "not_set_provider_default",
-      "credential_env": "ANTHROPIC_API_KEY"
+      "fresh_session_per_call": true
     }
   },
   "runtime_version": "authoritative-contract-v1.1",

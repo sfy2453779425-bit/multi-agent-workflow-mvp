@@ -1,13 +1,13 @@
 {
   "experiment_id": "ac_formal_3model_6case_20260924_v2",
-  "status": "PREPARED_SMOKE_PENDING",
+  "status": "READY_FOR_COLLECTION_FREEZE",
   "created_from_commit": "487a761b76147c5158215529b3c3d5ba18fd81d7",
   "worktree_dirty": true,
   "case_count": 6,
   "model_count": 3,
   "runs_per_case_model": 3,
   "planned_calls": 54,
-  "schedule_hash": "f4c4ceeea0922bb2b32e1582708f09a4289a5ecda052ac9e0b3e08bd7f8c4e50",
+  "schedule_hash": "d6cbabb155038ae27dd0aad190e45d9a9df57afd3b31236dd077d4263442ce6c",
   "policy_hash": "b90ecb8d3c2cc50dc9929f3b7b0a567b3f25e12ac30d650e15e42bc8b0ac515d",
   "workflow_hash": "dce3974f7d10407f80baea16771d5a0db48bb9b012796598177ac90f4f5d65b0",
   "source_hashes": {
@@ -20,12 +20,16 @@
     "prompt_and_runtime_helper": "cf88cd894ad3da360812f4873edae3fba55890b2decb19fc88454a96df2ad90e"
   },
   "tool_hashes": {
-    "experiments/ac_formal_v2/common.py": "4291ec44ae5b95979bb3a8b6c833d6900538b6d1b6c3715bfba9b310c87152bd",
-    "experiments/ac_formal_v2/collect.py": "e9ae5459c8c874b6413de0277cadc5438f5ac6347573453d29a0df891b76d201",
+    "experiments/ac_formal_v2/common.py": "ef1523a6e5f2592f47ec0b44d03a2656040d8006bf859385d6cf5546079757d8",
+    "experiments/ac_formal_v2/collect.py": "9e69b1237c1dcefd91f8de47c473e91e38017c5ea490350b24afb02f60ce21d8",
     "experiments/ac_formal_v2/replay.py": "4be687e13864397c22beca5dbf582a19eefc0c088c7e5a2bc43d1467a37c3325",
     "experiments/ac_formal_v2/tests/test_tools.py": "1754088294780121a611c872db32df537b88f25303593135032d5883f1e34bde",
-    "experiments/ac_formal_v2/README.md": "21e6b9fdd4e7a7a0015cf682c91162c7ec1bf38f853b2d6b60bc7085569af319",
-    "experiments/ac_formal_v2/DEVIATIONS.md": "a433a7827576b5b3d79be363e7a3e45868810bd1968d9f57cefdc3bb03a4faa9"
+    "experiments/ac_formal_v2/tests/test_cli_tools.py": "2e915eadddddffb93a3f77d609b9f1c80217a6b53d5716a15fc0d36d9593c886",
+    "experiments/ac_formal_v2/cli_gpt/run_gpt_cli.py": "67f34d99eceecb9108b70221f85129e21ebca0e41d1fb511c6673dd52c97b95d",
+    "experiments/ac_formal_v2/import_cli.py": "d4bf38f23bb7f025405c9a89a1731cd7ace1526cf6ab1a79043d85caf137d341",
+    "experiments/ac_formal_v2/cli_claude/run_claude_cli.py": "db77656da9323584944e71bc6767006bfd89b6fb74ba677eddf28ef5effac577",
+    "experiments/ac_formal_v2/README.md": "ad477a3208d7196dee00d1b28a47103abe739cb56f3ff6bfb14fc4ec9cca035b",
+    "experiments/ac_formal_v2/DEVIATIONS.md": "4dcd9525e7b4999b549819a518b7ff0969d4f7ea6bfcae4948c7fe4167a7faf9"
   },
   "input_hashes": {
     "cases": "c121feb04118968b0755ac67aa21defb29eeb419bd3ba65bb62a455be102e07d",
@@ -46,8 +50,8 @@
     "experiments/ac_formal_v2/frozen/prompts/CS12.json": "5d8606c60a017c0fb872f4ad72fe2c1426506c0a10dc8ebc2153acb39a4893ab",
     "experiments/ac_formal_v2/frozen/support_policy.json": "3af8fec18df7121497982365e3d899433b9c4e91832381c08a239a39cbf59660",
     "experiments/ac_formal_v2/frozen/workflow_v1.json": "dce3974f7d10407f80baea16771d5a0db48bb9b012796598177ac90f4f5d65b0",
-    "experiments/ac_formal_v2/config/freeze_config.json": "37703f8d5f1316ac912c48ea68b567801bb69a8d2184067f76bbc75a30938280",
-    "experiments/ac_formal_v2/config/schedule.json": "b2090f114039c00af8b0c36cc3c84b5b412758d19f786d7a23419f8a133a2585"
+    "experiments/ac_formal_v2/config/freeze_config.json": "cb06d0255e733e340953799eeab24b5ee83e0a5ecb84c0d0b21fb52981b99915",
+    "experiments/ac_formal_v2/config/schedule.json": "a322ef5191b09d33bed6eb7c7bbc2ea3a6e6e9bd9272b13671354f991e5dc090"
   },
   "prompt_builder_version": "customer-message-prompt-v2",
   "prompt_builder_hash": "dbcded4fa0098d71d1ce9459d1379e0b457ad5cb2c7134518103daaaf5349e56",

@@ -18,6 +18,7 @@ from urllib.request import Request, urlopen
 from experiments.ac_formal_v2.common import (
     BASE,
     CASE_IDS,
+    assert_collection_freeze_tag,
     EXPERIMENT_ID,
     PROVIDERS,
     ROOT,
@@ -50,9 +51,9 @@ from agent_builder.responses_provider import (
 )
 
 
-GPT_MODEL = "gpt-5.6"
+GPT_MODEL = "gpt-6-astra"
 CLAUDE_MODEL = "claude-opus-5-5"
-GPT_REASONING = "none"
+GPT_REASONING = "low"
 GPT_MAX_OUTPUT = 1024
 CLAUDE_MAX_OUTPUT = 1024
 HTTP_TIMEOUT = 120
@@ -671,12 +672,33 @@ def _collect_formal() -> list[dict[str, Any]]:
     return results
 
 
+def _collect_deepseek_only_formal() -> list[dict[str, Any]]:
+    assert_collection_freeze_tag()
+    manifest = load_json(BASE / "manifest.json")
+    assert_frozen_source_hashes(manifest)
+    schedule = load_json(BASE / "config" / "schedule.json")["calls"]
+    rows = sorted((row for row in schedule if row["provider"] == "deepseek"), key=lambda row: row["schedule_index"])
+    if len(rows) != 18 or len(CASE_IDS) != 6:
+        raise RuntimeError("FREEZE_VIOLATION: expected 18 DeepSeek rows for six frozen cases")
+    if not os.environ.get("DEEPSEEK_API_KEY"):
+        raise RuntimeError("FORMAL_COLLECTION_BLOCKED: DEEPSEEK_API_KEY is not set")
+    raw_dir = BASE / "raw" / EXPERIMENT_ID
+    deepseek_log = raw_dir / "calls_deepseek.jsonl"
+    if deepseek_log.exists() and deepseek_log.stat().st_size:
+        raise RuntimeError("DeepSeek formal artifact already exists; refusing to overwrite or retry")
+    results = _run_worker("deepseek", rows, False, Event())
+    if len(results) != len(rows):
+        raise RuntimeError(f"DeepSeek collection stopped after {len(results)} of {len(rows)} scheduled calls")
+    return results
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--prepare", action="store_true")
     group.add_argument("--smoke", action="store_true")
     group.add_argument("--formal", action="store_true")
+    group.add_argument("--deepseek-only-formal", action="store_true")
     args = parser.parse_args()
     if args.prepare:
         try:
@@ -687,23 +709,13 @@ def main() -> int:
         print(json.dumps({"prepared": True, "planned_calls": len(result["schedule"]), "schedule_hash": result["manifest"]["schedule_hash"]}))
         return 0
     if args.smoke:
-        if not (BASE / "manifest.json").exists():
-            print("NOT_PREPARED")
-            return 2
-        try:
-            from experiments.ac_formal_v2.common import assert_frozen_source_hashes
-            assert_frozen_source_hashes(load_json(BASE / "manifest.json"))
-            results = _collect_smoke()
-            print(json.dumps([
-                {"provider": item["provider"], "model_returned": item.get("model_returned"), "finish_reason": item.get("finish_reason"), "parse_status": item.get("parse_status"), "nonempty": bool(item.get("raw_text")), "transport_failure": item.get("transport_failure"), "experiment_notes": item.get("experiment_notes")}
-                for item in results
-            ], ensure_ascii=False))
-            return 0
-        except Exception as exc:
-            print(redact_secret_text(str(exc)))
-            return 2
+        print("LEGACY_SMOKE_DISABLED: use the isolated GPT probe; prior 401 artifacts are preserved")
+        return 2
+    if args.formal:
+        print("LEGACY_FORMAL_DISABLED: GPT and Claude formal calls must use their independent CLI runners")
+        return 2
     try:
-        results = _collect_formal()
+        results = _collect_deepseek_only_formal() if args.deepseek_only_formal else prepare_frozen()
     except Exception as exc:
         print(redact_secret_text(str(exc)))
         return 2
