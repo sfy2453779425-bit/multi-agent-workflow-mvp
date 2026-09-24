@@ -45,3 +45,11 @@ No files under `experiments/authoritative_contract/main/` or the invalidated `au
 - Probe: one isolated `gpt-6-astra` call on `Reply with the single word OK.` with reasoning effort `low`; no formal case was used.
 - A one-line `model_instructions_file` containing `Follow the user's instructions.` was accepted. The probe reported 7,405 input tokens, compared with 11,533 in the preceding default-instruction probe, a 35.8% reduction. Because this did not meet the predeclared 50% reduction threshold, the collection keeps the default Codex instructions.
 - The approximately 11.5k value is total input tokens for the default-instruction probe; an instruction-only token count was unavailable. The probe artifact is retained under the ignored `cli_raw/_probe/` directory and is not part of the freeze commit.
+
+## Claude formal collection interruption and resume
+
+Claude 正式采集中断与续跑：run_claude_cli.py --formal 于 2026-09-24T16:44:30Z 开始，完成 13/18 次（schedule #02–#39）后被操作者中断，属于工具调用中断，与内容无关。中断时没有产生不完整文件，已完成的 13 次都有输出文件和日志，sha256 一致。2026-09-24T17:01:01Z 用 cli_claude/resume_claude_cli.py 续跑剩余 5 次（#42、#48、#50、#52、#53）。该脚本直接调用冻结版 runner 的函数，冻结检查照常执行，没有重跑或覆盖任何已完成的调用。18 次全部成功，没有超过 1024 输出 token 的调用。
+
+## GPT CLI output-limit observation
+
+- All 18 formal Codex CLI records reported that `model_max_output_tokens` was ignored. The configured 1,024-token ceiling therefore was not enforceable through this CLI setting. The largest observed GPT output was 77 tokens; no formal GPT output exceeded 1,024 tokens, and all calls completed. No calls were repeated or altered because of this observation.

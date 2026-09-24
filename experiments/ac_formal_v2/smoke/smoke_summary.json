@@ -1,0 +1,33 @@
+{
+  "experiment_id": "ac_formal_3model_6case_20260924_v2",
+  "experiment_status": "SMOKE",
+  "case_id": "SMOKE01",
+  "calls": 3,
+  "providers_skipped": [],
+  "results": [
+    {
+      "provider": "deepseek",
+      "model_returned": "deepseek-v4-pro",
+      "finish_reason": "completed",
+      "parse_status": "PARSE_OK",
+      "transport_failure": false,
+      "experiment_notes": null
+    },
+    {
+      "provider": "gpt",
+      "model_returned": null,
+      "finish_reason": 401,
+      "parse_status": "PARSE_FAILED",
+      "transport_failure": false,
+      "experiment_notes": "HTTP 401"
+    },
+    {
+      "provider": "claude",
+      "model_returned": null,
+      "finish_reason": null,
+      "parse_status": "PARSE_FAILED",
+      "transport_failure": false,
+      "experiment_notes": "HTTP 401"
+    }
+  ]
+}
