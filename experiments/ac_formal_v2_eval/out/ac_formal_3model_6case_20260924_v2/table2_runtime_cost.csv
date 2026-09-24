@@ -1,0 +1,14 @@
+﻿model,view,final_field_conflict,final_text_conflict,no_usable_output,fallback_rate,intercept,leak,false_reject,normal_pass,parse_failure_fallback,false_reject_rate
+DeepSeek,C,0/18,9/18,0/18,N/A,,,,,,
+DeepSeek,O,0/18,9/18,0/18,N/A,,,,,,
+DeepSeek,D,0/18,0/18,18/18,50.0%,9,0,0,9,0,0.0% (0/9)
+DeepSeek,F,0,0,0,100%,,,,,,
+GPT,C,0/18,0/18,0/18,N/A,,,,,,
+GPT,O,0/18,0/18,0/18,N/A,,,,,,
+GPT,D,0/18,0/18,18/18,0.0%,0,0,0,18,0,0.0% (0/18)
+GPT,F,0,0,0,100%,,,,,,
+Claude,C,0/18,3/18,0/18,N/A,,,,,,
+Claude,O,0/18,3/18,0/18,N/A,,,,,,
+Claude,D,0/18,0/18,18/18,50.0%,3,0,6,9,0,40.0% (6/15)
+Claude,F,0,0,0,100%,,,,,,
+ALL,D,0/54,0/54,54/54,33.3%,12,0,6,36,0,14.3% (6/42)

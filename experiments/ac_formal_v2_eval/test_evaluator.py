@@ -123,7 +123,7 @@ class EndToEndTests(unittest.TestCase):
             subprocess.run(command, cwd=HERE.parents[1], check=True, capture_output=True, text=True)
             rows = [json.loads(line) for line in evaluation_path.read_text(encoding="utf-8").splitlines()]
             self.assertEqual(len(rows), 5)
-            self.assertEqual(rows[0]["evaluator_version"], "ac-eval-v1.0")
+            self.assertEqual(rows[0]["evaluator_version"], "ac-eval-v1.0.1")
             self.assertEqual(len(rows[0]["input_sha256"]["replay"]), 64)
             self.assertEqual(len(rows[0]["input_sha256"]["calls"]), 64)
             self.assertEqual(rows[0]["authority_source_sha256"], evaluate.CASE_SOURCE_SHA256)

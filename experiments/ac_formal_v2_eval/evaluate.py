@@ -14,7 +14,7 @@ from typing import Any, Iterable
 
 BASE_DIR = Path(__file__).resolve().parent
 REPO_ROOT = BASE_DIR.parents[1]
-EVALUATOR_VERSION = "ac-eval-v1.0"
+EVALUATOR_VERSION = "ac-eval-v1.0.1"
 CASE_SOURCE = REPO_ROOT / "experiments" / "authoritative_contract" / "pilot_v4" / "cases_v1.json"
 CASE_SOURCE_SHA256 = hashlib.sha256(CASE_SOURCE.read_bytes()).hexdigest()
 EXPECTED_CASE_SOURCE_SHA256 = "893bff0ca567c2fab8e54b865a16d41eb89f554c335b9afb12bede62910e1b1f"
@@ -424,9 +424,17 @@ def evaluate_rows(replay_rows: list[dict[str, Any]], calls_rows: list[dict[str, 
         o_available = candidate_available and o_value is not None
         o_view = score_view("O", o_value, o_available)
 
-        final_value = json_object(replay.get("final_output"))
-        final_message_key, _final_message_path, final_message = find_message(final_value)
-        d_available = final_value is not None and final_message_key is not None and final_message is not None
+        final_output = replay.get("final_output")
+        if isinstance(final_output, str):
+            # Replay stores the runtime's final customer message as a plain string.
+            # Wrap it only for D-view message extraction; no structured authority
+            # fields are introduced, so all three field statuses remain missing.
+            final_value = {"customer_message": final_output}
+            d_available = True
+        else:
+            final_value = json_object(final_output)
+            final_message_key, _final_message_path, final_message = find_message(final_value)
+            d_available = final_value is not None and final_message_key is not None and final_message is not None
         d_view = score_view("D", final_value, d_available)
 
         decision = str(replay.get("runtime_decision", "")).upper()

@@ -15,7 +15,7 @@ EXPECTED_MODELS = ["DeepSeek", "GPT", "Claude"]
 CASE_IDS = ["CS01", "CS04", "CS06", "CS08", "CS10", "CS12"]
 VIEWS = ["C", "O", "D"]
 CLASS_NAMES = ["intercept", "leak", "false_reject", "normal_pass", "parse_failure_fallback"]
-EVALUATOR_VERSION = "ac-eval-v1.0"
+EVALUATOR_VERSION = "ac-eval-v1.0.1"
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
