@@ -1,0 +1,133 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "evaluation_version": "evaluation-v2",
+  "human_eval_random_seed": 20260917,
+  "selected_run": 1,
+  "selected_cases": [
+    "customer_support_01",
+    "customer_support_05",
+    "outfit_01",
+    "outfit_02",
+    "presentation_01",
+    "presentation_02"
+  ],
+  "blind_mapping": {
+    "customer_support_01": {
+      "A": "chatgpt",
+      "B": "builder"
+    },
+    "customer_support_05": {
+      "A": "builder",
+      "B": "chatgpt"
+    },
+    "outfit_01": {
+      "A": "builder",
+      "B": "chatgpt"
+    },
+    "outfit_02": {
+      "A": "chatgpt",
+      "B": "builder"
+    },
+    "presentation_01": {
+      "A": "chatgpt",
+      "B": "builder"
+    },
+    "presentation_02": {
+      "A": "chatgpt",
+      "B": "builder"
+    }
+  },
+  "cases": {
+    "customer_support_01": {
+      "run": 1,
+      "label_to_system": {
+        "A": "chatgpt",
+        "B": "builder"
+      },
+      "original_response_sha256": {
+        "A": "4ed9870bc4f54f81122bf96b1f2c154f62f97b8992d6cce408e4d2ba28e5302a",
+        "B": "b457cd35f3007e96275c870009a48e9c4020ca4369d833adb7d414d85448fe69"
+      },
+      "blind_response_sha256": {
+        "A": "4ed9870bc4f54f81122bf96b1f2c154f62f97b8992d6cce408e4d2ba28e5302a",
+        "B": "b457cd35f3007e96275c870009a48e9c4020ca4369d833adb7d414d85448fe69"
+      }
+    },
+    "customer_support_05": {
+      "run": 1,
+      "label_to_system": {
+        "A": "builder",
+        "B": "chatgpt"
+      },
+      "original_response_sha256": {
+        "A": "b457cd35f3007e96275c870009a48e9c4020ca4369d833adb7d414d85448fe69",
+        "B": "08123a6433afa5b6111f16dc8165140006bbacb24721893a12483ed3d74ac484"
+      },
+      "blind_response_sha256": {
+        "A": "b457cd35f3007e96275c870009a48e9c4020ca4369d833adb7d414d85448fe69",
+        "B": "08123a6433afa5b6111f16dc8165140006bbacb24721893a12483ed3d74ac484"
+      }
+    },
+    "outfit_01": {
+      "run": 1,
+      "label_to_system": {
+        "A": "builder",
+        "B": "chatgpt"
+      },
+      "original_response_sha256": {
+        "A": "2f5c35e39603e3faa232afc93da5178eb6d194ed8e2364ebccb4e6ef54f7e0c0",
+        "B": "980ba7af6092185d89a7a9c0c3ccee1044385c25766ad6719bbeba7de3e96f3a"
+      },
+      "blind_response_sha256": {
+        "A": "2f5c35e39603e3faa232afc93da5178eb6d194ed8e2364ebccb4e6ef54f7e0c0",
+        "B": "980ba7af6092185d89a7a9c0c3ccee1044385c25766ad6719bbeba7de3e96f3a"
+      }
+    },
+    "outfit_02": {
+      "run": 1,
+      "label_to_system": {
+        "A": "chatgpt",
+        "B": "builder"
+      },
+      "original_response_sha256": {
+        "A": "fbb7e7c32510b182de3b41fac8aa8f4cb0e10b51698042e4cfa91916b407f5cf",
+        "B": "a7d92458fcb81bab6b4f3c4142ca5fade8fba676581277eb4328006720868b51"
+      },
+      "blind_response_sha256": {
+        "A": "fbb7e7c32510b182de3b41fac8aa8f4cb0e10b51698042e4cfa91916b407f5cf",
+        "B": "a7d92458fcb81bab6b4f3c4142ca5fade8fba676581277eb4328006720868b51"
+      }
+    },
+    "presentation_01": {
+      "run": 1,
+      "label_to_system": {
+        "A": "chatgpt",
+        "B": "builder"
+      },
+      "original_response_sha256": {
+        "A": "e24b56cd089aee63a1d9e741afd8b6c4f1aa210ca85ef8e9dc40fc69b1637831",
+        "B": "c338da3423942196e69846b15b620f90e60df5d7f3ac39e38f6e737d4e3b2764"
+      },
+      "blind_response_sha256": {
+        "A": "ad56dc54e5ff374b1b22e00e9dcd7ed6238e1ea205a73206f3e4d668f303f992",
+        "B": "e3779dfdbcf6b95014538f7a0eb30948b92e04897b315b3c17256344752a0e83"
+      }
+    },
+    "presentation_02": {
+      "run": 1,
+      "label_to_system": {
+        "A": "chatgpt",
+        "B": "builder"
+      },
+      "original_response_sha256": {
+        "A": "94aeb463331149fca0ecb79766d8a2febad29b84bff666182d9f82aa6d4a0e2f",
+        "B": "ce683644d698e8705fd4dc980ea45ed2bee4642d7524c1c92157d5c38f9b95b6"
+      },
+      "blind_response_sha256": {
+        "A": "8465d3a2dd5ae06842fba839ae1f6803ca5d5238d5595d291d29f575a115e39a",
+        "B": "5f59aa528d17698b23d2208b0c4d7300e4b5bac073b2ba2d9112c0a3e445b7f9"
+      }
+    }
+  },
+  "note": "Organizer-only file. Do not distribute to evaluators."
+}

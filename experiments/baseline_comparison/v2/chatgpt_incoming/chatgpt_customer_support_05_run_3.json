@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "case_id": "customer_support_05",
+  "fixture_version": "customer-support-2026-09-16-v2-mixed-precedence",
+  "prompt_version": "prompt-v1",
+  "run": 3,
+  "provider": "ChatGPT",
+  "model_name": "GPT-5.6 Sol",
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "timestamp": "2026-09-17T00:24:07.7437073+09:00",
+  "prompt_file": "prompts/chatgpt/customer_support_05.md",
+  "prompt_sha256": "8e050c2633a484914b4a3fd157a35a5be9ade3f90873ed6e61e42b6a5da39931",
+  "response": "{\n  \"category\": \"delivery\",\n  \"owner_team\": \"Logistics Support\",\n  \"priority\": \"P2\",\n  \"sla\": \"1 business day\",\n  \"policy_application\": \"Mixed intent detected: delivery delay and refund request. Per the specified precedence, delivery takes priority. Apply the delivery policy first: check tracking status and determine whether the parcel is delayed beyond the promised window. Refund eligibility cannot be determined from the supplied information and should not be assumed.\",\n  \"next_actions\": [\n    \"Confirm order number and tracking status.\",\n    \"Open a logistics investigation ticket.\",\n    \"Send customer a delivery status response.\"\n  ],\n  \"missing_information\": [\n    \"Order number.\",\n    \"Current tracking status.\",\n    \"Promised delivery window and whether it has been exceeded.\",\n    \"Information needed to determine refund eligibility and payment status.\"\n  ]\n}",
+  "run_id": "chatgpt_customer_support_05_3"
+}

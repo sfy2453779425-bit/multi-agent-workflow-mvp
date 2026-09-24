@@ -1,0 +1,25 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "Builder",
+  "case_id": "customer_support_01",
+  "run": 2,
+  "source_file": "builder_runs/customer_support_01/run_2.json",
+  "response_sha256": "b457cd35f3007e96275c870009a48e9c4020ca4369d833adb7d414d85448fe69",
+  "evaluation": {
+    "case_id": "customer_support_01",
+    "required_fields_present": true,
+    "required_fields_missing": [],
+    "context_usage": true,
+    "constraint_satisfaction": true,
+    "completeness": true,
+    "unsupported_fact_flags": [],
+    "human_evaluation_status": "pending",
+    "parsed": {
+      "category": "delivery",
+      "route": "Logistics Support",
+      "priority": "P2",
+      "sla": "1 business day"
+    },
+    "ground_truth_correctness": true
+  }
+}

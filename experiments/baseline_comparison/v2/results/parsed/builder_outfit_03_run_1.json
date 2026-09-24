@@ -1,0 +1,20 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "Builder",
+  "case_id": "outfit_03",
+  "run": 1,
+  "source_file": "builder_runs/outfit_03/run_1.json",
+  "response_sha256": "9ed6a8a1e67c7f541fa542310db60a8c5ee5f0ecfa85637d8c26499d094fd5c8",
+  "parsed": {
+    "selected_items": [
+      "B001",
+      "B002",
+      "B003",
+      "B004"
+    ],
+    "unknown_inventory_ids": [],
+    "unsupplied_recommendations": [],
+    "rain_unsafe_inventory_ids": [],
+    "weather_used": true
+  }
+}

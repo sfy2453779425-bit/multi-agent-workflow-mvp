@@ -1,0 +1,22 @@
+{
+  "experiment_id": "baseline_pilot_20260916_010827",
+  "system": "Builder",
+  "case_id": "outfit_01",
+  "run": 2,
+  "source_file": "builder_runs/outfit_01/run_2.json",
+  "response_sha256": "0b645f091c5b31e9afaefbd5d0ee22df64cb188a3cf03cbfb48267835f54628e",
+  "parsed": {
+    "selected_items": [
+      "A001",
+      "A002",
+      "A003",
+      "A006"
+    ],
+    "unknown_inventory_ids": [],
+    "unsupplied_recommendations": [
+      "explicit_additional_recommendation"
+    ],
+    "rain_unsafe_inventory_ids": [],
+    "weather_used": true
+  }
+}

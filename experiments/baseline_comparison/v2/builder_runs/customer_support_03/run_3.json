@@ -1,0 +1,874 @@
+{
+  "run_id": "builder_customer_support_03_3",
+  "experiment_id": "builder_v2_pilot_20260916",
+  "builder_version": "builder-v2",
+  "case_id": "customer_support_03",
+  "run": 3,
+  "system": "Builder",
+  "timestamp": "2026-09-16T13:19:31.469611+00:00",
+  "finished_at": "2026-09-16T13:19:31.476697+00:00",
+  "input": {
+    "query": "Customer cannot login because the account is locked and needs a password reset.",
+    "user_id": "user_a"
+  },
+  "fixture_version": "customer-support-2026-09-16-v2-account",
+  "fixture_sha256": "83a6225518b919e292a47d4f5a81d95d7d4fd2d3ad38eb3b8b8095b3b1451861",
+  "prompt_version": "prompt-v1",
+  "workflow_json": {
+    "schema_version": 1,
+    "workflow_id": "customer_support_ticket_workflow_v1",
+    "workflow_name": "Customer Support Ticket Workflow",
+    "description": "A builder template for classifying a customer support request, selecting a policy and routing the ticket to the right team.",
+    "runtime_type": "customer_support",
+    "base_agent_config": null,
+    "data_file": "support_policy.json",
+    "data_dir": null,
+    "default_query": "Customer says the delivery is late and asks whether the order can be refunded.",
+    "default_user_id": "user_a",
+    "agents": [
+      {
+        "id": "request_parser",
+        "name": "Support Request Parser Node",
+        "role": "Extract issue keywords, customer intent and available ticket context.",
+        "builder_equivalent": "Start Node + Parser/Prompt Node"
+      },
+      {
+        "id": "question",
+        "name": "Support Question Node",
+        "role": "Ask for missing issue details before routing the ticket.",
+        "builder_equivalent": "Condition Node + User Input Node"
+      },
+      {
+        "id": "ticket_classification",
+        "name": "Ticket Classification Node",
+        "role": "Classify the ticket category by matching local policy keywords.",
+        "builder_equivalent": "Classifier Node"
+      },
+      {
+        "id": "policy_lookup",
+        "name": "Policy Lookup Node",
+        "role": "Load the local support policy for the matched ticket category.",
+        "builder_equivalent": "Local Knowledge / RAG Node"
+      },
+      {
+        "id": "routing_decision",
+        "name": "Routing Decision Node",
+        "role": "Decide ticket owner, priority and next actions from classification and policy.",
+        "builder_equivalent": "Rule/LLM Decision Node"
+      },
+      {
+        "id": "compose",
+        "name": "Support Compose Node",
+        "role": "Render the ticket summary, routing decision and response draft.",
+        "builder_equivalent": "Output Template Node"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "request_parser",
+        "type": "support_request_parser",
+        "name": "Support Request Parser Node",
+        "role": "Extract issue keywords, customer intent and available ticket context.",
+        "builder_equivalent": "Start Node + Parser/Prompt Node",
+        "inputs": {
+          "user_message": "context.query",
+          "user_id": "context.user_id"
+        },
+        "outputs": {
+          "issue_text": "context.issue_text",
+          "intent": "context.intent"
+        },
+        "required_inputs": [
+          "user_message",
+          "user_id"
+        ],
+        "config": {}
+      },
+      {
+        "id": "question",
+        "type": "support_question",
+        "name": "Support Question Node",
+        "role": "Ask for missing issue details before routing the ticket.",
+        "builder_equivalent": "Condition Node + User Input Node",
+        "inputs": {
+          "issue_text": "context.issue_text"
+        },
+        "outputs": {
+          "missing_fields": "context.missing_fields",
+          "needs_clarification": "context.needs_clarification",
+          "next_question_field": "context.next_question_field",
+          "clarification_message": "context.clarification_message"
+        },
+        "required_inputs": [
+          "issue_text"
+        ],
+        "config": {}
+      },
+      {
+        "id": "ticket_classification",
+        "type": "ticket_classification",
+        "name": "Ticket Classification Node",
+        "role": "Classify the ticket category by matching local policy keywords.",
+        "builder_equivalent": "Classifier Node",
+        "inputs": {
+          "issue_text": "context.issue_text"
+        },
+        "outputs": {
+          "ticket_category_record": "context.ticket_category_record",
+          "ticket_category": "context.ticket_category",
+          "ticket_category_id": "context.ticket_category_id",
+          "matched_keywords": "context.matched_keywords",
+          "priority_candidate": "context.priority_candidate"
+        },
+        "required_inputs": [
+          "issue_text"
+        ],
+        "config": {}
+      },
+      {
+        "id": "policy_lookup",
+        "type": "policy_lookup",
+        "name": "Policy Lookup Node",
+        "role": "Load the local support policy for the matched ticket category.",
+        "builder_equivalent": "Local Knowledge / RAG Node",
+        "inputs": {
+          "category": "context.ticket_category_record"
+        },
+        "outputs": {
+          "policy": "context.policy",
+          "sla": "context.sla",
+          "owner_team": "context.owner_team"
+        },
+        "required_inputs": [
+          "category"
+        ],
+        "config": {}
+      },
+      {
+        "id": "routing_decision",
+        "type": "routing_decision",
+        "name": "Routing Decision Node",
+        "role": "Decide ticket owner, priority and next actions from classification and policy.",
+        "builder_equivalent": "Rule/LLM Decision Node",
+        "inputs": {
+          "category": "context.ticket_category_record",
+          "policy": "context.policy"
+        },
+        "outputs": {
+          "priority": "context.priority",
+          "next_actions": "context.next_actions"
+        },
+        "required_inputs": [
+          "category",
+          "policy"
+        ],
+        "config": {}
+      },
+      {
+        "id": "compose",
+        "type": "support_compose",
+        "name": "Support Compose Node",
+        "role": "Render the ticket summary, routing decision and response draft.",
+        "builder_equivalent": "Output Template Node",
+        "inputs": {
+          "owner_team": "context.owner_team",
+          "priority": "context.priority",
+          "next_actions": "context.next_actions",
+          "policy": "context.policy"
+        },
+        "outputs": {
+          "final_answer": "context.final_answer",
+          "summary_cards": "context.summary_cards"
+        },
+        "required_inputs": [
+          "owner_team",
+          "priority",
+          "next_actions",
+          "policy"
+        ],
+        "config": {}
+      }
+    ],
+    "execution": {
+      "type": "sequential",
+      "order": [
+        "request_parser",
+        "question",
+        "ticket_classification",
+        "policy_lookup",
+        "routing_decision",
+        "compose"
+      ],
+      "generated_by": "TemplateWorkflowBuilder"
+    },
+    "question_agent": {
+      "required_fields": [
+        "issue_text"
+      ],
+      "clarification_questions": {
+        "issue_text": "Please describe the customer issue before routing the ticket."
+      }
+    },
+    "experiment_mode": {
+      "type": "frozen_fixture",
+      "fixture_version": "customer-support-2026-09-16-v2-account",
+      "fixture_sha256": "83a6225518b919e292a47d4f5a81d95d7d4fd2d3ad38eb3b8b8095b3b1451861"
+    }
+  },
+  "workflow_sha256": "c51dd6664b2187fc2cbf923e1c06935fd51ac8194a3afcdb321df349443020dd",
+  "final_result": {
+    "answer": "[Customer Support Ticket Workflow]\nCategory: Account / Login\nIntent: account_access\nOwner team: Account Support\nPriority: P3 / SLA: 2 business days\n\nPolicy basis:\nVerify customer identity before changing account information or unlocking access.\n\nNext actions\n1. Ask for identity verification.\n2. Check account lock status.\n3. Provide password reset or unlock instructions.\n\nResponse draft: We have classified the issue and routed it to Account Support for follow-up.",
+    "context": {
+      "query": "Customer cannot login because the account is locked and needs a password reset.",
+      "user_id": "user_a",
+      "runtime_type": "customer_support",
+      "workflow_name": "Customer Support Ticket Workflow",
+      "executed_agents": [
+        "request_parser",
+        "question",
+        "ticket_classification",
+        "policy_lookup",
+        "routing_decision",
+        "compose"
+      ],
+      "executed_tools": [
+        "support_policy"
+      ],
+      "issue_text": "Customer cannot login because the account is locked and needs a password reset.",
+      "intent": "account_access",
+      "missing_fields": [],
+      "needs_clarification": false,
+      "next_question_field": "",
+      "clarification_message": "",
+      "ticket_category_record": {
+        "id": "account",
+        "label": "Account / Login",
+        "keywords": [
+          "account",
+          "login",
+          "password",
+          "email",
+          "verification",
+          "locked"
+        ],
+        "owner_team": "Account Support",
+        "priority": "P3",
+        "sla": "2 business days",
+        "policy": "Verify customer identity before changing account information or unlocking access.",
+        "next_actions": [
+          "Ask for identity verification.",
+          "Check account lock status.",
+          "Provide password reset or unlock instructions."
+        ]
+      },
+      "ticket_category": "Account / Login",
+      "ticket_category_id": "account",
+      "matched_keywords": [
+        "account",
+        "login",
+        "password",
+        "locked"
+      ],
+      "priority_candidate": "P3",
+      "policy": "Verify customer identity before changing account information or unlocking access.",
+      "sla": "2 business days",
+      "owner_team": "Account Support",
+      "priority": "P3",
+      "next_actions": [
+        "Ask for identity verification.",
+        "Check account lock status.",
+        "Provide password reset or unlock instructions."
+      ],
+      "final_answer": "[Customer Support Ticket Workflow]\nCategory: Account / Login\nIntent: account_access\nOwner team: Account Support\nPriority: P3 / SLA: 2 business days\n\nPolicy basis:\nVerify customer identity before changing account information or unlocking access.\n\nNext actions\n1. Ask for identity verification.\n2. Check account lock status.\n3. Provide password reset or unlock instructions.\n\nResponse draft: We have classified the issue and routed it to Account Support for follow-up.",
+      "summary_cards": [
+        {
+          "title": "Ticket Classification",
+          "rows": [
+            {
+              "label": "Category",
+              "value": "Account / Login"
+            },
+            {
+              "label": "Intent",
+              "value": "account_access"
+            }
+          ]
+        },
+        {
+          "title": "Routing Decision",
+          "rows": [
+            {
+              "label": "Owner",
+              "value": "Account Support"
+            },
+            {
+              "label": "Priority",
+              "value": "P3"
+            },
+            {
+              "label": "SLA",
+              "value": "2 business days"
+            }
+          ]
+        },
+        {
+          "title": "Next Actions",
+          "rows": [
+            {
+              "label": "1",
+              "value": "Ask for identity verification."
+            },
+            {
+              "label": "2",
+              "value": "Check account lock status."
+            },
+            {
+              "label": "3",
+              "value": "Provide password reset or unlock instructions."
+            }
+          ]
+        }
+      ],
+      "workflow_agents": [
+        {
+          "id": "request_parser",
+          "name": "Support Request Parser Node",
+          "role": "Extract issue keywords, customer intent and available ticket context.",
+          "builder_equivalent": "Start Node + Parser/Prompt Node"
+        },
+        {
+          "id": "question",
+          "name": "Support Question Node",
+          "role": "Ask for missing issue details before routing the ticket.",
+          "builder_equivalent": "Condition Node + User Input Node"
+        },
+        {
+          "id": "ticket_classification",
+          "name": "Ticket Classification Node",
+          "role": "Classify the ticket category by matching local policy keywords.",
+          "builder_equivalent": "Classifier Node"
+        },
+        {
+          "id": "policy_lookup",
+          "name": "Policy Lookup Node",
+          "role": "Load the local support policy for the matched ticket category.",
+          "builder_equivalent": "Local Knowledge / RAG Node"
+        },
+        {
+          "id": "routing_decision",
+          "name": "Routing Decision Node",
+          "role": "Decide ticket owner, priority and next actions from classification and policy.",
+          "builder_equivalent": "Rule/LLM Decision Node"
+        },
+        {
+          "id": "compose",
+          "name": "Support Compose Node",
+          "role": "Render the ticket summary, routing decision and response draft.",
+          "builder_equivalent": "Output Template Node"
+        }
+      ],
+      "workflow_nodes": [
+        {
+          "id": "request_parser",
+          "type": "support_request_parser",
+          "name": "Support Request Parser Node",
+          "role": "Extract issue keywords, customer intent and available ticket context.",
+          "builder_equivalent": "Start Node + Parser/Prompt Node",
+          "inputs": {
+            "user_message": "context.query",
+            "user_id": "context.user_id"
+          },
+          "outputs": {
+            "issue_text": "context.issue_text",
+            "intent": "context.intent"
+          },
+          "required_inputs": [
+            "user_message",
+            "user_id"
+          ],
+          "config": {}
+        },
+        {
+          "id": "question",
+          "type": "support_question",
+          "name": "Support Question Node",
+          "role": "Ask for missing issue details before routing the ticket.",
+          "builder_equivalent": "Condition Node + User Input Node",
+          "inputs": {
+            "issue_text": "context.issue_text"
+          },
+          "outputs": {
+            "missing_fields": "context.missing_fields",
+            "needs_clarification": "context.needs_clarification",
+            "next_question_field": "context.next_question_field",
+            "clarification_message": "context.clarification_message"
+          },
+          "required_inputs": [
+            "issue_text"
+          ],
+          "config": {}
+        },
+        {
+          "id": "ticket_classification",
+          "type": "ticket_classification",
+          "name": "Ticket Classification Node",
+          "role": "Classify the ticket category by matching local policy keywords.",
+          "builder_equivalent": "Classifier Node",
+          "inputs": {
+            "issue_text": "context.issue_text"
+          },
+          "outputs": {
+            "ticket_category_record": "context.ticket_category_record",
+            "ticket_category": "context.ticket_category",
+            "ticket_category_id": "context.ticket_category_id",
+            "matched_keywords": "context.matched_keywords",
+            "priority_candidate": "context.priority_candidate"
+          },
+          "required_inputs": [
+            "issue_text"
+          ],
+          "config": {}
+        },
+        {
+          "id": "policy_lookup",
+          "type": "policy_lookup",
+          "name": "Policy Lookup Node",
+          "role": "Load the local support policy for the matched ticket category.",
+          "builder_equivalent": "Local Knowledge / RAG Node",
+          "inputs": {
+            "category": "context.ticket_category_record"
+          },
+          "outputs": {
+            "policy": "context.policy",
+            "sla": "context.sla",
+            "owner_team": "context.owner_team"
+          },
+          "required_inputs": [
+            "category"
+          ],
+          "config": {}
+        },
+        {
+          "id": "routing_decision",
+          "type": "routing_decision",
+          "name": "Routing Decision Node",
+          "role": "Decide ticket owner, priority and next actions from classification and policy.",
+          "builder_equivalent": "Rule/LLM Decision Node",
+          "inputs": {
+            "category": "context.ticket_category_record",
+            "policy": "context.policy"
+          },
+          "outputs": {
+            "priority": "context.priority",
+            "next_actions": "context.next_actions"
+          },
+          "required_inputs": [
+            "category",
+            "policy"
+          ],
+          "config": {}
+        },
+        {
+          "id": "compose",
+          "type": "support_compose",
+          "name": "Support Compose Node",
+          "role": "Render the ticket summary, routing decision and response draft.",
+          "builder_equivalent": "Output Template Node",
+          "inputs": {
+            "owner_team": "context.owner_team",
+            "priority": "context.priority",
+            "next_actions": "context.next_actions",
+            "policy": "context.policy"
+          },
+          "outputs": {
+            "final_answer": "context.final_answer",
+            "summary_cards": "context.summary_cards"
+          },
+          "required_inputs": [
+            "owner_team",
+            "priority",
+            "next_actions",
+            "policy"
+          ],
+          "config": {}
+        }
+      ],
+      "workflow_execution": {
+        "type": "sequential",
+        "order": [
+          "request_parser",
+          "question",
+          "ticket_classification",
+          "policy_lookup",
+          "routing_decision",
+          "compose"
+        ],
+        "generated_by": "TemplateWorkflowBuilder"
+      }
+    }
+  },
+  "full_trace": [
+    {
+      "name": "Support Request Parser Node",
+      "detail": "support intent=account_access",
+      "data": {
+        "issue_text": "Customer cannot login because the account is locked and needs a password reset.",
+        "intent": "account_access"
+      },
+      "node_id": "request_parser",
+      "node_type": "support_request_parser",
+      "status": "SUCCESS",
+      "started_at": "2026-09-16T13:19:31.474655+00:00",
+      "finished_at": "2026-09-16T13:19:31.474689+00:00",
+      "duration_ms": 0.025,
+      "input": {
+        "user_message": "Customer cannot login because the account is locked and needs a password reset.",
+        "user_id": "user_a"
+      },
+      "output": {
+        "issue_text": "Customer cannot login because the account is locked and needs a password reset.",
+        "intent": "account_access"
+      },
+      "error": null
+    },
+    {
+      "name": "Support Question Node",
+      "detail": "ticket context is complete",
+      "data": {
+        "missing_fields": [],
+        "needs_clarification": false,
+        "next_question_field": "",
+        "clarification_message": ""
+      },
+      "node_id": "question",
+      "node_type": "support_question",
+      "status": "SUCCESS",
+      "started_at": "2026-09-16T13:19:31.474713+00:00",
+      "finished_at": "2026-09-16T13:19:31.474726+00:00",
+      "duration_ms": 0.013,
+      "input": {
+        "issue_text": "Customer cannot login because the account is locked and needs a password reset."
+      },
+      "output": {
+        "missing_fields": [],
+        "needs_clarification": false,
+        "next_question_field": "",
+        "clarification_message": ""
+      },
+      "error": null
+    },
+    {
+      "name": "Ticket Classification Node",
+      "detail": "category=Account / Login, matched=account, login, password, locked",
+      "data": {
+        "category": "Account / Login",
+        "priority_candidate": "P3",
+        "matched_keywords": [
+          "account",
+          "login",
+          "password",
+          "locked"
+        ]
+      },
+      "node_id": "ticket_classification",
+      "node_type": "ticket_classification",
+      "status": "SUCCESS",
+      "started_at": "2026-09-16T13:19:31.474739+00:00",
+      "finished_at": "2026-09-16T13:19:31.475020+00:00",
+      "duration_ms": 0.283,
+      "input": {
+        "issue_text": "Customer cannot login because the account is locked and needs a password reset."
+      },
+      "output": {
+        "ticket_category_record": {
+          "id": "account",
+          "label": "Account / Login",
+          "keywords": [
+            "account",
+            "login",
+            "password",
+            "email",
+            "verification",
+            "locked"
+          ],
+          "owner_team": "Account Support",
+          "priority": "P3",
+          "sla": "2 business days",
+          "policy": "Verify customer identity before changing account information or unlocking access.",
+          "next_actions": [
+            "Ask for identity verification.",
+            "Check account lock status.",
+            "Provide password reset or unlock instructions."
+          ]
+        },
+        "ticket_category": "Account / Login",
+        "ticket_category_id": "account",
+        "matched_keywords": [
+          "account",
+          "login",
+          "password",
+          "locked"
+        ],
+        "priority_candidate": "P3"
+      },
+      "error": null
+    },
+    {
+      "name": "Policy Lookup Node",
+      "detail": "loaded policy for Account / Login",
+      "data": {
+        "policy": "Verify customer identity before changing account information or unlocking access.",
+        "sla": "2 business days",
+        "owner_team": "Account Support",
+        "source": "support_policy.json"
+      },
+      "node_id": "policy_lookup",
+      "node_type": "policy_lookup",
+      "status": "SUCCESS",
+      "started_at": "2026-09-16T13:19:31.475046+00:00",
+      "finished_at": "2026-09-16T13:19:31.475057+00:00",
+      "duration_ms": 0.011,
+      "input": {
+        "category": {
+          "id": "account",
+          "label": "Account / Login",
+          "keywords": [
+            "account",
+            "login",
+            "password",
+            "email",
+            "verification",
+            "locked"
+          ],
+          "owner_team": "Account Support",
+          "priority": "P3",
+          "sla": "2 business days",
+          "policy": "Verify customer identity before changing account information or unlocking access.",
+          "next_actions": [
+            "Ask for identity verification.",
+            "Check account lock status.",
+            "Provide password reset or unlock instructions."
+          ]
+        }
+      },
+      "output": {
+        "policy": "Verify customer identity before changing account information or unlocking access.",
+        "sla": "2 business days",
+        "owner_team": "Account Support"
+      },
+      "error": null
+    },
+    {
+      "name": "Routing Decision Node",
+      "detail": "route to Account Support with priority P3",
+      "data": {
+        "owner_team": "Account Support",
+        "policy": "Verify customer identity before changing account information or unlocking access.",
+        "priority": "P3",
+        "next_actions": [
+          "Ask for identity verification.",
+          "Check account lock status.",
+          "Provide password reset or unlock instructions."
+        ]
+      },
+      "node_id": "routing_decision",
+      "node_type": "routing_decision",
+      "status": "SUCCESS",
+      "started_at": "2026-09-16T13:19:31.475074+00:00",
+      "finished_at": "2026-09-16T13:19:31.475085+00:00",
+      "duration_ms": 0.011,
+      "input": {
+        "category": {
+          "id": "account",
+          "label": "Account / Login",
+          "keywords": [
+            "account",
+            "login",
+            "password",
+            "email",
+            "verification",
+            "locked"
+          ],
+          "owner_team": "Account Support",
+          "priority": "P3",
+          "sla": "2 business days",
+          "policy": "Verify customer identity before changing account information or unlocking access.",
+          "next_actions": [
+            "Ask for identity verification.",
+            "Check account lock status.",
+            "Provide password reset or unlock instructions."
+          ]
+        },
+        "policy": "Verify customer identity before changing account information or unlocking access."
+      },
+      "output": {
+        "priority": "P3",
+        "next_actions": [
+          "Ask for identity verification.",
+          "Check account lock status.",
+          "Provide password reset or unlock instructions."
+        ]
+      },
+      "error": null
+    },
+    {
+      "name": "Support Compose Node",
+      "detail": "support ticket response rendered",
+      "data": {
+        "summary_cards": [
+          {
+            "title": "Ticket Classification",
+            "rows": [
+              {
+                "label": "Category",
+                "value": "Account / Login"
+              },
+              {
+                "label": "Intent",
+                "value": "account_access"
+              }
+            ]
+          },
+          {
+            "title": "Routing Decision",
+            "rows": [
+              {
+                "label": "Owner",
+                "value": "Account Support"
+              },
+              {
+                "label": "Priority",
+                "value": "P3"
+              },
+              {
+                "label": "SLA",
+                "value": "2 business days"
+              }
+            ]
+          },
+          {
+            "title": "Next Actions",
+            "rows": [
+              {
+                "label": "1",
+                "value": "Ask for identity verification."
+              },
+              {
+                "label": "2",
+                "value": "Check account lock status."
+              },
+              {
+                "label": "3",
+                "value": "Provide password reset or unlock instructions."
+              }
+            ]
+          }
+        ]
+      },
+      "node_id": "compose",
+      "node_type": "support_compose",
+      "status": "SUCCESS",
+      "started_at": "2026-09-16T13:19:31.475102+00:00",
+      "finished_at": "2026-09-16T13:19:31.475125+00:00",
+      "duration_ms": 0.022,
+      "input": {
+        "owner_team": "Account Support",
+        "priority": "P3",
+        "next_actions": [
+          "Ask for identity verification.",
+          "Check account lock status.",
+          "Provide password reset or unlock instructions."
+        ],
+        "policy": "Verify customer identity before changing account information or unlocking access."
+      },
+      "output": {
+        "final_answer": "[Customer Support Ticket Workflow]\nCategory: Account / Login\nIntent: account_access\nOwner team: Account Support\nPriority: P3 / SLA: 2 business days\n\nPolicy basis:\nVerify customer identity before changing account information or unlocking access.\n\nNext actions\n1. Ask for identity verification.\n2. Check account lock status.\n3. Provide password reset or unlock instructions.\n\nResponse draft: We have classified the issue and routed it to Account Support for follow-up.",
+        "summary_cards": [
+          {
+            "title": "Ticket Classification",
+            "rows": [
+              {
+                "label": "Category",
+                "value": "Account / Login"
+              },
+              {
+                "label": "Intent",
+                "value": "account_access"
+              }
+            ]
+          },
+          {
+            "title": "Routing Decision",
+            "rows": [
+              {
+                "label": "Owner",
+                "value": "Account Support"
+              },
+              {
+                "label": "Priority",
+                "value": "P3"
+              },
+              {
+                "label": "SLA",
+                "value": "2 business days"
+              }
+            ]
+          },
+          {
+            "title": "Next Actions",
+            "rows": [
+              {
+                "label": "1",
+                "value": "Ask for identity verification."
+              },
+              {
+                "label": "2",
+                "value": "Check account lock status."
+              },
+              {
+                "label": "3",
+                "value": "Provide password reset or unlock instructions."
+              }
+            ]
+          }
+        ]
+      },
+      "error": null
+    }
+  ],
+  "duration_ms": 7.085,
+  "node_statuses": [
+    {
+      "node_id": "request_parser",
+      "node_type": "support_request_parser",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "question",
+      "node_type": "support_question",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "ticket_classification",
+      "node_type": "ticket_classification",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "policy_lookup",
+      "node_type": "policy_lookup",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "routing_decision",
+      "node_type": "routing_decision",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "compose",
+      "node_type": "support_compose",
+      "status": "SUCCESS"
+    }
+  ],
+  "errors": [],
+  "failure_mode": null
+}

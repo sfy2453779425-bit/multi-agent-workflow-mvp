@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "case_id": "outfit_01",
+  "fixture_version": "outfit-2026-09-16-v1",
+  "prompt_version": "prompt-v1",
+  "run": 3,
+  "provider": "ChatGPT",
+  "model_name": "GPT-5.6 Sol",
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "timestamp": "2026-09-17T00:28:51.0759488+09:00",
+  "prompt_file": "prompts/chatgpt/outfit_01.md",
+  "prompt_sha256": "81e6e0b7a3369a911d83c3cadf025045ef382bcf82f55a94a79c131bf90f89c4",
+  "response": "날씨 요약\n\n- 날씨: 흐림\n- 기온: 최저 10°C / 최고 21°C\n- 강수확률: 20%\n\n추천 보유 아이템 순위\n\n1. 라이트 그레이 바람막이 (A003)\n   - 가볍게 걸치기 좋고 비에도 대응 가능해서 일교차가 큰 여행 날씨에 가장 적합합니다.\n\n2. 블랙 후드티 (A001)\n   - 최저 10°C까지 내려가므로 아침·저녁 보온용으로 좋습니다. 캐주얼 스타일에도 잘 맞습니다.\n\n3. 네이비 조거 팬츠 (A002)\n   - 중간 정도 보온성과 캐주얼·스트릿 스타일이라 여행 중 편하게 입기 좋습니다.\n\n4. 화이트 반팔 티셔츠 (A005)\n   - 낮 최고 21°C에는 단독으로 입거나 후드티·바람막이 안에 레이어드하기 좋습니다.\n\n5. 블랙 캔버스 스니커즈 (A006)\n   - 전체 코디와 잘 어울리는 캐주얼 신발입니다. 다만 비에는 적합하지 않으므로 강수 시 주의가 필요합니다.\n\n추천 조합\n\n화이트 반팔 티셔츠 + 블랙 후드티 + 라이트 그레이 바람막이 + 네이비 조거 팬츠 + 블랙 캔버스 스니커즈\n\n이유: 10~21°C로 일교차가 커서 여러 겹으로 입고 벗을 수 있는 구성이 가장 실용적입니다. 블랙 패딩(A004)은 보온성이 너무 높아 이번 기온에는 우선순위가 낮습니다.",
+  "run_id": "chatgpt_outfit_01_3"
+}

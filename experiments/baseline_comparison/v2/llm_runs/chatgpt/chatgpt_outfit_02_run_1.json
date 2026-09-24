@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "case_id": "outfit_02",
+  "fixture_version": "outfit-2026-09-16-v2-high-precipitation",
+  "prompt_version": "prompt-v1",
+  "run": 1,
+  "provider": "ChatGPT",
+  "model_name": "GPT-5.6 Sol",
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "timestamp": "2026-09-17T00:30:19.0220206+09:00",
+  "prompt_file": "prompts/chatgpt/outfit_02.md",
+  "prompt_sha256": "b292435426064654c8bb863f9983003f2006f2c189c2c77ad3b76a0104574648",
+  "response": "날씨 요약\n\n- 날씨: 비\n- 기온: 12~18°C\n- 강수확률: 80%\n\n추천 아이템 순위\n\n1. 라이트 그레이 바람막이 (A003)\n   - 비 오는 날 착용 가능(rain_ok: true)\n   - 가벼운 아우터라 12~18°C 날씨에 레이어드하기 좋음\n\n2. 블랙 후드티 (A001)\n   - 캐주얼 스타일이며 비 오는 날 착용 가능\n   - 중간 보온감이라 바람막이 안에 입기 적합\n\n3. 네이비 조거 팬츠 (A002)\n   - 비 오는 날 착용 가능\n   - 후드티·바람막이와 함께 편한 여행용 캐주얼 코디 구성 가능\n\n4. 화이트 반팔 티셔츠 (A005)\n   - 비 오는 날 착용 가능\n   - 기온이 올라가는 낮에는 후드티 안쪽 이너로 활용 가능\n\n추천 조합\n\n화이트 반팔 → 블랙 후드티 → 라이트 그레이 바람막이 + 네이비 조거 팬츠\n\n비가 올 확률이 **80%**이므로, 보유 옷 중 rain_ok: true인 아이템을 우선했습니다.\n\n다만 신발은 비 오는 날에 적합한 보유 아이템이 없습니다. 유일하게 제공된 **블랙 캔버스 스니커즈(A006)**는 rain_ok: false이므로 이번 조건에서는 추천 목록에서 제외합니다. 블랙 패딩(A004) 역시 rain_ok: false이고 보온감이 heavy라 제외했습니다.",
+  "run_id": "chatgpt_outfit_02_1"
+}

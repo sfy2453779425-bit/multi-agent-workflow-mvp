@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "case_id": "customer_support_03",
+  "fixture_version": "customer-support-2026-09-16-v2-account",
+  "prompt_version": "prompt-v1",
+  "run": 2,
+  "provider": "ChatGPT",
+  "model_name": "GPT-5.6 Sol",
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "timestamp": "2026-09-17T00:02:54.9530288+09:00",
+  "prompt_file": "prompts/chatgpt/customer_support_03.md",
+  "prompt_sha256": "461d37b24935604ba52853868f6f7cd442a9ef5f705437687cf55ec283e69c86",
+  "response": "Ticket classification: Account / Login (account)\nRouting decision: Account Support\nPriority: P3\nSLA: 2 business days\nPolicy application: Customer identity must be verified before changing account information, resetting access, or unlocking the account.\nNext actions:\n1. Ask for identity verification.\n2. Check the account lock status.\n3. After verification, provide password reset or account unlock instructions.",
+  "run_id": "chatgpt_customer_support_03_2"
+}

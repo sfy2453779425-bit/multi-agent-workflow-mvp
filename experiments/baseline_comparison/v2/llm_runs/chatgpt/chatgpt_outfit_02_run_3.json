@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "case_id": "outfit_02",
+  "fixture_version": "outfit-2026-09-16-v2-high-precipitation",
+  "prompt_version": "prompt-v1",
+  "run": 3,
+  "provider": "ChatGPT",
+  "model_name": "GPT-5.6 Sol",
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "timestamp": "2026-09-17T00:32:20.5107378+09:00",
+  "prompt_file": "prompts/chatgpt/outfit_02.md",
+  "prompt_sha256": "b292435426064654c8bb863f9983003f2006f2c189c2c77ad3b76a0104574648",
+  "response": "날씨 요약\n\n- 날씨: 비\n- 기온: 최저 12°C / 최고 18°C\n- 강수확률: 80%\n- 강수확률이 40% 이상이므로 제공된 옷 중 rain_ok: true인 아이템을 우선 선택했습니다.\n\n추천 순위\n\n| 순위 | 선택 아이템 | 이유 |\n|---|---|---|\n| 1 | A003 라이트 그레이 바람막이 | 비 오는 날 착용 가능(rain_ok: true)이고 가벼운 아우터라 여행용으로 활용하기 좋음 |\n| 2 | A001 블랙 후드티 | 중간 보온도이며 비 오는 날 착용 가능. 12~18°C 날씨에서 바람막이와 레이어드 가능 |\n| 3 | A002 네이비 조거 팬츠 | 중간 보온도이고 rain_ok: true. 캐주얼·스트릿 스타일로 상의와 조합 가능 |\n| 4 | A005 화이트 반팔 티셔츠 | rain_ok: true. 후드티 안에 레이어드하는 용도로 사용 가능 |\n\n추천 조합\n\n화이트 반팔 티셔츠 + 블랙 후드티 + 네이비 조거 팬츠 + 라이트 그레이 바람막이\n\n전체적으로 캐주얼하고, 12~18°C + 비 + 강수확률 80% 조건에서 보유 아이템 중 비에 대응 가능한 옷으로 구성한 조합입니다.\n\n다만 보유 신발은 **A006 블랙 캔버스 스니커즈만 제공되었고 rain_ok: false **이므로, 현재 데이터만으로는 비에 적합한 신발을 추천할 수 없습니다. A004 블랙 패딩도 rain_ok: false라 이번 조합에서는 제외했습니다.",
+  "run_id": "chatgpt_outfit_02_3"
+}

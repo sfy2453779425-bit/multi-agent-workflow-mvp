@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "case_id": "customer_support_04",
+  "fixture_version": "customer-support-2026-09-16-v2-technical",
+  "prompt_version": "prompt-v1",
+  "run": 3,
+  "provider": "ChatGPT",
+  "model_name": "GPT-5.6 Sol",
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "timestamp": "2026-09-17T00:07:18.0388090+09:00",
+  "prompt_file": "prompts/chatgpt/customer_support_04.md",
+  "prompt_sha256": "ae16d373c6e787239834cb6164ce6afd54c04e4221e3e358b86a472f396d2690",
+  "response": "{\n  \"category\": {\n    \"id\": \"technical\",\n    \"label\": \"Technical Issue\"\n  },\n  \"owner_team\": \"Technical Support\",\n  \"priority\": \"P2\",\n  \"sla\": \"1 business day\",\n  \"routing_decision\": \"Route to Technical Support for diagnosis after collecting the required troubleshooting information.\",\n  \"policy_application\": \"Apply the frozen technical-support policy: collect reproduction steps and device/application information, then route the issue to Technical Support. Include logs if available.\",\n  \"next_actions\": [\n    \"Collect reproduction steps, including what the user does immediately before the crash occurs.\",\n    \"Ask for device information and the mobile app version.\",\n    \"Collect relevant error details or logs if available.\",\n    \"Route the ticket to Technical Support for diagnosis.\"\n  ],\n  \"missing_information\": [\n    \"Reproduction steps are not provided.\",\n    \"Device information is not provided.\",\n    \"Mobile app version is not provided.\",\n    \"Error details or logs are not provided.\"\n  ]\n}",
+  "run_id": "chatgpt_customer_support_04_3"
+}

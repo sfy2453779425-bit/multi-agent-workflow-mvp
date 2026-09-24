@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "case_id": "customer_support_04",
+  "fixture_version": "customer-support-2026-09-16-v2-technical",
+  "prompt_version": "prompt-v1",
+  "run": 2,
+  "provider": "ChatGPT",
+  "model_name": "GPT-5.6 Sol",
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "timestamp": "2026-09-17T00:06:15.7609073+09:00",
+  "prompt_file": "prompts/chatgpt/customer_support_04.md",
+  "prompt_sha256": "ae16d373c6e787239834cb6164ce6afd54c04e4221e3e358b86a472f396d2690",
+  "response": "Ticket Classification\n\n- Category: Technical Issue (technical)\n- Owner Team / Route: Technical Support\n- Priority: P2\n- SLA: 1 business day\n\nPolicy Application\n\nThe issue matches the Technical Issue category because the mobile app crashes, shows an error, is not working, and the problem occurred after an update. Apply the frozen policy: collect reproduction steps and device information, then route the case to Technical Support for diagnosis.\n\nNext Actions\n\n1. Collect the exact steps that reproduce the crash.\n2. Ask for the customer's device information and mobile app version.\n3. Obtain relevant error details or logs if available.\n4. Route the ticket to Technical Support with the collected information.\n\nMissing information: reproduction steps, device details, app version, and any available error logs have not been supplied.",
+  "run_id": "chatgpt_customer_support_04_2"
+}

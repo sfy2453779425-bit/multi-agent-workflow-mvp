@@ -1,0 +1,10 @@
+system,case_id,run_count,status,structured_fields_match,compared_fields
+ChatGPT,outfit_01,0,pending_real_runs,,
+ChatGPT,presentation_01,0,pending_real_runs,,
+ChatGPT,customer_support_01,0,pending_real_runs,,
+Claude,outfit_01,0,pending_real_runs,,
+Claude,presentation_01,0,pending_real_runs,,
+Claude,customer_support_01,0,pending_real_runs,,
+Builder,outfit_01,3,available,True,selected_items;unknown_inventory_ids;unsupplied_recommendations;weather_used
+Builder,presentation_01,3,available,True,duration_minutes;knowledge_used;outline_sections
+Builder,customer_support_01,3,available,True,category;priority;route;sla

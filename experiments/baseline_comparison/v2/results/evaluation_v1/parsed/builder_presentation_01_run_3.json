@@ -1,0 +1,19 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "Builder",
+  "case_id": "presentation_01",
+  "run": 3,
+  "source_file": "builder_runs/presentation_01/run_3.json",
+  "response_sha256": "c338da3423942196e69846b15b620f90e60df5d7f3ac39e38f6e737d4e3b2764",
+  "parsed": {
+    "duration_minutes": 15,
+    "outline_sections": [
+      "opening",
+      "problem",
+      "architecture",
+      "multi-domain evidence",
+      "conclusion"
+    ],
+    "knowledge_used": true
+  }
+}

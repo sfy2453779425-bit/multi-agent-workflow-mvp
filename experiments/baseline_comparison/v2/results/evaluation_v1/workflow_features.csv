@@ -1,0 +1,13 @@
+system,feature,status,evidence
+ChatGPT,workflow_validation,not_available_in_this_experiment,No comparable workflow artifact was collected from this product run.
+ChatGPT,structured_execution,not_available_in_this_experiment,No comparable workflow artifact was collected from this product run.
+ChatGPT,node_level_trace,not_available_in_this_experiment,No comparable workflow artifact was collected from this product run.
+ChatGPT,failure_localization,not_available_in_this_experiment,No comparable workflow artifact was collected from this product run.
+ChatGPT,repeatability_recording,not_available_in_this_experiment,No comparable workflow artifact was collected from this product run.
+ChatGPT,configuration_reuse,not_available_in_this_experiment,No comparable workflow artifact was collected from this product run.
+Builder,workflow_validation,available,Generated Workflow JSON was accepted by the existing Runtime validation.
+Builder,structured_execution,available,30 Builder run records include declared node execution.
+Builder,node_level_trace,available,Normal records preserve six node-level trace entries.
+Builder,failure_localization,available,Controlled weather failure identifies the failed node and downstream skips.
+Builder,repeatability_recording,available,Three run records per frozen Case are stored for structured comparison.
+Builder,configuration_reuse,available,The reuse calculation compares generated outfit and commute configurations.

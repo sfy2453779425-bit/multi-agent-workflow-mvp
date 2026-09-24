@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "case_id": "customer_support_02",
+  "fixture_version": "customer-support-2026-09-16-v2-refund",
+  "prompt_version": "prompt-v1",
+  "run": 1,
+  "provider": "ChatGPT",
+  "model_name": "GPT-5.6 Sol",
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "timestamp": "2026-09-16T23:58:30.7270886+09:00",
+  "prompt_file": "prompts/chatgpt/customer_support_02.md",
+  "prompt_sha256": "b4fe1442b7fa86f86721f465453ec14b22b44e3f8da0a4cdbfc273786ad42377",
+  "response": "Ticket Classification\n\n| Field | Decision |\n|---|---|\n| Category | Refund / Return (refund) |\n| Owner Team | Billing Support |\n| Priority | P2 |\n| SLA | 1 business day |\n\nRouting Decision\n\nRoute to Billing Support if the refund criteria are met.\n\nPolicy Application\n\nThe customer reports being charged twice and requests a refund. Under the frozen refund policy, refund eligibility and payment transaction status must be verified before processing or routing the refund.\n\nNext Actions\n\n1. Check refund eligibility.\n2. Verify the payment transaction status, including the reported duplicate charge.\n3. Route to Billing Support if the refund criteria are met.\n\nMissing information: The supplied data does not include the order's refund eligibility, transaction records, or confirmation that both charges were successfully captured. Therefore, refund approval cannot be determined from the provided information alone.",
+  "run_id": "chatgpt_customer_support_02_1"
+}

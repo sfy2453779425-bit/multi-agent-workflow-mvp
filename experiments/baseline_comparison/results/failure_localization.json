@@ -1,0 +1,150 @@
+{
+  "case_id": "outfit_01",
+  "experiment": "failure_localization",
+  "failed_node": "weather",
+  "error": "weather service unavailable",
+  "trace": [
+    {
+      "name": "Request Parser Node",
+      "detail": "city=칭다오, date=다음 주, user=user_a",
+      "data": {
+        "workflow": "C:\\Users\\lain\\AppData\\Local\\Temp\\baseline_outfit_01_832gj45c\\workflow.json",
+        "base_config": "D:\\综合设计\\configs\\outfit_agent.json",
+        "intent": "outfit_recommendation",
+        "matched_keywords": [
+          "옷",
+          "추천"
+        ]
+      },
+      "node_id": "request_parser",
+      "node_type": "request_parser",
+      "status": "SUCCESS",
+      "started_at": "2026-09-16T13:38:43.126827+00:00",
+      "finished_at": "2026-09-16T13:38:43.126873+00:00",
+      "duration_ms": 0.037,
+      "input": {
+        "user_message": "다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘",
+        "user_id": "user_a"
+      },
+      "output": {
+        "query": "다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘",
+        "agent_name": "Personalized Outfit Agent",
+        "user_id": "user_a",
+        "city_display": "칭다오",
+        "city_query": "Qingdao",
+        "day_offset": 7,
+        "date_label": "다음 주",
+        "matched_keywords": [
+          "옷",
+          "추천"
+        ],
+        "executed_tools": []
+      },
+      "error": null
+    },
+    {
+      "name": "Question Node",
+      "detail": "purpose=여행, 여행, style=캐주얼, 캐주얼 → 정보 충분",
+      "data": {
+        "detected_purpose": [
+          "여행",
+          "여행"
+        ],
+        "detected_style": [
+          "캐주얼",
+          "캐주얼"
+        ],
+        "missing_fields": [],
+        "next_question_field": "",
+        "needs_clarification": false,
+        "clarification_message": ""
+      },
+      "node_id": "question",
+      "node_type": "question",
+      "status": "SUCCESS",
+      "started_at": "2026-09-16T13:38:43.126903+00:00",
+      "finished_at": "2026-09-16T13:38:43.126938+00:00",
+      "duration_ms": 0.035,
+      "input": {
+        "query": "다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘",
+        "city": "칭다오",
+        "date": "다음 주"
+      },
+      "output": {
+        "detected_purpose": [
+          "여행",
+          "여행"
+        ],
+        "detected_style": [
+          "캐주얼",
+          "캐주얼"
+        ],
+        "missing_fields": [],
+        "next_question_field": "",
+        "needs_clarification": false,
+        "clarification_message": ""
+      },
+      "error": null
+    },
+    {
+      "name": "Weather Tool Node",
+      "detail": "weather failed",
+      "data": {},
+      "node_id": "weather",
+      "node_type": "weather",
+      "status": "FAILED",
+      "started_at": "2026-09-16T13:38:43.126970+00:00",
+      "finished_at": "2026-09-16T13:38:43.126980+00:00",
+      "duration_ms": 0.012,
+      "input": {
+        "city_query": "Qingdao",
+        "day_offset": 7
+      },
+      "output": {},
+      "error": "weather service unavailable"
+    },
+    {
+      "name": "Shopping History Analysis Node",
+      "detail": "skipped after failure in weather",
+      "data": {},
+      "node_id": "shopping_analysis",
+      "node_type": "shopping_analysis",
+      "status": "SKIPPED",
+      "started_at": "2026-09-16T13:38:43.126992+00:00",
+      "finished_at": "2026-09-16T13:38:43.126992+00:00",
+      "duration_ms": 0.0,
+      "input": {},
+      "output": {},
+      "error": null
+    },
+    {
+      "name": "Recommendation Node",
+      "detail": "skipped after failure in weather",
+      "data": {},
+      "node_id": "recommendation",
+      "node_type": "recommendation",
+      "status": "SKIPPED",
+      "started_at": "2026-09-16T13:38:43.126999+00:00",
+      "finished_at": "2026-09-16T13:38:43.126999+00:00",
+      "duration_ms": 0.0,
+      "input": {},
+      "output": {},
+      "error": null
+    },
+    {
+      "name": "Compose Node",
+      "detail": "skipped after failure in weather",
+      "data": {},
+      "node_id": "compose",
+      "node_type": "compose",
+      "status": "SKIPPED",
+      "started_at": "2026-09-16T13:38:43.127005+00:00",
+      "finished_at": "2026-09-16T13:38:43.127005+00:00",
+      "duration_ms": 0.0,
+      "input": {},
+      "output": {},
+      "error": null
+    }
+  ],
+  "excluded_from_answer_quality": true
+}

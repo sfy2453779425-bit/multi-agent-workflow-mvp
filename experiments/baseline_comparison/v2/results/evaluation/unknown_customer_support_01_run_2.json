@@ -1,0 +1,25 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "ChatGPT",
+  "case_id": "customer_support_01",
+  "run": 2,
+  "source_file": "llm_runs/chatgpt/chatgpt_customer_support_01_run_2.json",
+  "response_sha256": "adf89b389236631e136f9a4ecef439c26d08aaa402d319a93ca3e46e32f3d1d8",
+  "evaluation": {
+    "case_id": "customer_support_01",
+    "required_fields_present": true,
+    "required_fields_missing": [],
+    "context_usage": true,
+    "constraint_satisfaction": true,
+    "completeness": true,
+    "unsupported_fact_flags": [],
+    "human_evaluation_status": "pending",
+    "parsed": {
+      "category": "delivery",
+      "route": "Logistics Support",
+      "priority": "P2",
+      "sla": "1 business day"
+    },
+    "ground_truth_correctness": true
+  }
+}

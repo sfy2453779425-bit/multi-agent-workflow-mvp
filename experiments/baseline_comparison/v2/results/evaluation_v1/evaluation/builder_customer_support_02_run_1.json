@@ -1,0 +1,25 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "Builder",
+  "case_id": "customer_support_02",
+  "run": 1,
+  "source_file": "builder_runs/customer_support_02/run_1.json",
+  "response_sha256": "33f185d20051e4b3477acfe94548f4a47f0acb579adf294a23c0a2e5c81045fe",
+  "evaluation": {
+    "case_id": "customer_support_02",
+    "required_fields_present": true,
+    "required_fields_missing": [],
+    "context_usage": true,
+    "constraint_satisfaction": true,
+    "completeness": true,
+    "unsupported_fact_flags": [],
+    "human_evaluation_status": "pending",
+    "parsed": {
+      "category": "refund",
+      "route": "Billing Support",
+      "priority": "P2",
+      "sla": "1 business day"
+    },
+    "ground_truth_correctness": true
+  }
+}

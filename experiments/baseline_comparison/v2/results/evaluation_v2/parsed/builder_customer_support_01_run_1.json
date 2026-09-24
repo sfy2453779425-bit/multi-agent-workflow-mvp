@@ -1,0 +1,14 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "Builder",
+  "case_id": "customer_support_01",
+  "run": 1,
+  "source_file": "builder_runs/customer_support_01/run_1.json",
+  "response_sha256": "b457cd35f3007e96275c870009a48e9c4020ca4369d833adb7d414d85448fe69",
+  "parsed": {
+    "category": "delivery",
+    "route": "Logistics Support",
+    "priority": "P2",
+    "sla": "1 business day"
+  }
+}

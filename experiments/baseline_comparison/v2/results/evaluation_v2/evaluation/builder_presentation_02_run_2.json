@@ -1,0 +1,31 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "Builder",
+  "case_id": "presentation_02",
+  "run": 2,
+  "source_file": "builder_runs/presentation_02/run_2.json",
+  "response_sha256": "ce683644d698e8705fd4dc980ea45ed2bee4642d7524c1c92157d5c38f9b95b6",
+  "evaluation": {
+    "case_id": "presentation_02",
+    "required_fields_present": true,
+    "required_fields_missing": [],
+    "context_usage": true,
+    "constraint_satisfaction": true,
+    "completeness": true,
+    "unsupported_fact_flags": [],
+    "human_evaluation_status": "pending",
+    "parsed": {
+      "duration_minutes": 10,
+      "outline_sections": [
+        "opening",
+        "problem",
+        "architecture",
+        "multi-domain evidence",
+        "conclusion"
+      ],
+      "knowledge_used": true
+    },
+    "ground_truth_correctness": "not_applicable",
+    "open_language_quality": "human_evaluation_required"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "case_id": "customer_support_03",
+  "fixture_version": "customer-support-2026-09-16-v2-account",
+  "prompt_version": "prompt-v1",
+  "run": 3,
+  "provider": "ChatGPT",
+  "model_name": "GPT-5.6 Sol",
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "timestamp": "2026-09-17T00:03:54.0275895+09:00",
+  "prompt_file": "prompts/chatgpt/customer_support_03.md",
+  "prompt_sha256": "461d37b24935604ba52853868f6f7cd442a9ef5f705437687cf55ec283e69c86",
+  "response": "{\n  \"category\": {\n    \"id\": \"account\",\n    \"label\": \"Account / Login\"\n  },\n  \"owner_team\": \"Account Support\",\n  \"priority\": \"P3\",\n  \"sla\": \"2 business days\",\n  \"policy_application\": \"Verify customer identity before changing account information or unlocking access.\",\n  \"next_actions\": [\n    \"Ask for identity verification.\",\n    \"Check account lock status.\",\n    \"Provide password reset or unlock instructions.\"\n  ]\n}",
+  "run_id": "chatgpt_customer_support_03_3"
+}

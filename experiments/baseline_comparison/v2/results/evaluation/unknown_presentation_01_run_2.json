@@ -1,0 +1,31 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "ChatGPT",
+  "case_id": "presentation_01",
+  "run": 2,
+  "source_file": "llm_runs/chatgpt/chatgpt_presentation_01_run_2.json",
+  "response_sha256": "124cfb5b1e0abdf0ddc49206300a510476f2038fd0800677c419b5acdd883864",
+  "evaluation": {
+    "case_id": "presentation_01",
+    "required_fields_present": true,
+    "required_fields_missing": [],
+    "context_usage": true,
+    "constraint_satisfaction": true,
+    "completeness": true,
+    "unsupported_fact_flags": [],
+    "human_evaluation_status": "pending",
+    "parsed": {
+      "duration_minutes": 15,
+      "outline_sections": [
+        "opening",
+        "problem",
+        "architecture",
+        "multi-domain evidence",
+        "conclusion"
+      ],
+      "knowledge_used": true
+    },
+    "ground_truth_correctness": "not_applicable",
+    "open_language_quality": "human_evaluation_required"
+  }
+}

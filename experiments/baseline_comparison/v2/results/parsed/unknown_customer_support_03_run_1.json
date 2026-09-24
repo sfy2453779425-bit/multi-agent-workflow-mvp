@@ -1,0 +1,14 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "ChatGPT",
+  "case_id": "customer_support_03",
+  "run": 1,
+  "source_file": "llm_runs/chatgpt/chatgpt_customer_support_03_run_1.json",
+  "response_sha256": "14bbb37effe7d840a9b59f3822d5e61f0f387fe85e96330c84ad8c96aff11c41",
+  "parsed": {
+    "category": "account",
+    "route": "Account Support",
+    "priority": "P3",
+    "sla": "2 business days"
+  }
+}

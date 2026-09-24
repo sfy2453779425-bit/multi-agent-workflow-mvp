@@ -1,0 +1,36 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "ChatGPT",
+  "case_id": "outfit_01",
+  "run": 2,
+  "source_file": "llm_runs/chatgpt/chatgpt_outfit_01_run_2.json",
+  "response_sha256": "d17403c10755ea0a44f12d8fbf23a065edef62f00217b021e9e0fe63bd182a65",
+  "evaluation": {
+    "case_id": "outfit_01",
+    "required_fields_present": false,
+    "required_fields_missing": [
+      "reason"
+    ],
+    "context_usage": true,
+    "constraint_satisfaction": true,
+    "completeness": false,
+    "unsupported_fact_flags": [],
+    "human_evaluation_status": "pending",
+    "parsed": {
+      "selected_items": [
+        "A003",
+        "A005",
+        "A002",
+        "A001",
+        "A006",
+        "A004"
+      ],
+      "unknown_inventory_ids": [],
+      "unsupplied_recommendations": [],
+      "rain_unsafe_inventory_ids": [],
+      "weather_used": true
+    },
+    "ground_truth_correctness": "not_applicable",
+    "open_language_quality": "human_evaluation_required"
+  }
+}

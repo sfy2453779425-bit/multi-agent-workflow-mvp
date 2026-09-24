@@ -1,0 +1,50 @@
+{
+  "case_id": "presentation_02",
+  "runs": [
+    {
+      "run": 1,
+      "source_file": "builder_runs/presentation_02/run_1.json",
+      "required_fields_present": true,
+      "constraint_satisfaction": true,
+      "unsupported_fact_flags": [],
+      "trace_statuses": [
+        "SUCCESS",
+        "SUCCESS",
+        "SUCCESS",
+        "SUCCESS",
+        "SUCCESS",
+        "SUCCESS"
+      ]
+    },
+    {
+      "run": 2,
+      "source_file": "builder_runs/presentation_02/run_2.json",
+      "required_fields_present": true,
+      "constraint_satisfaction": true,
+      "unsupported_fact_flags": [],
+      "trace_statuses": [
+        "SUCCESS",
+        "SUCCESS",
+        "SUCCESS",
+        "SUCCESS",
+        "SUCCESS",
+        "SUCCESS"
+      ]
+    },
+    {
+      "run": 3,
+      "source_file": "builder_runs/presentation_02/run_3.json",
+      "required_fields_present": true,
+      "constraint_satisfaction": true,
+      "unsupported_fact_flags": [],
+      "trace_statuses": [
+        "SUCCESS",
+        "SUCCESS",
+        "SUCCESS",
+        "SUCCESS",
+        "SUCCESS",
+        "SUCCESS"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+figure,scope,system,metric,value,denominator,unit,category,sequence,status,source
+Figure 1,Overall,ChatGPT,Required fields,23,30,count,,,,results/evaluation_v2/case_quality.csv
+Figure 1,Overall,ChatGPT,Constraint satisfaction,30,30,count,,,,results/evaluation_v2/case_quality.csv
+Figure 1,Overall,ChatGPT,Completeness,23,30,count,,,,results/evaluation_v2/case_quality.csv
+Figure 1,Overall,Builder,Required fields,30,30,count,,,,results/evaluation_v2/case_quality.csv
+Figure 1,Overall,Builder,Constraint satisfaction,30,30,count,,,,results/evaluation_v2/case_quality.csv
+Figure 1,Overall,Builder,Completeness,30,30,count,,,,results/evaluation_v2/case_quality.csv
+Figure 2,Outfit,ChatGPT,Structured repeatability,0,1,case,outfit_01,,False,results/evaluation_v2/repeatability.csv
+Figure 2,Outfit,ChatGPT,Structured repeatability,0,1,case,outfit_02,,False,results/evaluation_v2/repeatability.csv
+Figure 2,Outfit,ChatGPT,Structured repeatability,0,1,case,outfit_03,,False,results/evaluation_v2/repeatability.csv
+Figure 2,Presentation,ChatGPT,Structured repeatability,1,1,case,presentation_01,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Presentation,ChatGPT,Structured repeatability,1,1,case,presentation_02,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Customer Support,ChatGPT,Structured repeatability,1,1,case,customer_support_01,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Customer Support,ChatGPT,Structured repeatability,1,1,case,customer_support_02,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Customer Support,ChatGPT,Structured repeatability,1,1,case,customer_support_03,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Customer Support,ChatGPT,Structured repeatability,1,1,case,customer_support_04,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Customer Support,ChatGPT,Structured repeatability,1,1,case,customer_support_05,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Outfit,Builder,Structured repeatability,1,1,case,outfit_01,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Outfit,Builder,Structured repeatability,1,1,case,outfit_02,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Outfit,Builder,Structured repeatability,1,1,case,outfit_03,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Presentation,Builder,Structured repeatability,1,1,case,presentation_01,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Presentation,Builder,Structured repeatability,1,1,case,presentation_02,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Customer Support,Builder,Structured repeatability,1,1,case,customer_support_01,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Customer Support,Builder,Structured repeatability,1,1,case,customer_support_02,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Customer Support,Builder,Structured repeatability,1,1,case,customer_support_03,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Customer Support,Builder,Structured repeatability,1,1,case,customer_support_04,,True,results/evaluation_v2/repeatability.csv
+Figure 2,Customer Support,Builder,Structured repeatability,1,1,case,customer_support_05,,True,results/evaluation_v2/repeatability.csv
+Figure 2 summary,Customer Support,ChatGPT,Structured repeatability,5,5,case,,,,results/evaluation_v2/repeatability.csv
+Figure 2 summary,Presentation,ChatGPT,Structured repeatability,2,2,case,,,,results/evaluation_v2/repeatability.csv
+Figure 2 summary,Outfit,ChatGPT,Structured repeatability,0,3,case,,,,results/evaluation_v2/repeatability.csv
+Figure 2 summary,Overall,ChatGPT,Structured repeatability,7,10,case,,,,results/evaluation_v2/repeatability.csv
+Figure 2 summary,Customer Support,Builder,Structured repeatability,5,5,case,,,,results/evaluation_v2/repeatability.csv
+Figure 2 summary,Presentation,Builder,Structured repeatability,2,2,case,,,,results/evaluation_v2/repeatability.csv
+Figure 2 summary,Outfit,Builder,Structured repeatability,3,3,case,,,,results/evaluation_v2/repeatability.csv
+Figure 2 summary,Overall,Builder,Structured repeatability,10,10,case,,,,results/evaluation_v2/repeatability.csv
+Figure 3,Controlled failure,Builder,Node status,1,1,status,request_parser,1,SUCCESS,results/evaluation_v1/failure_localization.json
+Figure 3,Controlled failure,Builder,Node status,1,1,status,question,2,SUCCESS,results/evaluation_v1/failure_localization.json
+Figure 3,Controlled failure,Builder,Node status,1,1,status,weather,3,FAILED,results/evaluation_v1/failure_localization.json
+Figure 3,Controlled failure,Builder,Node status,1,1,status,shopping_analysis,4,SKIPPED,results/evaluation_v1/failure_localization.json
+Figure 3,Controlled failure,Builder,Node status,1,1,status,recommendation,5,SKIPPED,results/evaluation_v1/failure_localization.json
+Figure 3,Controlled failure,Builder,Node status,1,1,status,compose,6,SKIPPED,results/evaluation_v1/failure_localization.json
+Figure 4,Manual,Manual,Changed leaf values,46,,count,,,,results/evaluation_v1/workflow_reuse_quantitative.csv
+Figure 4,Manual,Manual,Removed fields,2,,count,,,,results/evaluation_v1/workflow_reuse_quantitative.csv
+Figure 4,Manual,Manual,Modified nodes,6,,count,,,,results/evaluation_v1/workflow_reuse_quantitative.csv
+Figure 4,Manual,Manual,Observed configuration actions,3,,count,,,,results/evaluation_v1/workflow_reuse_quantitative.csv
+Figure 4,Template Builder,Template Builder,Exposed task-level inputs,3,,count,,,,results/evaluation_v1/workflow_reuse_quantitative.csv
+Figure 4,Template Builder,Template Builder,Template-generated fields,157,,count,,,,results/evaluation_v1/workflow_reuse_quantitative.csv
+Figure 4,Template Builder,Template Builder,Reused nodes,6,,count,,,,results/evaluation_v1/workflow_reuse_quantitative.csv
+Figure 4,Template Builder,Template Builder,Input bindings,12,,count,,,,results/evaluation_v1/workflow_reuse_quantitative.csv
+Figure 4,Template Builder,Template Builder,Output bindings,43,,count,,,,results/evaluation_v1/workflow_reuse_quantitative.csv
+Figure 4,Template Builder,Template Builder,Required-input declarations,12,,count,,,,results/evaluation_v1/workflow_reuse_quantitative.csv
+Figure 4,Template Builder,Template Builder,Execution-order entries,6,,count,,,,results/evaluation_v1/workflow_reuse_quantitative.csv

@@ -1,0 +1,18 @@
+{
+  "case_id": "customer_support_05",
+  "fixture_version": "customer-support-2026-09-16-v2-mixed-precedence",
+  "domain": "customer_support",
+  "input": {"query": "The delivery is late and I want a refund for the parcel.", "user_id": "user_a"},
+  "shared_context": {},
+  "business_data": {
+    "default_category": "delivery",
+    "categories": [
+      {"id": "delivery", "label": "Delivery / Shipping", "keywords": ["delivery", "shipping", "late", "delay", "parcel", "tracking", "arrived"], "owner_team": "Logistics Support", "priority": "P2", "sla": "1 business day", "policy": "Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.", "next_actions": ["Confirm order number and tracking status.", "Open a logistics investigation ticket.", "Send customer a delivery status response."]},
+      {"id": "refund", "label": "Refund / Return", "keywords": ["refund", "return", "cancel", "chargeback", "money back", "payment"], "owner_team": "Billing Support", "priority": "P2", "sla": "1 business day", "policy": "Check order eligibility and payment status. If eligible, route to billing support for refund processing.", "next_actions": ["Check refund eligibility.", "Verify payment transaction status.", "Route to billing support if refund criteria are met."]}
+    ]
+  },
+  "constraints": {"apply_frozen_policy": true, "do_not_invent_facts": true, "mixed_intent_precedence": ["delivery", "refund"], "required_decisions": ["category", "route", "priority", "sla", "policy_application"], "language": "English"},
+  "output_requirements": {"required_fields": ["category", "owner_team", "priority", "sla", "next_actions"], "format": "ticket classification, routing decision, SLA, and next actions"},
+  "ground_truth": {"derivation": "mixed-intent precedence is frozen as delivery before refund; route the first decision to logistics and mention billing only after eligibility is checked", "category_precedence": ["delivery", "refund"], "builder_output_is_not_ground_truth": true},
+  "builder": {"template": "configs/builder_templates/customer_support_ticket_template.json", "data_file": "support_policy.json"}
+}

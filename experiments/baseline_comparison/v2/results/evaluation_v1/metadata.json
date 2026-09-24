@@ -1,0 +1,11 @@
+{
+  "evaluation_version": "evaluation-v1",
+  "parser_source_sha256": "80d94aa9694fe13cb840db43ac500c01070dc6041c0abbf1cdc3376175a534d8",
+  "analysis_source_sha256": "eb7f34293bafe93f92c934adbf28dd94afbbe30f4f1a41aeeaa13d211e03098a",
+  "migration_note": "Legacy top-level evaluation artifacts were frozen before evaluation-v2 parser correction.",
+  "defect_description": "The Outfit parser treated every mentioned known inventory ID as selected, including explicitly excluded items.",
+  "raw_data_modified": false,
+  "prompt_modified": false,
+  "fixture_modified": false,
+  "builder_modified": false
+}

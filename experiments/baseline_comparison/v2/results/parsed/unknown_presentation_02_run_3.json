@@ -1,0 +1,19 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "ChatGPT",
+  "case_id": "presentation_02",
+  "run": 3,
+  "source_file": "llm_runs/chatgpt/chatgpt_presentation_02_run_3.json",
+  "response_sha256": "f4ea3a2c8220120b3fba352f5205e6fe3c4e1eec40f767e88587ac6de76d0d09",
+  "parsed": {
+    "duration_minutes": 10,
+    "outline_sections": [
+      "opening",
+      "problem",
+      "architecture",
+      "multi-domain evidence",
+      "conclusion"
+    ],
+    "knowledge_used": true
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "ChatGPT",
+  "case_id": "customer_support_04",
+  "run": 3,
+  "source_file": "llm_runs/chatgpt/chatgpt_customer_support_04_run_3.json",
+  "response_sha256": "5ad1db25652bcb5d761b7a888b298a495f0160333d1706048a004e40867b53b1",
+  "evaluation": {
+    "case_id": "customer_support_04",
+    "required_fields_present": true,
+    "required_fields_missing": [],
+    "context_usage": true,
+    "constraint_satisfaction": true,
+    "completeness": true,
+    "unsupported_fact_flags": [],
+    "human_evaluation_status": "pending",
+    "parsed": {
+      "category": "technical",
+      "route": "Technical Support",
+      "priority": "P2",
+      "sla": "1 business day"
+    },
+    "ground_truth_correctness": true
+  }
+}

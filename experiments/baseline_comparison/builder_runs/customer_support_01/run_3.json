@@ -1,0 +1,872 @@
+{
+  "run_id": "builder_customer_support_01_3",
+  "experiment_id": "baseline_pilot_20260916_010827",
+  "builder_version": "builder-v1",
+  "case_id": "customer_support_01",
+  "run": 3,
+  "system": "Builder",
+  "timestamp": "2026-09-16T13:38:43.113098+00:00",
+  "finished_at": "2026-09-16T13:38:43.119114+00:00",
+  "input": {
+    "query": "Customer says the delivery is late and asks whether the order can be refunded.",
+    "user_id": "user_a"
+  },
+  "fixture_version": "customer-support-2026-09-16-v1",
+  "fixture_sha256": "19b5bbc3f56d9f049b2a93a7406cb0403a00bd5355f336f62fe448c0d0e33bb4",
+  "prompt_version": "prompt-v1",
+  "workflow_json": {
+    "schema_version": 1,
+    "workflow_id": "customer_support_ticket_workflow_v1",
+    "workflow_name": "Customer Support Ticket Workflow",
+    "description": "A builder template for classifying a customer support request, selecting a policy and routing the ticket to the right team.",
+    "runtime_type": "customer_support",
+    "base_agent_config": null,
+    "data_file": "support_policy.json",
+    "data_dir": null,
+    "default_query": "Customer says the delivery is late and asks whether the order can be refunded.",
+    "default_user_id": "user_a",
+    "agents": [
+      {
+        "id": "request_parser",
+        "name": "Support Request Parser Node",
+        "role": "Extract issue keywords, customer intent and available ticket context.",
+        "builder_equivalent": "Start Node + Parser/Prompt Node"
+      },
+      {
+        "id": "question",
+        "name": "Support Question Node",
+        "role": "Ask for missing issue details before routing the ticket.",
+        "builder_equivalent": "Condition Node + User Input Node"
+      },
+      {
+        "id": "ticket_classification",
+        "name": "Ticket Classification Node",
+        "role": "Classify the ticket category by matching local policy keywords.",
+        "builder_equivalent": "Classifier Node"
+      },
+      {
+        "id": "policy_lookup",
+        "name": "Policy Lookup Node",
+        "role": "Load the local support policy for the matched ticket category.",
+        "builder_equivalent": "Local Knowledge / RAG Node"
+      },
+      {
+        "id": "routing_decision",
+        "name": "Routing Decision Node",
+        "role": "Decide ticket owner, priority and next actions from classification and policy.",
+        "builder_equivalent": "Rule/LLM Decision Node"
+      },
+      {
+        "id": "compose",
+        "name": "Support Compose Node",
+        "role": "Render the ticket summary, routing decision and response draft.",
+        "builder_equivalent": "Output Template Node"
+      }
+    ],
+    "nodes": [
+      {
+        "id": "request_parser",
+        "type": "support_request_parser",
+        "name": "Support Request Parser Node",
+        "role": "Extract issue keywords, customer intent and available ticket context.",
+        "builder_equivalent": "Start Node + Parser/Prompt Node",
+        "inputs": {
+          "user_message": "context.query",
+          "user_id": "context.user_id"
+        },
+        "outputs": {
+          "issue_text": "context.issue_text",
+          "intent": "context.intent"
+        },
+        "required_inputs": [
+          "user_message",
+          "user_id"
+        ],
+        "config": {}
+      },
+      {
+        "id": "question",
+        "type": "support_question",
+        "name": "Support Question Node",
+        "role": "Ask for missing issue details before routing the ticket.",
+        "builder_equivalent": "Condition Node + User Input Node",
+        "inputs": {
+          "issue_text": "context.issue_text"
+        },
+        "outputs": {
+          "missing_fields": "context.missing_fields",
+          "needs_clarification": "context.needs_clarification",
+          "next_question_field": "context.next_question_field",
+          "clarification_message": "context.clarification_message"
+        },
+        "required_inputs": [
+          "issue_text"
+        ],
+        "config": {}
+      },
+      {
+        "id": "ticket_classification",
+        "type": "ticket_classification",
+        "name": "Ticket Classification Node",
+        "role": "Classify the ticket category by matching local policy keywords.",
+        "builder_equivalent": "Classifier Node",
+        "inputs": {
+          "issue_text": "context.issue_text"
+        },
+        "outputs": {
+          "ticket_category_record": "context.ticket_category_record",
+          "ticket_category": "context.ticket_category",
+          "ticket_category_id": "context.ticket_category_id",
+          "matched_keywords": "context.matched_keywords",
+          "priority_candidate": "context.priority_candidate"
+        },
+        "required_inputs": [
+          "issue_text"
+        ],
+        "config": {}
+      },
+      {
+        "id": "policy_lookup",
+        "type": "policy_lookup",
+        "name": "Policy Lookup Node",
+        "role": "Load the local support policy for the matched ticket category.",
+        "builder_equivalent": "Local Knowledge / RAG Node",
+        "inputs": {
+          "category": "context.ticket_category_record"
+        },
+        "outputs": {
+          "policy": "context.policy",
+          "sla": "context.sla",
+          "owner_team": "context.owner_team"
+        },
+        "required_inputs": [
+          "category"
+        ],
+        "config": {}
+      },
+      {
+        "id": "routing_decision",
+        "type": "routing_decision",
+        "name": "Routing Decision Node",
+        "role": "Decide ticket owner, priority and next actions from classification and policy.",
+        "builder_equivalent": "Rule/LLM Decision Node",
+        "inputs": {
+          "category": "context.ticket_category_record",
+          "policy": "context.policy"
+        },
+        "outputs": {
+          "priority": "context.priority",
+          "next_actions": "context.next_actions"
+        },
+        "required_inputs": [
+          "category",
+          "policy"
+        ],
+        "config": {}
+      },
+      {
+        "id": "compose",
+        "type": "support_compose",
+        "name": "Support Compose Node",
+        "role": "Render the ticket summary, routing decision and response draft.",
+        "builder_equivalent": "Output Template Node",
+        "inputs": {
+          "owner_team": "context.owner_team",
+          "priority": "context.priority",
+          "next_actions": "context.next_actions",
+          "policy": "context.policy"
+        },
+        "outputs": {
+          "final_answer": "context.final_answer",
+          "summary_cards": "context.summary_cards"
+        },
+        "required_inputs": [
+          "owner_team",
+          "priority",
+          "next_actions",
+          "policy"
+        ],
+        "config": {}
+      }
+    ],
+    "execution": {
+      "type": "sequential",
+      "order": [
+        "request_parser",
+        "question",
+        "ticket_classification",
+        "policy_lookup",
+        "routing_decision",
+        "compose"
+      ],
+      "generated_by": "TemplateWorkflowBuilder"
+    },
+    "question_agent": {
+      "required_fields": [
+        "issue_text"
+      ],
+      "clarification_questions": {
+        "issue_text": "Please describe the customer issue before routing the ticket."
+      }
+    },
+    "experiment_mode": {
+      "type": "frozen_fixture",
+      "fixture_version": "customer-support-2026-09-16-v1",
+      "fixture_sha256": "19b5bbc3f56d9f049b2a93a7406cb0403a00bd5355f336f62fe448c0d0e33bb4"
+    }
+  },
+  "workflow_sha256": "7bd29146e3bcfb71d8e8e67dcbc04fc46c33e5a9962218c1cc02c3237cce7fc2",
+  "final_result": {
+    "answer": "[Customer Support Ticket Workflow]\nCategory: Delivery / Shipping\nIntent: refund_or_return\nOwner team: Logistics Support\nPriority: P2 / SLA: 1 business day\n\nPolicy basis:\nCheck tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.\n\nNext actions\n1. Confirm order number and tracking status.\n2. Open a logistics investigation ticket.\n3. Send customer a delivery status response.\n\nResponse draft: We have classified the issue and routed it to Logistics Support for follow-up.",
+    "context": {
+      "query": "Customer says the delivery is late and asks whether the order can be refunded.",
+      "user_id": "user_a",
+      "runtime_type": "customer_support",
+      "workflow_name": "Customer Support Ticket Workflow",
+      "executed_agents": [
+        "request_parser",
+        "question",
+        "ticket_classification",
+        "policy_lookup",
+        "routing_decision",
+        "compose"
+      ],
+      "executed_tools": [
+        "support_policy"
+      ],
+      "issue_text": "Customer says the delivery is late and asks whether the order can be refunded.",
+      "intent": "refund_or_return",
+      "missing_fields": [],
+      "needs_clarification": false,
+      "next_question_field": "",
+      "clarification_message": "",
+      "ticket_category_record": {
+        "id": "delivery",
+        "label": "Delivery / Shipping",
+        "keywords": [
+          "delivery",
+          "shipping",
+          "late",
+          "delay",
+          "parcel",
+          "tracking",
+          "arrived"
+        ],
+        "owner_team": "Logistics Support",
+        "priority": "P2",
+        "sla": "1 business day",
+        "policy": "Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.",
+        "next_actions": [
+          "Confirm order number and tracking status.",
+          "Open a logistics investigation ticket.",
+          "Send customer a delivery status response."
+        ]
+      },
+      "ticket_category": "Delivery / Shipping",
+      "ticket_category_id": "delivery",
+      "matched_keywords": [
+        "delivery",
+        "late"
+      ],
+      "priority_candidate": "P2",
+      "policy": "Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.",
+      "sla": "1 business day",
+      "owner_team": "Logistics Support",
+      "priority": "P2",
+      "next_actions": [
+        "Confirm order number and tracking status.",
+        "Open a logistics investigation ticket.",
+        "Send customer a delivery status response."
+      ],
+      "final_answer": "[Customer Support Ticket Workflow]\nCategory: Delivery / Shipping\nIntent: refund_or_return\nOwner team: Logistics Support\nPriority: P2 / SLA: 1 business day\n\nPolicy basis:\nCheck tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.\n\nNext actions\n1. Confirm order number and tracking status.\n2. Open a logistics investigation ticket.\n3. Send customer a delivery status response.\n\nResponse draft: We have classified the issue and routed it to Logistics Support for follow-up.",
+      "summary_cards": [
+        {
+          "title": "Ticket Classification",
+          "rows": [
+            {
+              "label": "Category",
+              "value": "Delivery / Shipping"
+            },
+            {
+              "label": "Intent",
+              "value": "refund_or_return"
+            }
+          ]
+        },
+        {
+          "title": "Routing Decision",
+          "rows": [
+            {
+              "label": "Owner",
+              "value": "Logistics Support"
+            },
+            {
+              "label": "Priority",
+              "value": "P2"
+            },
+            {
+              "label": "SLA",
+              "value": "1 business day"
+            }
+          ]
+        },
+        {
+          "title": "Next Actions",
+          "rows": [
+            {
+              "label": "1",
+              "value": "Confirm order number and tracking status."
+            },
+            {
+              "label": "2",
+              "value": "Open a logistics investigation ticket."
+            },
+            {
+              "label": "3",
+              "value": "Send customer a delivery status response."
+            }
+          ]
+        }
+      ],
+      "workflow_agents": [
+        {
+          "id": "request_parser",
+          "name": "Support Request Parser Node",
+          "role": "Extract issue keywords, customer intent and available ticket context.",
+          "builder_equivalent": "Start Node + Parser/Prompt Node"
+        },
+        {
+          "id": "question",
+          "name": "Support Question Node",
+          "role": "Ask for missing issue details before routing the ticket.",
+          "builder_equivalent": "Condition Node + User Input Node"
+        },
+        {
+          "id": "ticket_classification",
+          "name": "Ticket Classification Node",
+          "role": "Classify the ticket category by matching local policy keywords.",
+          "builder_equivalent": "Classifier Node"
+        },
+        {
+          "id": "policy_lookup",
+          "name": "Policy Lookup Node",
+          "role": "Load the local support policy for the matched ticket category.",
+          "builder_equivalent": "Local Knowledge / RAG Node"
+        },
+        {
+          "id": "routing_decision",
+          "name": "Routing Decision Node",
+          "role": "Decide ticket owner, priority and next actions from classification and policy.",
+          "builder_equivalent": "Rule/LLM Decision Node"
+        },
+        {
+          "id": "compose",
+          "name": "Support Compose Node",
+          "role": "Render the ticket summary, routing decision and response draft.",
+          "builder_equivalent": "Output Template Node"
+        }
+      ],
+      "workflow_nodes": [
+        {
+          "id": "request_parser",
+          "type": "support_request_parser",
+          "name": "Support Request Parser Node",
+          "role": "Extract issue keywords, customer intent and available ticket context.",
+          "builder_equivalent": "Start Node + Parser/Prompt Node",
+          "inputs": {
+            "user_message": "context.query",
+            "user_id": "context.user_id"
+          },
+          "outputs": {
+            "issue_text": "context.issue_text",
+            "intent": "context.intent"
+          },
+          "required_inputs": [
+            "user_message",
+            "user_id"
+          ],
+          "config": {}
+        },
+        {
+          "id": "question",
+          "type": "support_question",
+          "name": "Support Question Node",
+          "role": "Ask for missing issue details before routing the ticket.",
+          "builder_equivalent": "Condition Node + User Input Node",
+          "inputs": {
+            "issue_text": "context.issue_text"
+          },
+          "outputs": {
+            "missing_fields": "context.missing_fields",
+            "needs_clarification": "context.needs_clarification",
+            "next_question_field": "context.next_question_field",
+            "clarification_message": "context.clarification_message"
+          },
+          "required_inputs": [
+            "issue_text"
+          ],
+          "config": {}
+        },
+        {
+          "id": "ticket_classification",
+          "type": "ticket_classification",
+          "name": "Ticket Classification Node",
+          "role": "Classify the ticket category by matching local policy keywords.",
+          "builder_equivalent": "Classifier Node",
+          "inputs": {
+            "issue_text": "context.issue_text"
+          },
+          "outputs": {
+            "ticket_category_record": "context.ticket_category_record",
+            "ticket_category": "context.ticket_category",
+            "ticket_category_id": "context.ticket_category_id",
+            "matched_keywords": "context.matched_keywords",
+            "priority_candidate": "context.priority_candidate"
+          },
+          "required_inputs": [
+            "issue_text"
+          ],
+          "config": {}
+        },
+        {
+          "id": "policy_lookup",
+          "type": "policy_lookup",
+          "name": "Policy Lookup Node",
+          "role": "Load the local support policy for the matched ticket category.",
+          "builder_equivalent": "Local Knowledge / RAG Node",
+          "inputs": {
+            "category": "context.ticket_category_record"
+          },
+          "outputs": {
+            "policy": "context.policy",
+            "sla": "context.sla",
+            "owner_team": "context.owner_team"
+          },
+          "required_inputs": [
+            "category"
+          ],
+          "config": {}
+        },
+        {
+          "id": "routing_decision",
+          "type": "routing_decision",
+          "name": "Routing Decision Node",
+          "role": "Decide ticket owner, priority and next actions from classification and policy.",
+          "builder_equivalent": "Rule/LLM Decision Node",
+          "inputs": {
+            "category": "context.ticket_category_record",
+            "policy": "context.policy"
+          },
+          "outputs": {
+            "priority": "context.priority",
+            "next_actions": "context.next_actions"
+          },
+          "required_inputs": [
+            "category",
+            "policy"
+          ],
+          "config": {}
+        },
+        {
+          "id": "compose",
+          "type": "support_compose",
+          "name": "Support Compose Node",
+          "role": "Render the ticket summary, routing decision and response draft.",
+          "builder_equivalent": "Output Template Node",
+          "inputs": {
+            "owner_team": "context.owner_team",
+            "priority": "context.priority",
+            "next_actions": "context.next_actions",
+            "policy": "context.policy"
+          },
+          "outputs": {
+            "final_answer": "context.final_answer",
+            "summary_cards": "context.summary_cards"
+          },
+          "required_inputs": [
+            "owner_team",
+            "priority",
+            "next_actions",
+            "policy"
+          ],
+          "config": {}
+        }
+      ],
+      "workflow_execution": {
+        "type": "sequential",
+        "order": [
+          "request_parser",
+          "question",
+          "ticket_classification",
+          "policy_lookup",
+          "routing_decision",
+          "compose"
+        ],
+        "generated_by": "TemplateWorkflowBuilder"
+      }
+    }
+  },
+  "full_trace": [
+    {
+      "name": "Support Request Parser Node",
+      "detail": "support intent=refund_or_return",
+      "data": {
+        "issue_text": "Customer says the delivery is late and asks whether the order can be refunded.",
+        "intent": "refund_or_return"
+      },
+      "node_id": "request_parser",
+      "node_type": "support_request_parser",
+      "status": "SUCCESS",
+      "started_at": "2026-09-16T13:38:43.116669+00:00",
+      "finished_at": "2026-09-16T13:38:43.116713+00:00",
+      "duration_ms": 0.033,
+      "input": {
+        "user_message": "Customer says the delivery is late and asks whether the order can be refunded.",
+        "user_id": "user_a"
+      },
+      "output": {
+        "issue_text": "Customer says the delivery is late and asks whether the order can be refunded.",
+        "intent": "refund_or_return"
+      },
+      "error": null
+    },
+    {
+      "name": "Support Question Node",
+      "detail": "ticket context is complete",
+      "data": {
+        "missing_fields": [],
+        "needs_clarification": false,
+        "next_question_field": "",
+        "clarification_message": ""
+      },
+      "node_id": "question",
+      "node_type": "support_question",
+      "status": "SUCCESS",
+      "started_at": "2026-09-16T13:38:43.116745+00:00",
+      "finished_at": "2026-09-16T13:38:43.116762+00:00",
+      "duration_ms": 0.017,
+      "input": {
+        "issue_text": "Customer says the delivery is late and asks whether the order can be refunded."
+      },
+      "output": {
+        "missing_fields": [],
+        "needs_clarification": false,
+        "next_question_field": "",
+        "clarification_message": ""
+      },
+      "error": null
+    },
+    {
+      "name": "Ticket Classification Node",
+      "detail": "category=Delivery / Shipping, matched=delivery, late",
+      "data": {
+        "category": "Delivery / Shipping",
+        "priority_candidate": "P2",
+        "matched_keywords": [
+          "delivery",
+          "late"
+        ]
+      },
+      "node_id": "ticket_classification",
+      "node_type": "ticket_classification",
+      "status": "SUCCESS",
+      "started_at": "2026-09-16T13:38:43.116779+00:00",
+      "finished_at": "2026-09-16T13:38:43.117161+00:00",
+      "duration_ms": 0.386,
+      "input": {
+        "issue_text": "Customer says the delivery is late and asks whether the order can be refunded."
+      },
+      "output": {
+        "ticket_category_record": {
+          "id": "delivery",
+          "label": "Delivery / Shipping",
+          "keywords": [
+            "delivery",
+            "shipping",
+            "late",
+            "delay",
+            "parcel",
+            "tracking",
+            "arrived"
+          ],
+          "owner_team": "Logistics Support",
+          "priority": "P2",
+          "sla": "1 business day",
+          "policy": "Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.",
+          "next_actions": [
+            "Confirm order number and tracking status.",
+            "Open a logistics investigation ticket.",
+            "Send customer a delivery status response."
+          ]
+        },
+        "ticket_category": "Delivery / Shipping",
+        "ticket_category_id": "delivery",
+        "matched_keywords": [
+          "delivery",
+          "late"
+        ],
+        "priority_candidate": "P2"
+      },
+      "error": null
+    },
+    {
+      "name": "Policy Lookup Node",
+      "detail": "loaded policy for Delivery / Shipping",
+      "data": {
+        "policy": "Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.",
+        "sla": "1 business day",
+        "owner_team": "Logistics Support",
+        "source": "support_policy.json"
+      },
+      "node_id": "policy_lookup",
+      "node_type": "policy_lookup",
+      "status": "SUCCESS",
+      "started_at": "2026-09-16T13:38:43.117194+00:00",
+      "finished_at": "2026-09-16T13:38:43.117209+00:00",
+      "duration_ms": 0.014,
+      "input": {
+        "category": {
+          "id": "delivery",
+          "label": "Delivery / Shipping",
+          "keywords": [
+            "delivery",
+            "shipping",
+            "late",
+            "delay",
+            "parcel",
+            "tracking",
+            "arrived"
+          ],
+          "owner_team": "Logistics Support",
+          "priority": "P2",
+          "sla": "1 business day",
+          "policy": "Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.",
+          "next_actions": [
+            "Confirm order number and tracking status.",
+            "Open a logistics investigation ticket.",
+            "Send customer a delivery status response."
+          ]
+        }
+      },
+      "output": {
+        "policy": "Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.",
+        "sla": "1 business day",
+        "owner_team": "Logistics Support"
+      },
+      "error": null
+    },
+    {
+      "name": "Routing Decision Node",
+      "detail": "route to Logistics Support with priority P2",
+      "data": {
+        "owner_team": "Logistics Support",
+        "policy": "Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.",
+        "priority": "P2",
+        "next_actions": [
+          "Confirm order number and tracking status.",
+          "Open a logistics investigation ticket.",
+          "Send customer a delivery status response."
+        ]
+      },
+      "node_id": "routing_decision",
+      "node_type": "routing_decision",
+      "status": "SUCCESS",
+      "started_at": "2026-09-16T13:38:43.117232+00:00",
+      "finished_at": "2026-09-16T13:38:43.117245+00:00",
+      "duration_ms": 0.014,
+      "input": {
+        "category": {
+          "id": "delivery",
+          "label": "Delivery / Shipping",
+          "keywords": [
+            "delivery",
+            "shipping",
+            "late",
+            "delay",
+            "parcel",
+            "tracking",
+            "arrived"
+          ],
+          "owner_team": "Logistics Support",
+          "priority": "P2",
+          "sla": "1 business day",
+          "policy": "Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.",
+          "next_actions": [
+            "Confirm order number and tracking status.",
+            "Open a logistics investigation ticket.",
+            "Send customer a delivery status response."
+          ]
+        },
+        "policy": "Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up."
+      },
+      "output": {
+        "priority": "P2",
+        "next_actions": [
+          "Confirm order number and tracking status.",
+          "Open a logistics investigation ticket.",
+          "Send customer a delivery status response."
+        ]
+      },
+      "error": null
+    },
+    {
+      "name": "Support Compose Node",
+      "detail": "support ticket response rendered",
+      "data": {
+        "summary_cards": [
+          {
+            "title": "Ticket Classification",
+            "rows": [
+              {
+                "label": "Category",
+                "value": "Delivery / Shipping"
+              },
+              {
+                "label": "Intent",
+                "value": "refund_or_return"
+              }
+            ]
+          },
+          {
+            "title": "Routing Decision",
+            "rows": [
+              {
+                "label": "Owner",
+                "value": "Logistics Support"
+              },
+              {
+                "label": "Priority",
+                "value": "P2"
+              },
+              {
+                "label": "SLA",
+                "value": "1 business day"
+              }
+            ]
+          },
+          {
+            "title": "Next Actions",
+            "rows": [
+              {
+                "label": "1",
+                "value": "Confirm order number and tracking status."
+              },
+              {
+                "label": "2",
+                "value": "Open a logistics investigation ticket."
+              },
+              {
+                "label": "3",
+                "value": "Send customer a delivery status response."
+              }
+            ]
+          }
+        ]
+      },
+      "node_id": "compose",
+      "node_type": "support_compose",
+      "status": "SUCCESS",
+      "started_at": "2026-09-16T13:38:43.117268+00:00",
+      "finished_at": "2026-09-16T13:38:43.117299+00:00",
+      "duration_ms": 0.031,
+      "input": {
+        "owner_team": "Logistics Support",
+        "priority": "P2",
+        "next_actions": [
+          "Confirm order number and tracking status.",
+          "Open a logistics investigation ticket.",
+          "Send customer a delivery status response."
+        ],
+        "policy": "Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up."
+      },
+      "output": {
+        "final_answer": "[Customer Support Ticket Workflow]\nCategory: Delivery / Shipping\nIntent: refund_or_return\nOwner team: Logistics Support\nPriority: P2 / SLA: 1 business day\n\nPolicy basis:\nCheck tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.\n\nNext actions\n1. Confirm order number and tracking status.\n2. Open a logistics investigation ticket.\n3. Send customer a delivery status response.\n\nResponse draft: We have classified the issue and routed it to Logistics Support for follow-up.",
+        "summary_cards": [
+          {
+            "title": "Ticket Classification",
+            "rows": [
+              {
+                "label": "Category",
+                "value": "Delivery / Shipping"
+              },
+              {
+                "label": "Intent",
+                "value": "refund_or_return"
+              }
+            ]
+          },
+          {
+            "title": "Routing Decision",
+            "rows": [
+              {
+                "label": "Owner",
+                "value": "Logistics Support"
+              },
+              {
+                "label": "Priority",
+                "value": "P2"
+              },
+              {
+                "label": "SLA",
+                "value": "1 business day"
+              }
+            ]
+          },
+          {
+            "title": "Next Actions",
+            "rows": [
+              {
+                "label": "1",
+                "value": "Confirm order number and tracking status."
+              },
+              {
+                "label": "2",
+                "value": "Open a logistics investigation ticket."
+              },
+              {
+                "label": "3",
+                "value": "Send customer a delivery status response."
+              }
+            ]
+          }
+        ]
+      },
+      "error": null
+    }
+  ],
+  "duration_ms": 6.012,
+  "node_statuses": [
+    {
+      "node_id": "request_parser",
+      "node_type": "support_request_parser",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "question",
+      "node_type": "support_question",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "ticket_classification",
+      "node_type": "ticket_classification",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "policy_lookup",
+      "node_type": "policy_lookup",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "routing_decision",
+      "node_type": "routing_decision",
+      "status": "SUCCESS"
+    },
+    {
+      "node_id": "compose",
+      "node_type": "support_compose",
+      "status": "SUCCESS"
+    }
+  ],
+  "errors": [],
+  "failure_mode": null
+}

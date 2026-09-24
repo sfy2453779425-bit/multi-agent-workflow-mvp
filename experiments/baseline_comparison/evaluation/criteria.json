@@ -1,0 +1,45 @@
+{
+  "configuration_touch_points": {
+    "manual_harness": [
+      "agent_role:request_parser",
+      "agent_role:question",
+      "agent_role:domain_analysis",
+      "agent_role:knowledge_or_policy_lookup",
+      "agent_role:decision",
+      "agent_role:compose",
+      "component:model_role_definitions",
+      "component:tool_binding",
+      "component:context_memory_schema",
+      "component:constraints",
+      "component:feedback_loop",
+      "component:verification_trace_rule",
+      "component:execution_environment",
+      "workflow:execution_order",
+      "workflow:question_rule",
+      "workflow:data_binding",
+      "workflow:runtime_type"
+    ],
+    "builder": [
+      "builder:preset_selection",
+      "builder:workflow_name",
+      "builder:user_request"
+    ]
+  },
+  "reuse_scenario": {
+    "first_task": {
+      "preset": "travel_recommendation",
+      "workflow_name": "Travel Outfit Workflow",
+      "query": "다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘"
+    },
+    "second_task": {
+      "preset": "commute_recommendation",
+      "workflow_name": "Commute Outfit Workflow",
+      "query": "서울 내일 출근 포멀 옷 추천해줘"
+    },
+    "visible_fields": [
+      "preset",
+      "workflow_name",
+      "query"
+    ]
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "ChatGPT",
+  "case_id": "outfit_02",
+  "run": 1,
+  "source_file": "llm_runs/chatgpt/chatgpt_outfit_02_run_1.json",
+  "response_sha256": "fbb7e7c32510b182de3b41fac8aa8f4cb0e10b51698042e4cfa91916b407f5cf",
+  "parsed": {
+    "selected_items": [
+      "A003",
+      "A001",
+      "A002",
+      "A005",
+      "A006",
+      "A004"
+    ],
+    "unknown_inventory_ids": [],
+    "unsupplied_recommendations": [],
+    "rain_unsafe_inventory_ids": [
+      "A006",
+      "A004"
+    ],
+    "weather_used": true
+  }
+}

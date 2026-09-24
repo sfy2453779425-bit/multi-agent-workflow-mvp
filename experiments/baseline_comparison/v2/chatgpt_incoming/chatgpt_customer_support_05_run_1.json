@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "case_id": "customer_support_05",
+  "fixture_version": "customer-support-2026-09-16-v2-mixed-precedence",
+  "prompt_version": "prompt-v1",
+  "run": 1,
+  "provider": "ChatGPT",
+  "model_name": "GPT-5.6 Sol",
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "timestamp": "2026-09-17T00:08:38.1865418+09:00",
+  "prompt_file": "prompts/chatgpt/customer_support_05.md",
+  "prompt_sha256": "8e050c2633a484914b4a3fd157a35a5be9ade3f90873ed6e61e42b6a5da39931",
+  "response": "Ticket classification: Delivery / Shipping\n\n- Category: delivery — Delivery / Shipping\n- Owner team: Logistics Support\n- Priority: P2\n- SLA: 1 business day\n- Routing decision: Route to Logistics Support first. The request contains both delivery and refund intents, but the frozen mixed-intent precedence specifies delivery before refund.\n\nPolicy application: Check tracking status first. If the parcel is delayed beyond the promised delivery window, create a logistics investigation ticket and provide a status follow-up. A refund cannot be confirmed from the supplied information; refund eligibility and payment status would need to be checked separately under the refund policy.\n\nNext actions:\n1. Confirm the order number and tracking status.\n2. Determine whether the delivery is beyond the promised delivery window.\n3. If so, open a logistics investigation ticket.\n4. Send the customer a delivery status response.\n5. If refund handling is subsequently required, check refund eligibility and payment transaction status, then route to Billing Support if the refund criteria are met.\n\nMissing information: Order number, current tracking status, promised delivery window, refund eligibility, and payment transaction status are not provided.",
+  "run_id": "chatgpt_customer_support_05_1"
+}

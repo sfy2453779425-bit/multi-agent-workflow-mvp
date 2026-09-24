@@ -1,0 +1,14 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "Builder",
+  "case_id": "customer_support_03",
+  "run": 3,
+  "source_file": "builder_runs/customer_support_03/run_3.json",
+  "response_sha256": "3906d5d91ee7aaab906659dde1e2ffedb37089daa19263449c6a68c5215f7064",
+  "parsed": {
+    "category": "account",
+    "route": "Account Support",
+    "priority": "P3",
+    "sla": "2 business days"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "case_id": "customer_support_01",
+  "fixture_version": "customer-support-2026-09-16-v1",
+  "prompt_version": "prompt-v1",
+  "run": 1,
+  "provider": "ChatGPT",
+  "model_name": "GPT-5.6 Sol",
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "timestamp": "2026-09-16T23:52:43.4960384+09:00",
+  "prompt_file": "prompts/chatgpt/customer_support_01.md",
+  "prompt_sha256": "5a5bc084fec6b225d8f369b804c7900ff34db52969d0e45ee25af1b8a09a7b1a",
+  "response": "Ticket classification and routing decision\n\n| Field | Decision |\n|---|---|\n| Category | Delivery / Shipping (delivery) — primary issue. Refund request is a secondary Refund / Return concern. |\n| Owner team | Logistics Support initially; route to Billing Support only if refund eligibility criteria are met. |\n| Priority | P2 |\n| SLA | 1 business day |\n| Policy application | Check the tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and provide a status follow-up. Separately, check refund eligibility and payment status; if eligible, route the refund request to Billing Support for processing. |\n\nNext actions\n\n1. Confirm the order number and tracking status.\n2. Determine whether the delivery is beyond the promised delivery window.\n3. If delayed beyond that window, open a logistics investigation ticket.\n4. Check refund eligibility and verify the payment transaction status.\n5. If refund criteria are met, route the refund request to Billing Support.\n6. Send the customer a delivery status response and explain the refund status based on the eligibility check.\n\nMissing information: The order number, tracking status, promised delivery window, refund eligibility, and payment transaction status were not supplied, so a refund cannot yet be confirmed.",
+  "run_id": "chatgpt_customer_support_01_1"
+}

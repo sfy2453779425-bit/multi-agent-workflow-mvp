@@ -1,0 +1,843 @@
+﻿evaluator_id,case_id,response_label,task,context,response,usefulness,clarity,naturalness,human_perceived_completeness,optional_notes
+evaluator_01,customer_support_01,A,Customer says the delivery is late and asks whether the order can be refunded.,"Language: English
+Customer query: Customer says the delivery is late and asks whether the order can be refunded.
+Relevant frozen policy:
+- Category: Delivery / Shipping
+  Owner team: Logistics Support
+  Priority: P2
+  SLA: 1 business day
+  Policy: Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.
+  Next actions:
+  - Confirm order number and tracking status.
+  - Open a logistics investigation ticket.
+  - Send customer a delivery status response.
+- Category: Refund / Return
+  Owner team: Billing Support
+  Priority: P2
+  SLA: 1 business day
+  Policy: Check order eligibility and payment status. If eligible, route to billing support for refund processing.
+  Next actions:
+  - Check refund eligibility.
+  - Verify payment transaction status.
+  - Route to billing support if refund criteria are met.
+Do not invent facts.","Ticket classification and routing decision
+
+| Field | Decision |
+|---|---|
+| Category | Delivery / Shipping (delivery) — primary issue. Refund request is a secondary Refund / Return concern. |
+| Owner team | Logistics Support initially; route to Billing Support only if refund eligibility criteria are met. |
+| Priority | P2 |
+| SLA | 1 business day |
+| Policy application | Check the tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and provide a status follow-up. Separately, check refund eligibility and payment status; if eligible, route the refund request to Billing Support for processing. |
+
+Next actions
+
+1. Confirm the order number and tracking status.
+2. Determine whether the delivery is beyond the promised delivery window.
+3. If delayed beyond that window, open a logistics investigation ticket.
+4. Check refund eligibility and verify the payment transaction status.
+5. If refund criteria are met, route the refund request to Billing Support.
+6. Send the customer a delivery status response and explain the refund status based on the eligibility check.
+
+Missing information: The order number, tracking status, promised delivery window, refund eligibility, and payment transaction status were not supplied, so a refund cannot yet be confirmed.",,,,,
+evaluator_01,customer_support_01,B,Customer says the delivery is late and asks whether the order can be refunded.,"Language: English
+Customer query: Customer says the delivery is late and asks whether the order can be refunded.
+Relevant frozen policy:
+- Category: Delivery / Shipping
+  Owner team: Logistics Support
+  Priority: P2
+  SLA: 1 business day
+  Policy: Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.
+  Next actions:
+  - Confirm order number and tracking status.
+  - Open a logistics investigation ticket.
+  - Send customer a delivery status response.
+- Category: Refund / Return
+  Owner team: Billing Support
+  Priority: P2
+  SLA: 1 business day
+  Policy: Check order eligibility and payment status. If eligible, route to billing support for refund processing.
+  Next actions:
+  - Check refund eligibility.
+  - Verify payment transaction status.
+  - Route to billing support if refund criteria are met.
+Do not invent facts.","[Customer Support Ticket Workflow]
+Category: Delivery / Shipping
+Intent: refund_or_return
+Owner team: Logistics Support
+Priority: P2 / SLA: 1 business day
+
+Policy basis:
+Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.
+
+Next actions
+1. Confirm order number and tracking status.
+2. Open a logistics investigation ticket.
+3. Send customer a delivery status response.
+
+Response draft: We have classified the issue and routed it to Logistics Support for follow-up.",,,,,
+evaluator_01,customer_support_05,A,The delivery is late and I want a refund for the parcel.,"Language: English
+Customer query: The delivery is late and I want a refund for the parcel.
+Relevant frozen policy:
+- Category: Delivery / Shipping
+  Owner team: Logistics Support
+  Priority: P2
+  SLA: 1 business day
+  Policy: Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.
+  Next actions:
+  - Confirm order number and tracking status.
+  - Open a logistics investigation ticket.
+  - Send customer a delivery status response.
+- Category: Refund / Return
+  Owner team: Billing Support
+  Priority: P2
+  SLA: 1 business day
+  Policy: Check order eligibility and payment status. If eligible, route to billing support for refund processing.
+  Next actions:
+  - Check refund eligibility.
+  - Verify payment transaction status.
+  - Route to billing support if refund criteria are met.
+Mixed-intent precedence: delivery > refund
+Do not invent facts.","[Customer Support Ticket Workflow]
+Category: Delivery / Shipping
+Intent: refund_or_return
+Owner team: Logistics Support
+Priority: P2 / SLA: 1 business day
+
+Policy basis:
+Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.
+
+Next actions
+1. Confirm order number and tracking status.
+2. Open a logistics investigation ticket.
+3. Send customer a delivery status response.
+
+Response draft: We have classified the issue and routed it to Logistics Support for follow-up.",,,,,
+evaluator_01,customer_support_05,B,The delivery is late and I want a refund for the parcel.,"Language: English
+Customer query: The delivery is late and I want a refund for the parcel.
+Relevant frozen policy:
+- Category: Delivery / Shipping
+  Owner team: Logistics Support
+  Priority: P2
+  SLA: 1 business day
+  Policy: Check tracking status first. If the delivery is delayed beyond the promised window, create a logistics investigation ticket and offer status follow-up.
+  Next actions:
+  - Confirm order number and tracking status.
+  - Open a logistics investigation ticket.
+  - Send customer a delivery status response.
+- Category: Refund / Return
+  Owner team: Billing Support
+  Priority: P2
+  SLA: 1 business day
+  Policy: Check order eligibility and payment status. If eligible, route to billing support for refund processing.
+  Next actions:
+  - Check refund eligibility.
+  - Verify payment transaction status.
+  - Route to billing support if refund criteria are met.
+Mixed-intent precedence: delivery > refund
+Do not invent facts.","Ticket classification: Delivery / Shipping
+
+- Category: delivery — Delivery / Shipping
+- Owner team: Logistics Support
+- Priority: P2
+- SLA: 1 business day
+- Routing decision: Route to Logistics Support first. The request contains both delivery and refund intents, but the frozen mixed-intent precedence specifies delivery before refund.
+
+Policy application: Check tracking status first. If the parcel is delayed beyond the promised delivery window, create a logistics investigation ticket and provide a status follow-up. A refund cannot be confirmed from the supplied information; refund eligibility and payment status would need to be checked separately under the refund policy.
+
+Next actions:
+1. Confirm the order number and tracking status.
+2. Determine whether the delivery is beyond the promised delivery window.
+3. If so, open a logistics investigation ticket.
+4. Send the customer a delivery status response.
+5. If refund handling is subsequently required, check refund eligibility and payment transaction status, then route to Billing Support if the refund criteria are met.
+
+Missing information: Order number, current tracking status, promised delivery window, refund eligibility, and payment transaction status are not provided.",,,,,
+evaluator_01,outfit_01,A,다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘,"Language: 한국어
+Weather:
+- City: 칭다오
+- Date: 2026-09-23
+- Condition: 흐림
+- Temperature: 10.0–21.0°C
+- Precipitation probability: 20%
+Supplied inventory:
+- A001: 블랙 후드티; style=캐주얼; warmth=medium; rain_ok=True
+- A002: 네이비 조거 팬츠; style=스트릿; warmth=medium; rain_ok=True
+- A003: 라이트 그레이 바람막이; style=스포티; warmth=light; rain_ok=True
+- A004: 블랙 패딩; style=캐주얼; warmth=heavy; rain_ok=False
+- A005: 화이트 반팔 티셔츠; style=캐주얼; warmth=light; rain_ok=True
+- A006: 블랙 캔버스 스니커즈; style=스트릿; warmth=all; rain_ok=False
+Constraints:
+- Use only supplied inventory: False
+- Rain-safe precipitation threshold: %
+- Purpose: 여행
+- Style: 캐주얼
+- Do not invent facts: True","[Personalized Outfit Agent]
+칭다오의 다음 주(2026-09-23) 날씨는 흐림, 평균 15.5°C, 강수확률 20%입니다.
+쇼핑 기록 분석: 총 6개 구매 기록에서 선호 스타일은 캐주얼, 스트릿, 스포티, 선호 색상은 블랙, 네이비, 그레이로 분석되었습니다.
+추천 방향: 일교차를 고려한 가벼운 레이어드가 적합합니다.
+추천 순위: 1. 라이트 그레이 바람막이 | 2. 블랙 후드티 | 3. 네이비 조거 팬츠 | 4. 블랙 캔버스 스니커즈
+보유 단품 기반 추천: 1. 라이트 그레이 바람막이, 2. 블랙 후드티, 3. 네이비 조거 팬츠, 4. 블랙 캔버스 스니커즈
+추가 추천: 
+추가 조건: ",,,,,
+evaluator_01,outfit_01,B,다음 주에 칭다오 여행 가는데 캐주얼 옷 추천해줘,"Language: 한국어
+Weather:
+- City: 칭다오
+- Date: 2026-09-23
+- Condition: 흐림
+- Temperature: 10.0–21.0°C
+- Precipitation probability: 20%
+Supplied inventory:
+- A001: 블랙 후드티; style=캐주얼; warmth=medium; rain_ok=True
+- A002: 네이비 조거 팬츠; style=스트릿; warmth=medium; rain_ok=True
+- A003: 라이트 그레이 바람막이; style=스포티; warmth=light; rain_ok=True
+- A004: 블랙 패딩; style=캐주얼; warmth=heavy; rain_ok=False
+- A005: 화이트 반팔 티셔츠; style=캐주얼; warmth=light; rain_ok=True
+- A006: 블랙 캔버스 스니커즈; style=스트릿; warmth=all; rain_ok=False
+Constraints:
+- Use only supplied inventory: False
+- Rain-safe precipitation threshold: %
+- Purpose: 여행
+- Style: 캐주얼
+- Do not invent facts: True","날씨 요약: 2026년 9월 23일 칭다오, 흐림, 최저 10°C / 최고 21°C, 강수확률 **20%**입니다.
+
+1. 라이트 그레이 바람막이 (A003)
+   - 가벼운 아우터라 10~21°C의 일교차에 대응하기 좋습니다.
+   - rain_ok: true라 약한 비 가능성에도 적합합니다.
+
+2. 화이트 반팔 티셔츠 (A005)
+   - 낮 최고기온 21°C일 때 단독으로 입거나 바람막이 안에 레이어드하기 좋습니다.
+   - 캐주얼 스타일입니다.
+
+3. 블랙 후드티 (A001)
+   - 최저기온이 10°C이므로 아침·저녁에 활용하기 좋습니다.
+   - 캐주얼 스타일이고 rain_ok: true입니다.
+
+4. 네이비 조거 팬츠 (A002)
+   - 중간 보온감이라 여행 중 쌀쌀한 시간대에 무난합니다.
+   - 스트릿 계열이지만 위 아이템들과 캐주얼하게 조합 가능합니다.
+
+5. 블랙 캔버스 스니커즈 (A006)
+   - 전체 코디와 색상 조합은 무난합니다.
+   - 다만 rain_ok: false이므로 실제 비가 올 경우에는 주의가 필요합니다.
+
+추천 조합:
+화이트 반팔 티셔츠 + 네이비 조거 팬츠 + 라이트 그레이 바람막이 + 블랙 캔버스 스니커즈.
+
+아침·저녁이 특히 쌀쌀하면 반팔 대신 블랙 후드티를 선택하는 편이 적합합니다. **블랙 패딩(A004)**은 보온 등급이 heavy라 이번 10~21°C 조건에서는 우선순위를 낮게 잡았습니다.",,,,,
+evaluator_01,outfit_02,A,다음 주에 칭다오 여행 가는데 비 오는 날 캐주얼 옷 추천해줘,"Language: 한국어
+Weather:
+- City: 칭다오
+- Date: 2026-09-24
+- Condition: 비
+- Temperature: 12.0–18.0°C
+- Precipitation probability: 80%
+Supplied inventory:
+- A001: 블랙 후드티; style=캐주얼; warmth=medium; rain_ok=True
+- A002: 네이비 조거 팬츠; style=스트릿; warmth=medium; rain_ok=True
+- A003: 라이트 그레이 바람막이; style=스포티; warmth=light; rain_ok=True
+- A004: 블랙 패딩; style=캐주얼; warmth=heavy; rain_ok=False
+- A005: 화이트 반팔 티셔츠; style=캐주얼; warmth=light; rain_ok=True
+- A006: 블랙 캔버스 스니커즈; style=스트릿; warmth=all; rain_ok=False
+Constraints:
+- Use only supplied inventory: True
+- Rain-safe precipitation threshold: 40%
+- Purpose: 여행
+- Style: 캐주얼
+- Do not invent facts: True","날씨 요약
+
+- 날씨: 비
+- 기온: 12~18°C
+- 강수확률: 80%
+
+추천 아이템 순위
+
+1. 라이트 그레이 바람막이 (A003)
+   - 비 오는 날 착용 가능(rain_ok: true)
+   - 가벼운 아우터라 12~18°C 날씨에 레이어드하기 좋음
+
+2. 블랙 후드티 (A001)
+   - 캐주얼 스타일이며 비 오는 날 착용 가능
+   - 중간 보온감이라 바람막이 안에 입기 적합
+
+3. 네이비 조거 팬츠 (A002)
+   - 비 오는 날 착용 가능
+   - 후드티·바람막이와 함께 편한 여행용 캐주얼 코디 구성 가능
+
+4. 화이트 반팔 티셔츠 (A005)
+   - 비 오는 날 착용 가능
+   - 기온이 올라가는 낮에는 후드티 안쪽 이너로 활용 가능
+
+추천 조합
+
+화이트 반팔 → 블랙 후드티 → 라이트 그레이 바람막이 + 네이비 조거 팬츠
+
+비가 올 확률이 **80%**이므로, 보유 옷 중 rain_ok: true인 아이템을 우선했습니다.
+
+다만 신발은 비 오는 날에 적합한 보유 아이템이 없습니다. 유일하게 제공된 **블랙 캔버스 스니커즈(A006)**는 rain_ok: false이므로 이번 조건에서는 추천 목록에서 제외합니다. 블랙 패딩(A004) 역시 rain_ok: false이고 보온감이 heavy라 제외했습니다.",,,,,
+evaluator_01,outfit_02,B,다음 주에 칭다오 여행 가는데 비 오는 날 캐주얼 옷 추천해줘,"Language: 한국어
+Weather:
+- City: 칭다오
+- Date: 2026-09-24
+- Condition: 비
+- Temperature: 12.0–18.0°C
+- Precipitation probability: 80%
+Supplied inventory:
+- A001: 블랙 후드티; style=캐주얼; warmth=medium; rain_ok=True
+- A002: 네이비 조거 팬츠; style=스트릿; warmth=medium; rain_ok=True
+- A003: 라이트 그레이 바람막이; style=스포티; warmth=light; rain_ok=True
+- A004: 블랙 패딩; style=캐주얼; warmth=heavy; rain_ok=False
+- A005: 화이트 반팔 티셔츠; style=캐주얼; warmth=light; rain_ok=True
+- A006: 블랙 캔버스 스니커즈; style=스트릿; warmth=all; rain_ok=False
+Constraints:
+- Use only supplied inventory: True
+- Rain-safe precipitation threshold: 40%
+- Purpose: 여행
+- Style: 캐주얼
+- Do not invent facts: True","[Personalized Outfit Agent]
+칭다오의 다음 주(2026-09-24) 날씨는 비, 평균 15.0°C, 강수확률 80%입니다.
+쇼핑 기록 분석: 총 6개 구매 기록에서 선호 스타일은 캐주얼, 스트릿, 스포티, 선호 색상은 블랙, 네이비, 그레이로 분석되었습니다.
+추천 방향: 일교차를 고려한 가벼운 레이어드가 적합합니다.
+추천 순위: 1. 라이트 그레이 바람막이 | 2. 블랙 후드티 | 3. 네이비 조거 팬츠
+보유 단품 기반 추천: 1. 라이트 그레이 바람막이, 2. 블랙 후드티, 3. 네이비 조거 팬츠
+추가 추천: 
+추가 조건: ",,,,,
+evaluator_01,presentation_01,A,Prepare a 15-minute presentation outline about Harness Engineering and Multi-Agent Workflow Tool MVP.,"Language: English
+Task request: Prepare a 15-minute presentation outline about Harness Engineering and Multi-Agent Workflow Tool MVP.
+Duration: 15 minutes
+Required sections: opening, problem, architecture, multi-domain evidence, conclusion
+Supplied knowledge:
+- Topic: Harness Engineering
+  - Harness Engineering is the execution structure around an agent, including tools, memory, constraints, verification and feedback loops.
+  - It can make multi-agent development easier, so a project must explain what value remains beyond using a generic harness.
+  - The differentiating value should move from generic execution plumbing to domain-specific workflow templates and evidence.
+- Topic: Multi-Agent Workflow Tool
+  - A workflow tool turns a domain process into ordered nodes with defined inputs and outputs.
+  - The MVP should show that templates can generate executable Workflow JSON instead of staying as static diagrams.
+  - Sequential execution and trace output make the result explainable during a presentation.
+- Topic: Workflow Template
+  - A template defines node order, node roles, required fields and the tool equivalents.
+  - The generated Workflow JSON is the contract between the visual the tool and the execution engine.
+  - Trace verifies that each node ran in the expected order and produced intermediate evidence.
+Use supplied knowledge only: True
+Do not invent facts: True","**Duration: 15 minutes**
+
+### 1. Opening — 1.5 minutes
+
+**Purpose:** Introduce the central idea and frame the relationship between Harness Engineering and the Multi-Agent Workflow Tool MVP.
+
+**Outline**
+
+* Define the basic concept:
+
+  * **Agent = Model + Harness**
+* Explain Harness Engineering as the execution structure around an agent.
+* Introduce the MVP as a system that converts domain workflows into executable multi-agent workflows.
+
+**Evidence points**
+
+* A harness includes:
+
+  * Tools
+  * Memory
+  * Constraints
+  * Verification
+  * Feedback loops
+* The MVP focuses on moving beyond generic execution plumbing toward **domain-specific workflow templates and evidence**.
+
+**Suggested visual**
+
+* `Agent = Model + Harness`
+* Under “Harness,” show: Tools / Memory / Constraints / Verification / Feedback
+
+---
+
+### 2. Problem — 2.5 minutes
+
+**Purpose:** Explain why simply building another generic agent framework is not enough.
+
+**Outline**
+
+* Generic harnesses already make multi-agent development easier.
+* Therefore, the project needs to clarify what additional value remains beyond generic harness functionality.
+* The main project value should come from:
+
+  * Domain-specific workflow templates
+  * Explicit workflow structure
+  * Executable output
+  * Evidence that execution followed the intended process
+
+**Evidence points**
+
+* Harness Engineering can already provide reusable execution structure.
+* Generic execution infrastructure alone is insufficient differentiation.
+* The supplied project direction explicitly shifts differentiation toward:
+
+  * Workflow templates
+  * Domain-specific nodes
+  * Execution evidence
+
+**Defensive positioning sentence**
+
+> “The MVP does not attempt to replace generic agent harnesses; it adds value by converting domain processes into structured, executable, and traceable workflow templates.”
+
+---
+
+### 3. Architecture — 4 minutes
+
+**Purpose:** Show how the Multi-Agent Workflow Tool works.
+
+**Core architecture**
+
+**Template → Workflow JSON → Engine → Trace**
+
+#### A. Workflow Template
+
+A template defines:
+
+* Node order
+* Node roles
+* Required fields
+* the tool equivalents
+
+#### B. Workflow Tool
+
+* Represents a domain process as ordered nodes.
+* Each node has defined inputs and outputs.
+* The the tool should produce an executable workflow rather than only a static diagram.
+
+#### C. Workflow JSON
+
+* Acts as the contract between:
+
+  * Visual the tool
+  * Execution engine
+* Encodes the generated workflow structure.
+
+#### D. Execution Engine
+
+* Executes nodes sequentially.
+* Uses the generated Workflow JSON as its execution structure.
+
+#### E. Trace
+
+* Records execution order.
+* Shows intermediate evidence from each node.
+* Makes the workflow explainable during the presentation.
+
+**Evidence points**
+
+* The supplied architecture explicitly requires the template to generate **executable Workflow JSON**.
+* Sequential execution provides a clear way to demonstrate workflow behavior.
+* Trace provides evidence that nodes executed in the expected order and generated intermediate outputs.
+
+**Suggested visual**
+
+```text
+Domain Process
+      ↓
+Workflow Template
+      ↓
+Visual the tool
+      ↓
+Workflow JSON
+      ↓
+Execution Engine
+      ↓
+Execution Trace
+```
+
+---
+
+### 4. Multi-Domain Evidence — 3.5 minutes
+
+**Purpose:** Demonstrate that the MVP is a reusable workflow tool rather than a solution hard-coded for one scenario.
+
+**Outline**
+
+* Show multiple workflow templates from different domains.
+* Compare their shared structural components.
+* Highlight the domain-specific nodes that differentiate each workflow.
+* Demonstrate that every template follows the same execution pipeline:
+
+**Template → Workflow JSON → Engine → Trace**
+
+**Evidence points**
+
+* Multiple domains are specifically recommended as evidence that the the tool is not hard-coded to one recommendation scenario.
+* Templates can share:
+
+  * Ordered-node structure
+  * Defined inputs and outputs
+  * Workflow JSON generation
+  * Sequential execution
+  * Trace generation
+* Domain-specific nodes provide the differentiated layer above the generic harness.
+
+**Suggested comparison slide**
+
+| Layer              | Common Across Domains | Domain-Specific             |
+| ------------------ | --------------------- | --------------------------- |
+| Template structure | Yes                   | Node definitions vary       |
+| Node ordering      | Yes                   | Order may vary              |
+| Required fields    | Structured            | Depends on domain           |
+| Workflow JSON      | Yes                   | Content varies              |
+| Execution engine   | Yes                   | Executes generated workflow |
+| Trace              | Yes                   | Evidence varies by workflow |
+
+**Demo structure**
+Keep the demo under two minutes:
+
+1. Select a template.
+2. Show the generated Workflow JSON.
+3. Execute the workflow.
+4. Show the trace.
+
+---
+
+### 5. Conclusion — 2 minutes
+
+**Purpose:** Reconnect Harness Engineering with the MVP’s differentiated value.
+
+**Outline**
+
+* Harness Engineering provides the execution foundation around agents.
+* Generic harness components can be reused rather than rebuilt.
+* The MVP concentrates project-specific value in:
+
+  * Domain workflow templates
+  * Structured node definitions
+  * Executable Workflow JSON
+  * Sequential execution
+  * Trace-based evidence
+
+**Closing message**
+
+> “The key contribution of the Multi-Agent Workflow Tool MVP is not generic agent execution infrastructure. Its value is the ability to turn domain processes into reusable templates, generate executable Workflow JSON, and provide trace evidence that the intended workflow actually ran.”
+
+**Evidence points**
+
+* Generic harness: execution foundation.
+* Project-specific layer: workflow templates.
+* Workflow JSON: contract between the tool and engine.
+* Trace: execution evidence and explainability.
+
+---
+
+## Timing Summary
+
+| Section                      |        Time |
+| ---------------------------- | ----------: |
+| Opening                      |     1.5 min |
+| Problem                      |     2.5 min |
+| Architecture                 |       4 min |
+| Multi-Domain Evidence        |     3.5 min |
+| Conclusion                   |       2 min |
+| **Demo / transition buffer** | **1.5 min** |
+| **Total**                    |  **15 min** |
+
+### Evidence Points Summary
+
+The presentation can support its argument using only the supplied information:
+
+* **Agent = Model + Harness**
+* Harness = tools, memory, constraints, verification, and feedback loops.
+* Generic harness functionality should not be presented as the main differentiation.
+* Differentiation shifts toward **domain-specific workflow templates and evidence**.
+* A workflow tool represents processes as ordered nodes with defined inputs and outputs.
+* Templates generate **executable Workflow JSON**.
+* Workflow JSON connects the visual the tool with the execution engine.
+* Sequential execution makes execution behavior clear.
+* Trace proves node execution order and exposes intermediate evidence.
+* Multiple domains demonstrate that the MVP is not hard-coded to a single scenario.
+
+**Missing information:** The supplied data does not provide specific domain names, concrete workflow node examples, screenshots, implementation technologies, performance results, or quantitative evaluation metrics. Those should not be added unless additional project information is provided.",,,,,
+evaluator_01,presentation_01,B,Prepare a 15-minute presentation outline about Harness Engineering and Multi-Agent Workflow Tool MVP.,"Language: English
+Task request: Prepare a 15-minute presentation outline about Harness Engineering and Multi-Agent Workflow Tool MVP.
+Duration: 15 minutes
+Required sections: opening, problem, architecture, multi-domain evidence, conclusion
+Supplied knowledge:
+- Topic: Harness Engineering
+  - Harness Engineering is the execution structure around an agent, including tools, memory, constraints, verification and feedback loops.
+  - It can make multi-agent development easier, so a project must explain what value remains beyond using a generic harness.
+  - The differentiating value should move from generic execution plumbing to domain-specific workflow templates and evidence.
+- Topic: Multi-Agent Workflow Tool
+  - A workflow tool turns a domain process into ordered nodes with defined inputs and outputs.
+  - The MVP should show that templates can generate executable Workflow JSON instead of staying as static diagrams.
+  - Sequential execution and trace output make the result explainable during a presentation.
+- Topic: Workflow Template
+  - A template defines node order, node roles, required fields and the tool equivalents.
+  - The generated Workflow JSON is the contract between the visual the tool and the execution engine.
+  - Trace verifies that each node ran in the expected order and produced intermediate evidence.
+Use supplied knowledge only: True
+Do not invent facts: True","[Presentation Planning Workflow]
+Topic: Prepare a 15-minute presentation outline about Harness Engineering and Multi-Agent Workflow Tool MVP.
+Duration: 15 minutes
+Matched knowledge: Multi-Agent Workflow Tool, Harness Engineering, Workflow Template
+
+Outline
+1. Opening: define the presentation topic and why Multi-Agent Workflow Tool, Harness Engineering, Workflow Template matters.
+2. Problem: explain why a single-domain MVP is not enough to prove a the tool.
+3. Architecture: show Template -> Workflow JSON -> Multi-Agent Engine -> Trace.
+4. Multi-domain evidence: compare recommendation, presentation planning and support ticket workflows.
+5. Conclusion: position the current semester as the executable foundation for next semester.
+
+Key evidence
+- A workflow tool turns a domain process into ordered nodes with defined inputs and outputs.
+- The MVP should show that templates can generate executable Workflow JSON instead of staying as static diagrams.
+- Harness Engineering is the execution structure around an agent, including tools, memory, constraints, verification and feedback loops.
+- It can make multi-agent development easier, so a project must explain what value remains beyond using a generic harness.
+- A template defines node order, node roles, required fields and the tool equivalents.
+
+Trace proof: this outline was produced by a 6-node generated workflow.",,,,,
+evaluator_01,presentation_02,A,Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Tool MVP.,"Language: English
+Task request: Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Tool MVP.
+Duration: 10 minutes
+Required sections: opening, problem, architecture, multi-domain evidence, conclusion
+Supplied knowledge:
+- Topic: Multi-Agent Workflow Tool
+  - A workflow tool turns a domain process into ordered nodes with defined inputs and outputs.
+  - The MVP generates executable Workflow JSON and uses sequential execution and trace output to make the result explainable.
+- Topic: Workflow Template
+  - A template defines node order, node roles and required fields.
+  - The generated Workflow JSON is the contract between the the tool and the execution engine.
+Use supplied knowledge only: True
+Do not invent facts: True","## Duration
+
+**10 minutes total**
+
+## Outline Sections
+
+### 1. Opening — 1 minute
+
+**Goal:** Introduce the relationship between Workflow Templates and the Multi-Agent Workflow Tool MVP.
+
+**Key points**
+
+* A workflow tool converts a domain process into **ordered nodes with defined inputs and outputs**.
+* A Workflow Template specifies:
+
+  * node order,
+  * node roles,
+  * required fields.
+* The MVP turns the template into an executable workflow rather than leaving it as a conceptual design.
+
+**Core message**
+
+> The central idea is to transform a reusable Workflow Template into executable Workflow JSON, run it through an engine, and expose the execution through a trace.
+
+**Evidence points**
+
+* “A workflow tool turns a domain process into ordered nodes with defined inputs and outputs.”
+* “A template defines node order, node roles and required fields.”
+
+---
+
+### 2. Problem — 1.5 minutes
+
+**Goal:** Explain what the MVP needs to solve.
+
+**Key points**
+
+* A domain workflow needs a structured representation before it can be executed.
+* The the tool must preserve:
+
+  * the sequence of nodes,
+  * the responsibility of each node,
+  * the required data for each node.
+* There must also be a clear interface between workflow generation and execution.
+
+**Problem statement**
+
+> Without a defined workflow structure and execution contract, the the tool and execution engine cannot reliably share the same workflow definition.
+
+**Evidence points**
+
+* Templates define node order, node roles, and required fields.
+* The generated **Workflow JSON is the contract between the the tool and the execution engine**.
+
+---
+
+### 3. Architecture and MVP Flow — 3 minutes
+
+**Goal:** Present the main system flow and the MVP scope.
+
+### Architecture
+
+**Template → Workflow JSON → Engine → Trace**
+
+#### Step 1: Workflow Template
+
+Defines:
+
+* node order,
+* node roles,
+* required fields.
+
+#### Step 2: Workflow Tool
+
+Transforms the domain workflow definition into **Workflow JSON**.
+
+#### Step 3: Workflow JSON
+
+Acts as the interface or contract between:
+
+* the the tool,
+* the execution engine.
+
+#### Step 4: Execution Engine
+
+The MVP uses **sequential execution**.
+
+#### Step 5: Trace
+
+Produces execution trace output so the workflow execution can be inspected and explained.
+
+**MVP focus**
+
+* Generate executable Workflow JSON.
+* Execute nodes sequentially.
+* Produce trace output.
+* Demonstrate that the generated template can actually be executed.
+
+**Evidence points**
+
+* “The MVP generates executable Workflow JSON.”
+* It “uses sequential execution and trace output to make the result explainable.”
+* “The generated Workflow JSON is the contract between the the tool and the execution engine.”
+* “Use trace as proof that the template is executable.”
+
+**Suggested visual**
+
+```text
+Workflow Template
+       ↓
+Workflow Tool
+       ↓
+Workflow JSON
+       ↓
+Execution Engine
+       ↓
+Sequential Execution
+       ↓
+Execution Trace
+```
+
+---
+
+### 4. Multi-Domain Evidence — 2.5 minutes
+
+**Goal:** Show that Workflow Templates are intended to represent workflows across different domains.
+
+**Key points**
+
+* The supplied design recommends comparing templates across domains.
+* The comparison should focus on whether different domain processes can still be represented using the same structural concepts:
+
+  * ordered nodes,
+  * node roles,
+  * required fields,
+  * Workflow JSON,
+  * execution trace.
+* The strongest evidence would be showing that multiple domain-specific templates can all pass through the same general flow:
+
+**Template → Workflow JSON → Engine → Trace**
+
+**Evidence points**
+
+* The supplied slide guidance explicitly recommends: **“Compare templates across domains.”**
+* Workflow templates have a common structural definition based on node order, roles, and required fields.
+* Trace output can demonstrate that a generated template is executable.
+
+**Missing information**
+The supplied material does **not identify specific domains or provide concrete multi-domain examples**. Therefore, the presentation should not claim that particular domains have already been implemented or validated.
+
+A safe slide structure would be:
+
+| Comparison Dimension | Domain Template A          | Domain Template B          |
+| -------------------- | -------------------------- | -------------------------- |
+| Node order           | To be provided             | To be provided             |
+| Node roles           | To be provided             | To be provided             |
+| Required fields      | To be provided             | To be provided             |
+| Workflow JSON        | Same contract concept      | Same contract concept      |
+| Execution trace      | Used as execution evidence | Used as execution evidence |
+
+For the actual presentation, concrete domain names and results should be added only when supporting project data is available.
+
+---
+
+### 5. Conclusion + Short Demo — 2 minutes
+
+**Goal:** Close with the MVP value and show the end-to-end flow.
+
+**Demo flow**
+Keep the demonstration under two minutes:
+
+1. Start from a Workflow Template.
+2. Show the generated Workflow JSON.
+3. Run it through the sequential execution engine.
+4. Show the resulting trace.
+
+**Conclusion**
+
+* Workflow Templates provide a structured definition of a process.
+* Workflow JSON connects the the tool to the execution engine.
+* Sequential execution provides a simple MVP execution model.
+* Trace output provides evidence that the generated workflow is executable and makes the execution easier to explain.
+* Multi-domain comparison is the next important evidence point, but concrete domain implementations are not included in the supplied information.
+
+**Evidence points**
+
+* “Show Template → Workflow JSON → Engine → Trace.”
+* “Keep the demo under two minutes.”
+* “Use trace as proof that the template is executable.”
+
+---
+
+## Evidence Points
+
+The presentation can make the following claims directly from the supplied knowledge:
+
+1. **Workflow Tool purpose:** converts a domain process into ordered nodes with defined inputs and outputs.
+2. **Template structure:** defines node order, node roles, and required fields.
+3. **the tool output:** generates executable Workflow JSON.
+4. **Interface contract:** Workflow JSON is the contract between the the tool and execution engine.
+5. **MVP execution model:** sequential execution.
+6. **Explainability mechanism:** execution trace output.
+7. **Execution evidence:** trace can be used to demonstrate that a template is executable.
+8. **Multi-domain evaluation direction:** templates should be compared across domains.
+9. **Recommended demonstration:** Template → Workflow JSON → Engine → Trace.
+10. **Demo constraint:** keep the demo under two minutes.
+
+**Information not supplied:** specific application domains, concrete workflow examples, performance measurements, implementation technologies, numbers of agents/nodes, benchmark results, or validation results. These should not be added without additional project data.",,,,,
+evaluator_01,presentation_02,B,Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Tool MVP.,"Language: English
+Task request: Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Tool MVP.
+Duration: 10 minutes
+Required sections: opening, problem, architecture, multi-domain evidence, conclusion
+Supplied knowledge:
+- Topic: Multi-Agent Workflow Tool
+  - A workflow tool turns a domain process into ordered nodes with defined inputs and outputs.
+  - The MVP generates executable Workflow JSON and uses sequential execution and trace output to make the result explainable.
+- Topic: Workflow Template
+  - A template defines node order, node roles and required fields.
+  - The generated Workflow JSON is the contract between the the tool and the execution engine.
+Use supplied knowledge only: True
+Do not invent facts: True","[Presentation Planning Workflow]
+Topic: Prepare a 10-minute presentation outline about Workflow Template and Multi-Agent Workflow Tool MVP.
+Duration: 10 minutes
+Matched knowledge: Multi-Agent Workflow Tool, Workflow Template
+
+Outline
+1. Opening: define the presentation topic and why Multi-Agent Workflow Tool, Workflow Template matters.
+2. Problem: explain why a single-domain MVP is not enough to prove a the tool.
+3. Architecture: show Template -> Workflow JSON -> Multi-Agent Engine -> Trace.
+4. Multi-domain evidence: compare recommendation, presentation planning and support ticket workflows.
+5. Conclusion: position the current semester as the executable foundation for next semester.
+
+Key evidence
+- A workflow tool turns a domain process into ordered nodes with defined inputs and outputs.
+- The MVP generates executable Workflow JSON and uses sequential execution and trace output to make the result explainable.
+- A template defines node order, node roles and required fields.
+- The generated Workflow JSON is the contract between the the tool and the execution engine.
+
+Trace proof: this outline was produced by a 6-node generated workflow.",,,,,

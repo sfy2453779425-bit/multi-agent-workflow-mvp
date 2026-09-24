@@ -1,0 +1,32 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "Builder",
+  "case_id": "outfit_03",
+  "run": 2,
+  "source_file": "builder_runs/outfit_03/run_2.json",
+  "response_sha256": "9ed6a8a1e67c7f541fa542310db60a8c5ee5f0ecfa85637d8c26499d094fd5c8",
+  "evaluation": {
+    "case_id": "outfit_03",
+    "required_fields_present": true,
+    "required_fields_missing": [],
+    "context_usage": true,
+    "constraint_satisfaction": true,
+    "completeness": true,
+    "unsupported_fact_flags": [],
+    "human_evaluation_status": "pending",
+    "parsed": {
+      "selected_items": [
+        "B001",
+        "B002",
+        "B003",
+        "B004"
+      ],
+      "unknown_inventory_ids": [],
+      "unsupplied_recommendations": [],
+      "rain_unsafe_inventory_ids": [],
+      "weather_used": true
+    },
+    "ground_truth_correctness": "not_applicable",
+    "open_language_quality": "human_evaluation_required"
+  }
+}

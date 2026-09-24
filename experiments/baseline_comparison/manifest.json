@@ -1,0 +1,125 @@
+{
+  "experiment_id": "baseline_pilot_20260916_010827",
+  "created_at": "2026-09-16T01:08:28.040838+00:00",
+  "python_version": "3.14.5",
+  "test_count": 68,
+  "test_command": "python -B -m unittest discover -s tests -q",
+  "workflow_runtime_version": "workflow-runtime-contract-v1",
+  "workflow_schema_version": 1,
+  "runtime_source_sha256": "fdc99820363cde08c27ec6b788123450fd0708933704c405f9339d49d80d62c5",
+  "git_head": "487a761b76147c5158215529b3c3d5ba18fd81d7",
+  "git_worktree_state": "dirty",
+  "git_status": [
+    "M .gitignore",
+    " M README.md",
+    " M configs/outfit_workflow.json",
+    " M deliverables/forms/form2_requirements.txt",
+    " M deliverables/forms/form3_completed.txt",
+    " M deliverables/forms/form3_uiux.txt",
+    " M deliverables/forms/form4_completed.txt",
+    " M deliverables/forms/form4_detaildesign.txt",
+    " M deliverables/forms/form5_completed.txt",
+    " M deliverables/forms/sw3_plan.txt",
+    " M experiments/harness_comparison.py",
+    " M src/agent_builder/__init__.py",
+    " M src/agent_builder/engine.py",
+    " M src/agent_builder/template_builder.py",
+    " M src/agent_builder/workflow.py",
+    " M tools/dev/run_harness_comparison.cmd",
+    " M verify_project.py",
+    " M web_app.py",
+    "?? .codex-audio-transcribe/",
+    "?? .codex-finalizer/",
+    "?? .codex-presentation-build/",
+    "?? .playwright-mcp/",
+    "?? deliverables/audio_transcripts/",
+    "?? deliverables/forms/hwp_handoff/",
+    "?? deliverables/forms/patent_idea_summary_kr.txt",
+    "?? deliverables/forms/patent_specification_draft_kr.txt",
+    "?? deliverables/forms/patent_specification_submission.docx",
+    "?? deliverables/forms/revised_docs/",
+    "?? deliverables/nene_agent_builder_poster_panel_preview.png",
+    "?? deliverables/poster_assets/",
+    "?? deliverables/poster_panel_content_draft_kr.md",
+    "?? deliverables/poster_required_confirmation_zh.md",
+    "?? deliverables/presentation_submission/",
+    "?? experiments/baseline_comparison/",
+    "?? src/agent_builder/node_registry.py",
+    "?? src/agent_builder/workflow_runtime.py",
+    "?? src/agent_builder/workflow_schema.py",
+    "?? tests/test_baseline_experiment.py",
+    "?? tests/test_workflow_runtime.py"
+  ],
+  "template_versions": {
+    "outfit_01": {
+      "path": "configs\\builder_templates\\outfit_recommendation_template.json",
+      "sha256": "0bf77f1a065bd14904c94b98a087614f274ca9fa28b8bdb8d22ce7208e4c0242"
+    },
+    "presentation_01": {
+      "path": "configs\\builder_templates\\presentation_planning_template.json",
+      "sha256": "519e4261f75362885c52584e161fc4109f42f5fc30996157b3113f01c93b01e2"
+    },
+    "customer_support_01": {
+      "path": "configs\\builder_templates\\customer_support_ticket_template.json",
+      "sha256": "71467e82b03ef261351a88f16503e97cef1969454f5de3c7524c648ad5e7f04f"
+    }
+  },
+  "fixture_versions": {
+    "outfit_01": {
+      "version": "outfit-2026-09-16-v1",
+      "sha256": "3e3b3417dce7482094d73e04368f2c1420c3548bb89e3d3bab0ac46c6b521678"
+    },
+    "presentation_01": {
+      "version": "presentation-2026-09-16-v1",
+      "sha256": "4d8bb302d1ea4dd207a13d02414e03069c7714406b8e85b85cb1bc8a32928aef"
+    },
+    "customer_support_01": {
+      "version": "customer-support-2026-09-16-v1",
+      "sha256": "19b5bbc3f56d9f049b2a93a7406cb0403a00bd5355f336f62fe448c0d0e33bb4"
+    }
+  },
+  "prompt_versions": {
+    "outfit_01": {
+      "version": "prompt-v1",
+      "sha256": "81e6e0b7a3369a911d83c3cadf025045ef382bcf82f55a94a79c131bf90f89c4"
+    },
+    "presentation_01": {
+      "version": "prompt-v1",
+      "sha256": "d338d253b192dd3d8024754620592e1bef14c87588067d7d0253b8005b79c715"
+    },
+    "customer_support_01": {
+      "version": "prompt-v1",
+      "sha256": "5a5bc084fec6b225d8f369b804c7900ff34db52969d0e45ee25af1b8a09a7b1a"
+    }
+  },
+  "cases": [
+    "outfit_01",
+    "presentation_01",
+    "customer_support_01"
+  ],
+  "systems": [
+    "ChatGPT",
+    "Claude",
+    "Builder"
+  ],
+  "runs_per_case": 3,
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "fixture_files": {
+    "outfit_01": "fixtures/outfit/outfit_01.json",
+    "presentation_01": "fixtures/presentation/presentation_01.json",
+    "customer_support_01": "fixtures/customer_support/customer_support_01.json"
+  },
+  "prompt_files": {
+    "chatgpt": {
+      "outfit_01": "prompts/chatgpt/outfit_01.md",
+      "presentation_01": "prompts/chatgpt/presentation_01.md",
+      "customer_support_01": "prompts/chatgpt/customer_support_01.md"
+    },
+    "claude": {
+      "outfit_01": "prompts/claude/outfit_01.md",
+      "presentation_01": "prompts/claude/presentation_01.md",
+      "customer_support_01": "prompts/claude/customer_support_01.md"
+    }
+  }
+}

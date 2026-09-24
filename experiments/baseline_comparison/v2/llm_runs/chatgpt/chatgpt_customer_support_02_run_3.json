@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "case_id": "customer_support_02",
+  "fixture_version": "customer-support-2026-09-16-v2-refund",
+  "prompt_version": "prompt-v1",
+  "run": 3,
+  "provider": "ChatGPT",
+  "model_name": "GPT-5.6 Sol",
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "timestamp": "2026-09-17T00:00:35.9183872+09:00",
+  "prompt_file": "prompts/chatgpt/customer_support_02.md",
+  "prompt_sha256": "b4fe1442b7fa86f86721f465453ec14b22b44e3f8da0a4cdbfc273786ad42377",
+  "response": "{\n  \"category\": {\n    \"id\": \"refund\",\n    \"label\": \"Refund / Return\"\n  },\n  \"owner_team\": \"Billing Support\",\n  \"priority\": \"P2\",\n  \"sla\": \"1 business day\",\n  \"policy_application\": \"The request matches the refund category because the customer is requesting a refund and reports being charged twice. Under the frozen policy, refund eligibility and payment transaction status must be checked before routing for refund processing. The supplied data does not establish whether the refund is eligible or whether the duplicate charge is confirmed.\",\n  \"next_actions\": [\n    \"Check refund eligibility.\",\n    \"Verify payment transaction status.\",\n    \"Route to Billing Support if refund criteria are met.\"\n  ]\n}",
+  "run_id": "chatgpt_customer_support_02_3"
+}

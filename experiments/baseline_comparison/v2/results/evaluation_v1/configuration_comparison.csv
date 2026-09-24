@@ -1,0 +1,4 @@
+comparison,system_or_scenario,case_id,action_count,changed_fields,configuration_errors,notes
+initial_configuration,manual_harness,all_three_cases,17,,,Count of explicit action definitions in criteria.json.
+initial_configuration,builder,all_three_cases,3,,,"Preset, workflow name, and user request are the defined touch points."
+reuse_configuration,travel_to_commute,outfit_01_to_commute_template,3,preset;workflow_name;query,,Changed visible fields are reported; user time and efficiency are not measured.

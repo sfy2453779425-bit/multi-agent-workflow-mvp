@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "case_id": "customer_support_01",
+  "fixture_version": "customer-support-2026-09-16-v1",
+  "prompt_version": "prompt-v1",
+  "run": 3,
+  "provider": "ChatGPT",
+  "model_name": "GPT-5.6 Sol",
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "timestamp": "2026-09-16T23:56:56.3244173+09:00",
+  "prompt_file": "prompts/chatgpt/customer_support_01.md",
+  "prompt_sha256": "5a5bc084fec6b225d8f369b804c7900ff34db52969d0e45ee25af1b8a09a7b1a",
+  "response": "{\n  \"category\": \"delivery\",\n  \"owner_team\": \"Logistics Support\",\n  \"priority\": \"P2\",\n  \"sla\": \"1 business day\",\n  \"route\": \"Logistics Support\",\n  \"policy_application\": \"The primary issue is a late delivery, so apply the Delivery / Shipping policy first. Confirm the order number and tracking status. If the delivery is delayed beyond the promised window, open a logistics investigation ticket and provide a status follow-up. The customer also asks about a refund, but refund eligibility cannot be determined from the supplied information. If refund criteria are met after eligibility and payment status are checked, route the refund portion to Billing Support.\",\n  \"next_actions\": [\n    \"Confirm order number and tracking status.\",\n    \"Determine whether the delivery is delayed beyond the promised window.\",\n    \"Open a logistics investigation ticket if the promised delivery window has been exceeded.\",\n    \"Send the customer a delivery status response.\",\n    \"Check refund eligibility and payment transaction status.\",\n    \"Route to Billing Support if the refund criteria are met.\"\n  ],\n  \"missing_information\": [\n    \"Order number.\",\n    \"Current tracking status.\",\n    \"Promised delivery window.\",\n    \"Refund eligibility details.\",\n    \"Payment transaction status.\"\n  ]\n}",
+  "run_id": "chatgpt_customer_support_01_3"
+}

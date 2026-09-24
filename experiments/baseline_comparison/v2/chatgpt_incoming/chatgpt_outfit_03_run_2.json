@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "case_id": "outfit_03",
+  "fixture_version": "outfit-2026-09-16-v2-commute",
+  "prompt_version": "prompt-v1",
+  "run": 2,
+  "provider": "ChatGPT",
+  "model_name": "GPT-5.6 Sol",
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "timestamp": "2026-09-17T00:37:19.2312102+09:00",
+  "prompt_file": "prompts/chatgpt/outfit_03.md",
+  "prompt_sha256": "cee1b96f6765e7e9d8b12b3b771aa7b975748cf351f0f57ac8b3325b39cfcde7",
+  "response": "날씨 요약\n\n- 날씨: 흐림\n- 기온: 최저 6°C / 최고 14°C\n- 강수확률: 20%\n- 비 대비 기준인 40% 미만이므로 별도의 우천용 아이템은 필요하지 않습니다.\n\n추천 출근 포멀 코디\n\n1. 네이비 블레이저 (B001) — 기온이 낮아 출근길 보온에 적합하고, 포멀 스타일에 맞습니다.\n2. 화이트 셔츠 (B003) — 블레이저와 함께 기본적인 포멀 출근 조합을 구성할 수 있습니다.\n3. 그레이 슬랙스 (B002) — 네이비 블레이저와 조합하기 좋으며, 포멀 스타일과 보온 수준도 적절합니다.\n4. 블랙 로퍼 (B004) — 포멀 출근용 신발로 적합합니다. 다만 비에는 적합하지 않지만, 강수확률이 20%라 현재 조건에서는 선택 가능합니다.\n\n최종 조합:\n화이트 셔츠 + 네이비 블레이저 + 그레이 슬랙스 + 블랙 로퍼\n\n최저기온이 6°C라 아침·저녁에는 다소 쌀쌀할 수 있지만, 제공된 보유 의류만 기준으로 보면 이 조합이 가장 적합합니다.",
+  "run_id": "chatgpt_outfit_03_2"
+}

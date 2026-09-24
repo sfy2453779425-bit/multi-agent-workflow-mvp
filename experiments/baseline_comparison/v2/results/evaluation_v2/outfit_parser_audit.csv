@@ -1,0 +1,10 @@
+case_id,run,run_id,precipitation_probability,selected_items,excluded_items,mentioned_only_items,ambiguous_items,parse_status,recommendation_order,inventory_only_compliant,rain_unsafe_inventory_ids,weather_used,required_fields_present,constraint_satisfaction,completeness
+outfit_01,1,chatgpt_outfit_01_1,20,"[""A003"", ""A005"", ""A001"", ""A002"", ""A006""]",[],"[""A004""]",[],ok,"[""A003"", ""A005"", ""A001"", ""A002"", ""A006""]",True,[],True,False,True,False
+outfit_01,2,chatgpt_outfit_01_2,20,"[""A003"", ""A005"", ""A002"", ""A001"", ""A006""]",[],"[""A004""]",[],ok,"[""A003"", ""A005"", ""A002"", ""A001"", ""A006""]",True,[],True,False,True,False
+outfit_01,3,chatgpt_outfit_01_3,20,"[""A003"", ""A001"", ""A002"", ""A005"", ""A006""]",[],"[""A004""]",[],ok,"[""A003"", ""A001"", ""A002"", ""A005"", ""A006""]",True,[],True,True,True,True
+outfit_02,1,chatgpt_outfit_02_1,80,"[""A003"", ""A001"", ""A002"", ""A005""]","[""A006"", ""A004""]",[],[],ok,"[""A003"", ""A001"", ""A002"", ""A005""]",True,[],True,False,True,False
+outfit_02,2,chatgpt_outfit_02_2,80,"[""A003"", ""A001"", ""A002"", ""A005""]","[""A006""]",[],[],ok,"[""A003"", ""A001"", ""A002"", ""A005""]",True,[],True,False,True,False
+outfit_02,3,chatgpt_outfit_02_3,80,"[""A003"", ""A001"", ""A002"", ""A005""]","[""A006"", ""A004""]",[],[],ok,"[""A003"", ""A001"", ""A002"", ""A005""]",True,[],True,True,True,True
+outfit_03,1,chatgpt_outfit_03_1,20,"[""B001"", ""B002"", ""B003"", ""B004""]",[],[],[],ok,"[""B001"", ""B002"", ""B003"", ""B004""]",True,[],True,False,True,False
+outfit_03,2,chatgpt_outfit_03_2,20,"[""B001"", ""B003"", ""B002"", ""B004""]",[],[],[],ok,"[""B001"", ""B003"", ""B002"", ""B004""]",True,[],True,False,True,False
+outfit_03,3,chatgpt_outfit_03_3,20,"[""B001"", ""B002"", ""B003"", ""B004""]",[],[],[],ok,"[""B001"", ""B002"", ""B003"", ""B004""]",True,[],True,False,True,False

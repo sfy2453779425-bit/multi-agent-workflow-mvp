@@ -1,0 +1,14 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "ChatGPT",
+  "case_id": "customer_support_01",
+  "run": 3,
+  "source_file": "llm_runs/chatgpt/chatgpt_customer_support_01_run_3.json",
+  "response_sha256": "ffdc4fb1c3cb9431b7b967c95b96ef28d2825bc28357c72fe4dc8e2dd8d27e0a",
+  "parsed": {
+    "category": "delivery",
+    "route": "Logistics Support",
+    "priority": "P2",
+    "sla": "1 business day"
+  }
+}

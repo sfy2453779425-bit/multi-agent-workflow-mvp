@@ -1,0 +1,31 @@
+case_id,run_id,old_selected_items,new_selected_items,old_excluded_items,new_excluded_items,old_constraint_satisfaction,new_constraint_satisfaction,old_completeness,new_completeness,old_repeatability_contribution,new_repeatability_contribution,changed,reason
+customer_support_01,chatgpt_customer_support_01_1,[],[],[],[],True,True,True,True,True,True,False,no change
+customer_support_01,chatgpt_customer_support_01_2,[],[],[],[],True,True,True,True,True,True,False,no change
+customer_support_01,chatgpt_customer_support_01_3,[],[],[],[],True,True,True,True,True,True,False,no change
+customer_support_02,chatgpt_customer_support_02_1,[],[],[],[],True,True,True,True,True,True,False,no change
+customer_support_02,chatgpt_customer_support_02_2,[],[],[],[],True,True,True,True,True,True,False,no change
+customer_support_02,chatgpt_customer_support_02_3,[],[],[],[],True,True,True,True,True,True,False,no change
+customer_support_03,chatgpt_customer_support_03_1,[],[],[],[],True,True,True,True,True,True,False,no change
+customer_support_03,chatgpt_customer_support_03_2,[],[],[],[],True,True,True,True,True,True,False,no change
+customer_support_03,chatgpt_customer_support_03_3,[],[],[],[],True,True,True,True,True,True,False,no change
+customer_support_04,chatgpt_customer_support_04_1,[],[],[],[],True,True,True,True,True,True,False,no change
+customer_support_04,chatgpt_customer_support_04_2,[],[],[],[],True,True,True,True,True,True,False,no change
+customer_support_04,chatgpt_customer_support_04_3,[],[],[],[],True,True,True,True,True,True,False,no change
+customer_support_05,chatgpt_customer_support_05_1,[],[],[],[],True,True,True,True,True,True,False,no change
+customer_support_05,chatgpt_customer_support_05_2,[],[],[],[],True,True,True,True,True,True,False,no change
+customer_support_05,chatgpt_customer_support_05_3,[],[],[],[],True,True,True,True,True,True,False,no change
+outfit_01,chatgpt_outfit_01_1,"[""A003"", ""A005"", ""A001"", ""A002"", ""A006"", ""A004""]","[""A003"", ""A005"", ""A001"", ""A002"", ""A006""]",[],[],True,True,False,False,False,False,True,selected_items semantic classification changed
+outfit_01,chatgpt_outfit_01_2,"[""A003"", ""A005"", ""A002"", ""A001"", ""A006"", ""A004""]","[""A003"", ""A005"", ""A002"", ""A001"", ""A006""]",[],[],True,True,False,False,False,False,True,selected_items semantic classification changed
+outfit_01,chatgpt_outfit_01_3,"[""A003"", ""A001"", ""A002"", ""A005"", ""A006"", ""A004""]","[""A003"", ""A001"", ""A002"", ""A005"", ""A006""]",[],[],True,True,True,True,False,False,True,selected_items semantic classification changed
+outfit_02,chatgpt_outfit_02_1,"[""A003"", ""A001"", ""A002"", ""A005"", ""A006"", ""A004""]","[""A003"", ""A001"", ""A002"", ""A005""]",[],"[""A006"", ""A004""]",False,True,False,False,False,False,True,selected_items semantic classification changed; excluded_items was added or changed; constraint_satisfaction changed
+outfit_02,chatgpt_outfit_02_2,"[""A003"", ""A001"", ""A002"", ""A005"", ""A006""]","[""A003"", ""A001"", ""A002"", ""A005""]",[],"[""A006""]",False,True,False,False,False,False,True,selected_items semantic classification changed; excluded_items was added or changed; constraint_satisfaction changed
+outfit_02,chatgpt_outfit_02_3,"[""A003"", ""A001"", ""A002"", ""A005"", ""A006"", ""A004""]","[""A003"", ""A001"", ""A002"", ""A005""]",[],"[""A006"", ""A004""]",False,True,False,True,False,False,True,selected_items semantic classification changed; excluded_items was added or changed; constraint_satisfaction changed; completeness changed
+outfit_03,chatgpt_outfit_03_1,"[""B001"", ""B002"", ""B003"", ""B004""]","[""B001"", ""B002"", ""B003"", ""B004""]",[],[],True,True,False,False,False,False,False,no change
+outfit_03,chatgpt_outfit_03_2,"[""B001"", ""B003"", ""B002"", ""B004""]","[""B001"", ""B003"", ""B002"", ""B004""]",[],[],True,True,False,False,False,False,False,no change
+outfit_03,chatgpt_outfit_03_3,"[""B001"", ""B002"", ""B003"", ""B004""]","[""B001"", ""B002"", ""B003"", ""B004""]",[],[],True,True,False,False,False,False,False,no change
+presentation_01,chatgpt_presentation_01_1,[],[],[],[],True,True,True,True,True,True,False,no change
+presentation_01,chatgpt_presentation_01_2,[],[],[],[],True,True,True,True,True,True,False,no change
+presentation_01,chatgpt_presentation_01_3,[],[],[],[],True,True,True,True,True,True,False,no change
+presentation_02,chatgpt_presentation_02_1,[],[],[],[],True,True,True,True,True,True,False,no change
+presentation_02,chatgpt_presentation_02_2,[],[],[],[],True,True,True,True,True,True,False,no change
+presentation_02,chatgpt_presentation_02_3,[],[],[],[],True,True,True,True,True,True,False,no change

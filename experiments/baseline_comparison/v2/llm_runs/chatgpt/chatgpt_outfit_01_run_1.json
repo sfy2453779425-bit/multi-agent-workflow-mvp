@@ -1,0 +1,16 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "case_id": "outfit_01",
+  "fixture_version": "outfit-2026-09-16-v1",
+  "prompt_version": "prompt-v1",
+  "run": 1,
+  "provider": "ChatGPT",
+  "model_name": "GPT-5.6 Sol",
+  "sampling_parameters": "unavailable",
+  "exact_backend_revision": "unavailable",
+  "timestamp": "2026-09-17T00:25:37.7220357+09:00",
+  "prompt_file": "prompts/chatgpt/outfit_01.md",
+  "prompt_sha256": "81e6e0b7a3369a911d83c3cadf025045ef382bcf82f55a94a79c131bf90f89c4",
+  "response": "날씨 요약: 2026년 9월 23일 칭다오, 흐림, 최저 10°C / 최고 21°C, 강수확률 **20%**입니다.\n\n1. 라이트 그레이 바람막이 (A003)\n   - 가벼운 아우터라 10~21°C의 일교차에 대응하기 좋습니다.\n   - rain_ok: true라 약한 비 가능성에도 적합합니다.\n\n2. 화이트 반팔 티셔츠 (A005)\n   - 낮 최고기온 21°C일 때 단독으로 입거나 바람막이 안에 레이어드하기 좋습니다.\n   - 캐주얼 스타일입니다.\n\n3. 블랙 후드티 (A001)\n   - 최저기온이 10°C이므로 아침·저녁에 활용하기 좋습니다.\n   - 캐주얼 스타일이고 rain_ok: true입니다.\n\n4. 네이비 조거 팬츠 (A002)\n   - 중간 보온감이라 여행 중 쌀쌀한 시간대에 무난합니다.\n   - 스트릿 계열이지만 위 아이템들과 캐주얼하게 조합 가능합니다.\n\n5. 블랙 캔버스 스니커즈 (A006)\n   - 전체 코디와 색상 조합은 무난합니다.\n   - 다만 rain_ok: false이므로 실제 비가 올 경우에는 주의가 필요합니다.\n\n추천 조합:\n화이트 반팔 티셔츠 + 네이비 조거 팬츠 + 라이트 그레이 바람막이 + 블랙 캔버스 스니커즈.\n\n아침·저녁이 특히 쌀쌀하면 반팔 대신 블랙 후드티를 선택하는 편이 적합합니다. **블랙 패딩(A004)**은 보온 등급이 heavy라 이번 10~21°C 조건에서는 우선순위를 낮게 잡았습니다.",
+  "run_id": "chatgpt_outfit_01_1"
+}

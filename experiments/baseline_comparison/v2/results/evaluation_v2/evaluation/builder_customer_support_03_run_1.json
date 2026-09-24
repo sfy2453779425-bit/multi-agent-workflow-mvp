@@ -1,0 +1,25 @@
+{
+  "experiment_id": "builder_v2_pilot_20260916",
+  "system": "Builder",
+  "case_id": "customer_support_03",
+  "run": 1,
+  "source_file": "builder_runs/customer_support_03/run_1.json",
+  "response_sha256": "3906d5d91ee7aaab906659dde1e2ffedb37089daa19263449c6a68c5215f7064",
+  "evaluation": {
+    "case_id": "customer_support_03",
+    "required_fields_present": true,
+    "required_fields_missing": [],
+    "context_usage": true,
+    "constraint_satisfaction": true,
+    "completeness": true,
+    "unsupported_fact_flags": [],
+    "human_evaluation_status": "pending",
+    "parsed": {
+      "category": "account",
+      "route": "Account Support",
+      "priority": "P3",
+      "sla": "2 business days"
+    },
+    "ground_truth_correctness": true
+  }
+}
